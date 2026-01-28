@@ -5,7 +5,7 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="relative min-h-screen w-full overflow-hidden paper-texture">
+      <section className="relative min-h-screen w-full overflow-hidden">
         <div className="absolute inset-0">
           <Image
             src="/images/lovable_hero.jpg"
@@ -14,7 +14,8 @@ export default function Page() {
             className="w-full h-full object-cover opacity-90"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-background via-background/40 to-transparent" />
         </div>
         <div className="relative z-10 min-h-screen flex flex-col justify-center items-center text-center px-6 pt-20">
           <div className="max-w-3xl w-full px-8 py-12 md:px-12 md:py-16 bg-foreground/60 backdrop-blur-md rounded-lg border border-foreground/20 shadow-lg animate-fade-in-up">
@@ -30,7 +31,7 @@ export default function Page() {
                 ✨ Hi friend, welcome to the Midnight Teahouse ✨
               </p>
               <p className="font-body text-base md:text-lg text-background/85 leading-relaxed">
-                We're delighted to invite you into our beloved evening world—cozy nights of tea, live music, and slow, intimate connections, hosted in a beautiful home in SOMA.
+                We're delighted to invite you into our beloved evening world—cozy nights of tea, live music, and slow, intimate connections.
               </p>
             </div>
             <div className="mt-12 animate-fade-in-up-delay-2">
