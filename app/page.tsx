@@ -61,16 +61,28 @@ export default function Page() {
           </div>
           <div className="grid md:grid-cols-2 gap-16 items-center max-w-4xl mx-auto">
             <div className="text-center">
-              <div className="w-48 md:w-64 mx-auto mb-8 animate-float-slow h-48 md:h-64 bg-muted/20 rounded-lg flex items-center justify-center">
-                <span className="text-6xl">☕</span>
+              <div className="w-48 md:w-64 mx-auto mb-8 animate-float-slow h-48 md:h-64 flex items-center justify-center">
+                <Image
+                  src="/images/teacup-illustration-lovable.png"
+                  alt="Steaming teacup illustration"
+                  width={256}
+                  height={256}
+                  className="w-full h-full object-contain"
+                />
               </div>
               <p className="font-body text-muted-foreground leading-relaxed">
                 The night will be vibrant and social, and also welcoming of quieter, reflective moments to connect with yourself.
               </p>
             </div>
             <div className="text-center">
-              <div className="w-48 md:w-64 mx-auto mb-8 animate-drift h-48 md:h-64 bg-muted/20 rounded-lg flex items-center justify-center">
-                <span className="text-6xl">🏮</span>
+              <div className="w-48 md:w-64 mx-auto mb-8 animate-drift h-48 md:h-64 flex items-center justify-center">
+                <Image
+                  src="/images/lanterns-illustration-lovable.png"
+                  alt="Glowing lanterns illustration"
+                  width={256}
+                  height={256}
+                  className="w-full h-full object-contain"
+                />
               </div>
               <p className="font-body text-muted-foreground leading-relaxed">
                 It's our small gesture towards reintroducing romance and beauty back into San Francisco's nightlife.
