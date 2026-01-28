@@ -9,6 +9,8 @@
     - "Update header styling and add custom fonts"
     - "Add hover animations to navigation"
     - "Fix font loading issue"
+- **Push after committing**: After creating a commit, push the changes to the remote repository.
+  - Use: `git push` (or `git push origin <branch-name>` if needed)
 
 ## Guidelines
 
