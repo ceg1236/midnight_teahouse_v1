@@ -18,7 +18,7 @@ export default function Page() {
           <div className="absolute bottom-0 left-0 right-0 h-64 hero-bottom-fade" />
         </div>
         <div className="relative z-10 min-h-screen flex flex-col justify-center items-center text-center px-6 pt-20">
-          <div className="max-w-3xl w-full px-8 py-12 md:px-12 md:py-16 bg-foreground/60 backdrop-blur-md rounded-lg border border-foreground/20 shadow-lg animate-fade-in-up">
+          <div className="max-w-3xl w-full px-8 py-12 md:px-12 md:py-16 bg-foreground/60 backdrop-blur-lg rounded-lg border border-foreground/20 shadow-lg animate-fade-in-up">
             <div className="max-w-2xl mx-auto">
               <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl text-background leading-tight mb-8">
                 An Evening at the
