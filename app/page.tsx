@@ -17,31 +17,33 @@ export default function Page() {
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/30" />
         </div>
         <div className="relative z-10 min-h-screen flex flex-col justify-center items-center text-center px-6 pt-20">
-          <div className="max-w-2xl animate-fade-in-up">
-            <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl text-foreground leading-tight mb-8">
-              An Evening at the
-              <br />
-              <span className="italic">Enchanted Teahouse</span>
-            </h1>
-          </div>
-          <div className="max-w-xl animate-fade-in-up-delay">
-            <p className="font-body text-lg md:text-xl text-foreground/80 leading-relaxed mb-4">
-              ✨ Hi friend, welcome to the Midnight Teahouse ✨
-            </p>
-            <p className="font-body text-base md:text-lg text-muted-foreground leading-relaxed">
-              We're delighted to invite you into our beloved evening world—cozy nights of tea, live music, and slow, intimate connections, hosted in a beautiful home in SOMA.
-            </p>
-          </div>
-          <div className="mt-12 animate-fade-in-up-delay-2">
-            <Link
-              href="/reservations"
-              className="inline-block px-8 py-4 border border-foreground/30 text-foreground font-body text-lg tracking-wide rounded-sm transition-all duration-300 hover:bg-foreground hover:text-background"
-            >
-              request an evening →
-            </Link>
+          <div className="max-w-3xl w-full px-8 py-12 md:px-12 md:py-16 bg-foreground/60 backdrop-blur-md rounded-lg border border-foreground/20 shadow-lg animate-fade-in-up">
+            <div className="max-w-2xl mx-auto">
+              <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl text-background leading-tight mb-8">
+                An Evening at the
+                <br />
+                <span className="italic">Enchanted Teahouse</span>
+              </h1>
+            </div>
+            <div className="max-w-xl mx-auto animate-fade-in-up-delay">
+              <p className="font-body text-lg md:text-xl text-background/95 leading-relaxed mb-4">
+                ✨ Hi friend, welcome to the Midnight Teahouse ✨
+              </p>
+              <p className="font-body text-base md:text-lg text-background/85 leading-relaxed">
+                We're delighted to invite you into our beloved evening world—cozy nights of tea, live music, and slow, intimate connections, hosted in a beautiful home in SOMA.
+              </p>
+            </div>
+            <div className="mt-12 animate-fade-in-up-delay-2">
+              <Link
+                href="/reservations"
+                className="inline-block px-8 py-4 bg-background/90 hover:bg-background text-foreground font-body text-lg tracking-wide rounded-sm transition-all duration-300 shadow-md"
+              >
+                request an evening →
+              </Link>
+            </div>
           </div>
           <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-float-slow">
-            <span className="font-body text-sm text-muted-foreground">scroll</span>
+            <span className="font-body text-sm text-background drop-shadow-lg">scroll</span>
           </div>
         </div>
       </section>
