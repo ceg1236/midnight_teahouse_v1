@@ -14,8 +14,8 @@ export default function Page() {
             className="w-full h-full object-cover opacity-90"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-background via-background/40 to-transparent" />
+          <div className="absolute inset-0 hero-gradient-fade" />
+          <div className="absolute bottom-0 left-0 right-0 h-64 hero-bottom-fade" />
         </div>
         <div className="relative z-10 min-h-screen flex flex-col justify-center items-center text-center px-6 pt-20">
           <div className="max-w-3xl w-full px-8 py-12 md:px-12 md:py-16 bg-foreground/60 backdrop-blur-md rounded-lg border border-foreground/20 shadow-lg animate-fade-in-up">
@@ -42,9 +42,6 @@ export default function Page() {
                 request an evening →
               </Link>
             </div>
-          </div>
-          <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-float-slow">
-            <span className="font-body text-sm text-background drop-shadow-lg">scroll</span>
           </div>
         </div>
       </section>
