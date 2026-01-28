@@ -5,19 +5,18 @@ import { GeistMono } from 'geist/font/mono'
 import { Navbar } from './components/nav'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
-import Footer from './components/footer'
 import { baseUrl } from './sitemap'
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: 'Next.js Portfolio Starter',
-    template: '%s | Next.js Portfolio Starter',
+    default: 'Midnight Teahouse',
+    template: '%s | Midnight Teahouse',
   },
-  description: 'This is my portfolio.',
+  description: 'An evening at the Enchanted Teahouse - cozy and warm, intimate connections in SOMA.',
   openGraph: {
-    title: 'My Portfolio',
-    description: 'This is my portfolio.',
+    title: 'Midnight Teahouse',
+    description: 'An evening at the Enchanted Teahouse - cozy and warm, intimate connections in SOMA.',
     url: baseUrl,
     siteName: 'My Portfolio',
     locale: 'en_US',
@@ -46,20 +45,15 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cx(
-        'text-black bg-white dark:text-white dark:bg-black',
-        GeistSans.variable,
-        GeistMono.variable
-      )}
+      className="text-foreground bg-background"
     >
-      <body className="antialiased max-w-xl mx-4 mt-8 lg:mx-auto">
-        <main className="flex-auto min-w-0 mt-6 flex flex-col px-2 md:px-0">
+      <body className="antialiased">
+        <div id="root">
           <Navbar />
           {children}
-          <Footer />
-          <Analytics />
-          <SpeedInsights />
-        </main>
+        </div>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )
