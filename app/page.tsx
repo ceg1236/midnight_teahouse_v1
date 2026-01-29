@@ -7,7 +7,7 @@ const iconSlots: IconSlot[] = [
     href: '/tea',
     label: 'Tea',
     imageNight: '/images/Teacup_white_jenny_crop.png',
-    imageDay: '/images/Teacup_blue_jenny_crop_v2.png',
+    imageDay: '/images/teacup_blue_jenny_crop_v2.png',
     position: 'top',
   },
   {
