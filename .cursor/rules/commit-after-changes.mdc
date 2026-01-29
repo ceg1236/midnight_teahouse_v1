@@ -1,0 +1,21 @@
+---
+description: Commit after completing changes per workflow.md
+alwaysApply: true
+---
+
+# Commit After Completing Changes
+
+Follow the project's **workflow.md** commit workflow.
+
+**After completing a logical set of changes** (e.g., a feature, fix, or styling update):
+
+1. **Stage** the relevant files: `git add <files>` (or `git add .` for all).
+2. **Commit** with a short, descriptive message: `git commit -m "Brief description of what changed"`.
+3. **Remind the user** to push: e.g., "Run `git push` when ready" (push may fail from this environment).
+
+Do this as part of the same turn where you finish the changes, not in a follow-up. If the user says "commit after this" or similar, treat it as a reminder to do the above and to add this rule if missing.
+
+**Examples of commit messages:**
+- "Add day/night mode with sun-moon toggle"
+- "Smooth day/night transition: background crossfade, icon fade"
+- "Fix nav link color in day mode"
