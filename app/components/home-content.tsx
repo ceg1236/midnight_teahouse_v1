@@ -16,15 +16,16 @@ export type IconSlot = {
   maxHeight?: number
 }
 
+/* Desktop (md+): absolute positions for circle layout */
 const positionClasses: Record<string, string> = {
-  top: 'top-[12%] left-1/2 -translate-x-1/2',
-  'top-left': 'top-[38%] left-[18%]',
-  'top-right': 'top-[38%] right-[18%]',
-  right: 'top-1/2 -translate-y-1/2 right-[12%]',
-  'bottom-left': 'bottom-[38%] left-[18%]',
-  'bottom-right': 'bottom-[38%] right-[18%]',
-  bottom: 'bottom-[12%] left-1/2 -translate-x-1/2',
-  left: 'top-1/2 -translate-y-1/2 left-[12%]',
+  top: 'md:top-[12%] md:left-1/2 md:-translate-x-1/2',
+  'top-left': 'md:top-[38%] md:left-[18%]',
+  'top-right': 'md:top-[38%] md:right-[18%]',
+  right: 'md:top-1/2 md:-translate-y-1/2 md:right-[12%]',
+  'bottom-left': 'md:bottom-[38%] md:left-[18%]',
+  'bottom-right': 'md:bottom-[38%] md:right-[18%]',
+  bottom: 'md:bottom-[12%] md:left-1/2 md:-translate-x-1/2',
+  left: 'md:top-1/2 md:-translate-y-1/2 md:left-[12%]',
 }
 
 export function HomeContent({ slots }: { slots: IconSlot[] }) {
@@ -44,14 +45,15 @@ export function HomeContent({ slots }: { slots: IconSlot[] }) {
 
   return (
     <section className="relative min-h-screen w-full flex items-center justify-center px-4 py-24">
-      <div className="relative w-full max-w-4xl aspect-square max-h-[min(80vw,70vh)]">
+      {/* Mobile: vertical stack. Desktop (md+): circle with absolute positions */}
+      <div className="w-full max-w-4xl flex flex-col items-center gap-10 md:relative md:aspect-square md:max-h-[min(80vw,70vh)] md:gap-0">
         {slots.map((slot) => {
           const image = displayTheme === 'day' ? slot.imageDay : slot.imageNight
           return (
             <Link
               key={slot.id}
               href={slot.href}
-              className={`absolute flex flex-col items-center gap-2 transition-transform duration-300 hover:scale-110 ${positionClasses[slot.position]}`}
+              className={`flex flex-col items-center gap-2 transition-transform duration-300 hover:scale-110 md:absolute ${positionClasses[slot.position]}`}
             >
               {image ? (
                 <span
