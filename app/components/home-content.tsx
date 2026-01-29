@@ -46,7 +46,7 @@ export function HomeContent({ slots }: { slots: IconSlot[] }) {
   return (
     <section className="relative min-h-screen w-full flex items-center justify-center px-4 py-24">
       {/* Mobile: vertical stack. Desktop (md+): circle with absolute positions */}
-      <div className="w-full max-w-4xl flex flex-col items-center gap-10 md:relative md:aspect-square md:max-h-[min(80vw,70vh)] md:gap-0">
+      <div className="w-full max-w-4xl flex flex-col items-center gap-16 md:relative md:aspect-square md:max-h-[min(80vw,70vh)] md:gap-0">
         {slots.map((slot) => {
           const image = displayTheme === 'day' ? slot.imageDay : slot.imageNight
           return (
@@ -75,7 +75,7 @@ export function HomeContent({ slots }: { slots: IconSlot[] }) {
               ) : (
                 <span className="text-[#f8f6f2]/40 text-2xl">+</span>
               )}
-              <span className="page-icon-label font-cursive text-[#f8f6f2] text-lg md:text-xl whitespace-nowrap">
+              <span className="page-icon-label hidden font-cursive text-[#f8f6f2] text-lg md:block md:text-xl whitespace-nowrap">
                 {slot.label}
               </span>
             </Link>
