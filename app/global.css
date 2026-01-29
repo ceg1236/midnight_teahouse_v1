@@ -290,9 +290,22 @@ h1, h2, h3, h4, h5, h6 {
   background-position: 0 0;
 }
 
-/* Page background: solid blue, light fade to pale blue in bottom 5%, subtle texture */
-/* Plus gradient frame around the whole page outline (all four edges) */
+/* Page background: two layers for smooth day/night crossfade */
 .page-bg {
+  position: relative;
+  min-height: 100vh;
+}
+
+.page-bg-night,
+.page-bg-day {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  transition: opacity 1.2s ease;
+}
+
+.page-bg-night {
+  opacity: 1;
   background:
     linear-gradient(to bottom, rgba(47, 67, 129, 0.35) 0%, transparent 12%),
     linear-gradient(to top, rgba(47, 67, 129, 0.35) 0%, transparent 12%),
@@ -304,8 +317,8 @@ h1, h2, h3, h4, h5, h6 {
   background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, repeat;
 }
 
-/* Day mode: beige base with blue-edged gradient (same frame style as night) */
-[data-theme='day'] .page-bg {
+.page-bg-day {
+  opacity: 0;
   background:
     linear-gradient(to bottom, rgba(47, 67, 129, 0.2) 0%, transparent 12%),
     linear-gradient(to top, rgba(47, 67, 129, 0.2) 0%, transparent 12%),
@@ -317,10 +330,27 @@ h1, h2, h3, h4, h5, h6 {
   background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, repeat;
 }
 
+[data-theme='day'] .page-bg-night {
+  opacity: 0;
+}
+[data-theme='day'] .page-bg-day {
+  opacity: 1;
+}
+
+.page-icon-label {
+  transition: color 0.4s ease;
+}
 [data-theme='day'] .page-icon-label {
   color: #162143;
 }
 
+.site-nav {
+  transition: background-color 0.4s ease;
+}
+.site-nav a,
+.site-nav .site-nav-toggle {
+  transition: color 0.4s ease;
+}
 [data-theme='day'] .site-nav {
   background-color: #f8f6f2;
 }

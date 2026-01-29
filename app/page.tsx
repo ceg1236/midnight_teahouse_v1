@@ -23,15 +23,19 @@ const iconSlots: IconSlot[] = [
     href: '/kora',
     label: 'Music',
     imageNight: '/images/kora_white_jenny_crop_v2.png',
-    imageDay: '/images/kora_blue_jenny_crop.png',
+    imageDay: '/images/kora_blue_jenny_crop_v2.png',
     position: 'bottom',
   },
 ]
 
 export default function Page() {
   return (
-    <div className="min-h-screen page-bg">
-      <HomeContent slots={iconSlots} />
+    <div className="page-bg">
+      <div className="page-bg-night" aria-hidden />
+      <div className="page-bg-day" aria-hidden />
+      <div className="relative z-10">
+        <HomeContent slots={iconSlots} />
+      </div>
     </div>
   )
 }

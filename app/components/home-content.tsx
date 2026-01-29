@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import { useEffect, useState } from 'react'
 import { useTheme } from '../context/theme-context'
 
 export type IconSlot = {
@@ -26,12 +27,24 @@ const positionClasses: Record<string, string> = {
 
 export function HomeContent({ slots }: { slots: IconSlot[] }) {
   const { theme } = useTheme()
+  const [displayTheme, setDisplayTheme] = useState(theme)
+  const [iconOpacity, setIconOpacity] = useState(1)
+
+  useEffect(() => {
+    if (theme === displayTheme) return
+    setIconOpacity(0)
+    const t = setTimeout(() => {
+      setDisplayTheme(theme)
+      setIconOpacity(1)
+    }, 250)
+    return () => clearTimeout(t)
+  }, [theme, displayTheme])
 
   return (
     <section className="relative min-h-screen w-full flex items-center justify-center px-4 py-24">
       <div className="relative w-full max-w-4xl aspect-square max-h-[min(80vw,70vh)]">
         {slots.map((slot) => {
-          const image = theme === 'day' ? slot.imageDay : slot.imageNight
+          const image = displayTheme === 'day' ? slot.imageDay : slot.imageNight
           return (
             <Link
               key={slot.id}
@@ -39,13 +52,18 @@ export function HomeContent({ slots }: { slots: IconSlot[] }) {
               className={`absolute flex flex-col items-center gap-2 transition-transform duration-300 hover:scale-110 ${positionClasses[slot.position]}`}
             >
               {image ? (
-                <Image
-                  src={image}
-                  alt={slot.label}
-                  width={120}
-                  height={120}
-                  className="w-20 h-auto md:w-28 md:h-auto object-contain"
-                />
+                <span
+                  className="inline-block w-20 md:w-28 transition-opacity duration-300"
+                  style={{ opacity: iconOpacity }}
+                >
+                  <Image
+                    src={image}
+                    alt={slot.label}
+                    width={120}
+                    height={120}
+                    className="w-full h-auto object-contain"
+                  />
+                </span>
               ) : (
                 <span className="text-[#f8f6f2]/40 text-2xl">+</span>
               )}

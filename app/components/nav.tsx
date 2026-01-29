@@ -54,7 +54,7 @@ export function Navbar() {
         </Link>
         <Link href="/" className="mx-8">
           <span className="font-cursive text-xl md:text-2xl text-[#f8f6f2]">
-            ✨ midnight teahouse ✨
+            midnight teahouse
           </span>
         </Link>
         <Link
