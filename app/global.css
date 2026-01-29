@@ -301,7 +301,7 @@ h1, h2, h3, h4, h5, h6 {
   position: absolute;
   inset: 0;
   z-index: 0;
-  transition: opacity 1.2s ease;
+  transition: opacity 1.5s ease;
 }
 
 .page-bg-night {
@@ -337,19 +337,31 @@ h1, h2, h3, h4, h5, h6 {
   opacity: 1;
 }
 
+/* Decorative stars on night background only; 10% from border, outside icon area */
+.page-bg-stars {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+[data-theme='day'] .page-bg-stars {
+  opacity: 0;
+}
+
 .page-icon-label {
-  transition: color 0.4s ease;
+  transition: color 1.5s ease;
 }
 [data-theme='day'] .page-icon-label {
   color: #162143;
 }
 
 .site-nav {
-  transition: background-color 0.4s ease;
+  transition: background-color 1.5s ease;
 }
 .site-nav a,
 .site-nav .site-nav-toggle {
-  transition: color 0.4s ease;
+  transition: color 1.5s ease;
 }
 [data-theme='day'] .site-nav {
   background-color: #f8f6f2;
