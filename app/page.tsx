@@ -14,9 +14,10 @@ const iconSlots: IconSlot[] = [
     id: 'candle',
     href: '/candle',
     label: 'Mood',
-    imageNight: '/images/Candle_white_jenny_crop_v2.png',
+    imageNight: '/images/Candle_white_jenny_crop_v3.png',
     imageDay: '/images/Candle_blue_jenny_crop.png',
     position: 'right',
+    maxHeight: 85,
   },
   {
     id: 'kora',
