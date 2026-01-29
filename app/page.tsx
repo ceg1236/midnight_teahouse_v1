@@ -35,6 +35,7 @@ const iconSlots: IconSlot[] = [
     imageNight: '/images/table_white_jenny_crop.png',
     imageDay: '/images/table_blue_jenny_crop.png',
     position: 'left', // 9:00
+    mobileWider: true,
   },
 ]
 

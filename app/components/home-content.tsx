@@ -14,6 +14,8 @@ export type IconSlot = {
   position: string
   /** Optional max height in px (e.g. for taller icons like kora) */
   maxHeight?: number
+  /** On mobile, use wider container (e.g. for table icon) */
+  mobileWider?: boolean
 }
 
 /* Desktop (md+): absolute positions for circle layout */
@@ -53,11 +55,11 @@ export function HomeContent({ slots }: { slots: IconSlot[] }) {
             <Link
               key={slot.id}
               href={slot.href}
-              className={`flex flex-col items-center gap-2 transition-transform duration-300 hover:scale-110 md:absolute ${positionClasses[slot.position]}`}
+              className={`flex min-h-[140px] flex-col items-center justify-center gap-2 transition-transform duration-300 hover:scale-110 md:min-h-0 md:absolute md:justify-start ${positionClasses[slot.position]}`}
             >
               {image ? (
                 <span
-                  className="inline-block w-20 md:w-28 transition-opacity duration-300"
+                  className={`inline-flex h-[120px] w-24 items-center justify-center transition-opacity duration-300 md:h-auto md:w-28 ${slot.mobileWider ? 'w-40' : ''}`}
                   style={{
                     opacity: iconOpacity,
                     maxHeight: slot.maxHeight ? `${slot.maxHeight}px` : undefined,
@@ -68,7 +70,7 @@ export function HomeContent({ slots }: { slots: IconSlot[] }) {
                     alt={slot.label}
                     width={120}
                     height={120}
-                    className="w-full h-auto object-contain"
+                    className="max-h-[120px] w-full object-contain md:max-h-none"
                     style={slot.maxHeight ? { maxHeight: `${slot.maxHeight}px` } : undefined}
                   />
                 </span>
