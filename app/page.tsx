@@ -26,6 +26,14 @@ const iconSlots: IconSlot[] = [
     imageDay: '/images/kora_blue_jenny_crop_v2.png',
     position: 'bottom',
   },
+  {
+    id: 'table',
+    href: '/table',
+    label: 'Table',
+    imageNight: '/images/table_white_jenny_crop.png',
+    imageDay: '/images/table_blue_jenny_crop.png',
+    position: 'left', // 9:00
+  },
 ]
 
 export default function Page() {
