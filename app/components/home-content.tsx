@@ -12,6 +12,8 @@ export type IconSlot = {
   imageNight: string
   imageDay: string
   position: string
+  /** Optional max height in px (e.g. for taller icons like kora) */
+  maxHeight?: number
 }
 
 const positionClasses: Record<string, string> = {
@@ -54,7 +56,10 @@ export function HomeContent({ slots }: { slots: IconSlot[] }) {
               {image ? (
                 <span
                   className="inline-block w-20 md:w-28 transition-opacity duration-300"
-                  style={{ opacity: iconOpacity }}
+                  style={{
+                    opacity: iconOpacity,
+                    maxHeight: slot.maxHeight ? `${slot.maxHeight}px` : undefined,
+                  }}
                 >
                   <Image
                     src={image}
@@ -62,6 +67,7 @@ export function HomeContent({ slots }: { slots: IconSlot[] }) {
                     width={120}
                     height={120}
                     className="w-full h-auto object-contain"
+                    style={slot.maxHeight ? { maxHeight: `${slot.maxHeight}px` } : undefined}
                   />
                 </span>
               ) : (

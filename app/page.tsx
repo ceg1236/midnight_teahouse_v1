@@ -25,6 +25,7 @@ const iconSlots: IconSlot[] = [
     imageNight: '/images/kora_white_jenny_crop_v2.png',
     imageDay: '/images/kora_blue_jenny_crop_v2.png',
     position: 'bottom',
+    maxHeight: 130,
   },
   {
     id: 'table',
