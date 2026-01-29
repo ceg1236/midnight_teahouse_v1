@@ -350,8 +350,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @keyframes star-wiggle {
-  0%, 100% { transform: translate(-50%, -50%) rotate(-0.5deg); }
-  50% { transform: translate(-50%, -50%) rotate(0.5deg); }
+  0%, 100% { transform: translate(-50%, -50%) rotate(-1.5deg); }
+  50% { transform: translate(-50%, -50%) rotate(1.5deg); }
 }
 .star-wiggle {
   animation: star-wiggle 4s ease-in-out infinite;
