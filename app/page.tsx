@@ -1,20 +1,6 @@
-import Image from 'next/image'
+import { BackgroundStars } from './components/background-stars'
 import { HomeContent } from './components/home-content'
 import type { IconSlot } from './components/home-content'
-
-/* Decorative stars: outer 6 at 10% from border; inner 4 near icons but ≥30px away (middle ring) */
-const backgroundStars = [
-  { src: '/images/star1_jenny.png', left: '14%', top: '16%', size: 24, opacity: 0.75 },
-  { src: '/images/star2_jenny.png', left: '86%', top: '12%', size: 20, opacity: 0.7 },
-  { src: '/images/star1_jenny.png', left: '11%', top: '84%', size: 28, opacity: 0.65 },
-  { src: '/images/star2_jenny.png', left: '89%', top: '86%', size: 22, opacity: 0.8 },
-  { src: '/images/star1_jenny.png', left: '16%', top: '52%', size: 26, opacity: 0.7 },
-  { src: '/images/star2_jenny.png', left: '84%', top: '46%', size: 20, opacity: 0.75 },
-  { src: '/images/star1_jenny.png', left: '34%', top: '26%', size: 20, opacity: 0.6 },
-  { src: '/images/star2_jenny.png', left: '68%', top: '28%', size: 22, opacity: 0.65 },
-  { src: '/images/star1_jenny.png', left: '26%', top: '74%', size: 24, opacity: 0.7 },
-  { src: '/images/star2_jenny.png', left: '74%', top: '72%', size: 20, opacity: 0.6 },
-] as const
 
 const iconSlots: IconSlot[] = [
   {
@@ -59,27 +45,7 @@ export default function Page() {
     <div className="page-bg">
       <div className="page-bg-night" aria-hidden />
       <div className="page-bg-day" aria-hidden />
-      <div className="page-bg-stars" aria-hidden>
-        {backgroundStars.map((star, i) => (
-          <Image
-            key={i}
-            src={star.src}
-            alt=""
-            width={star.size}
-            height={star.size}
-            className="star-wiggle absolute w-auto h-auto object-contain"
-            style={{
-              left: star.left,
-              top: star.top,
-              width: star.size,
-              height: star.size,
-              opacity: star.opacity,
-              transform: 'translate(-50%, -50%)',
-              animationDelay: `${i * 0.4}s`,
-            }}
-          />
-        ))}
-      </div>
+      <BackgroundStars />
       <div className="relative z-10">
         <HomeContent slots={iconSlots} />
       </div>
