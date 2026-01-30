@@ -1,3 +1,4 @@
+import { BackgroundPollen } from './components/background-pollen'
 import { BackgroundStars } from './components/background-stars'
 import { HomeContent } from './components/home-content'
 import type { IconSlot } from './components/home-content'
@@ -46,6 +47,7 @@ export default function Page() {
       <div className="page-bg-night" aria-hidden />
       <div className="page-bg-day" aria-hidden />
       <BackgroundStars />
+      <BackgroundPollen />
       <div className="relative z-10">
         <HomeContent slots={iconSlots} />
       </div>

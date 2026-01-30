@@ -349,9 +349,29 @@ h1, h2, h3, h4, h5, h6 {
   opacity: 0;
 }
 
+/* Pollen layer: day mode only (light background) */
+.page-bg-pollen {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+[data-theme='day'] .page-bg-pollen {
+  opacity: 1;
+}
+@keyframes pollen-float {
+  0%, 100% { transform: translate(-50%, -50%) translateY(0) rotate(-2deg); }
+  50% { transform: translate(-50%, -50%) translateY(-6px) rotate(2deg); }
+}
+.pollen-float {
+  animation: pollen-float 5s ease-in-out infinite;
+}
+
 @keyframes star-wiggle {
-  0%, 100% { transform: translate(-50%, -50%) rotate(-1.5deg); }
-  50% { transform: translate(-50%, -50%) rotate(1.5deg); }
+  0%, 100% { transform: translate(-50%, -50%) rotate(-5.5deg); }
+  50% { transform: translate(-50%, -50%) rotate(5.5deg); }
 }
 .star-wiggle {
   animation: star-wiggle 4s ease-in-out infinite;
