@@ -92,10 +92,19 @@ function generateValidPositions(): Array<{ left: string; top: string }> {
     }
   }
 
-  return positions.map(({ x, y }) => ({
+  const result = positions.map(({ x, y }) => ({
     left: `${x * 100}%`,
     top: `${y * 100}%`,
   }))
+  // Ensure we always have one entry per star (pad with fallback if something went wrong)
+  while (result.length < STAR_CONFIG.length) {
+    const angle = (result.length / STAR_CONFIG.length) * Math.PI * 2
+    const r = ICON_CENTER_RADIUS + 0.08 + Math.random() * 0.1
+    const x = Math.max(EDGE_MARGIN, Math.min(1 - EDGE_MARGIN, 0.5 + Math.cos(angle) * r))
+    const y = Math.max(EDGE_MARGIN, Math.min(1 - EDGE_MARGIN, 0.5 + Math.sin(angle) * r))
+    result.push({ left: `${x * 100}%`, top: `${y * 100}%` })
+  }
+  return result
 }
 
 export function BackgroundStars() {
@@ -111,7 +120,10 @@ export function BackgroundStars() {
 
   return (
     <div className="page-bg-stars" aria-hidden>
-      {STAR_CONFIG.map((star, i) => (
+      {STAR_CONFIG.map((star, i) => {
+        const pos = positions[i]
+        if (!pos) return null
+        return (
         <Image
           key={i}
           src={star.src}
@@ -120,8 +132,8 @@ export function BackgroundStars() {
           height={star.size}
           className="star-wiggle absolute w-auto h-auto object-contain"
           style={{
-            left: positions[i].left,
-            top: positions[i].top,
+            left: pos.left,
+            top: pos.top,
             width: star.size,
             height: star.size,
             opacity: star.opacity,
@@ -129,7 +141,8 @@ export function BackgroundStars() {
             animationDelay: `${i * 0.4}s`,
           }}
         />
-      ))}
+        )
+      })}
     </div>
   )
 }
