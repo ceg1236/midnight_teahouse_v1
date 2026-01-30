@@ -21,12 +21,11 @@ const STAR_CONFIG = [
   { src: '/images/star2_jenny.png', size: 22, opacity: 0.72 },
 ] as const
 
-const EDGE_MARGIN = 0.1            // 10% from page border
-const ICON_KEEP_AWAY = 0.1         // stars cannot be within this distance of any icon (10% of viewport)
-const MIN_STAR_DIST = 0.08         // min distance between any two stars (8% of viewport)
-const CANDIDATE_COUNT = 100        // try this many candidates per star; pick the one in most open space
+/* ─── Star placement: seed + jitter (values in 0–1, fraction of viewport) ─── */
+const EDGE_MARGIN = 0.1            // Stars stay at least this far from page edges
+const JITTER = 0.025               // Max random offset per axis on each load (±2.5% for variety)
 
-/** Icon positions on the circle (12, 3, 6, 9 o'clock) in normalized 0–1 coords */
+/** Icon positions (12, 3, 6, 9 o'clock). Seed positions are chosen to stay clear of these. */
 const ICON_CENTERS: Array<[number, number]> = [
   [0.5, 0.12],   // top
   [0.88, 0.5],   // right
@@ -34,103 +33,28 @@ const ICON_CENTERS: Array<[number, number]> = [
   [0.12, 0.5],   // left
 ]
 
-function dist(x1: number, y1: number, x2: number, y2: number) {
-  return Math.hypot(x2 - x1, y2 - y1)
+/** Fixed seed: 14 positions that are well-distributed, clear of icons and edges, and spaced apart. */
+const SEED_POSITIONS: Array<[number, number]> = [
+  [0.15, 0.15], [0.85, 0.15], [0.85, 0.85], [0.15, 0.85],  // corners
+  [0.5, 0.32], [0.68, 0.5], [0.5, 0.68], [0.32, 0.5],    // mid-edges (between icons)
+  [0.3, 0.3], [0.7, 0.3], [0.7, 0.7], [0.3, 0.7],        // inner quadrants
+  [0.5, 0.5], [0.25, 0.25],                               // center + one more
+]
+
+function clamp(x: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, x))
 }
 
-/** Min distance from (x,y) to any icon center; star is invalid if this < ICON_KEEP_AWAY */
-function minDistToIcons(x: number, y: number): number {
-  let d = Infinity
-  for (const [ix, iy] of ICON_CENTERS) {
-    d = Math.min(d, dist(x, y, ix, iy))
-  }
-  return d
-}
-
-/** Distance from (x,y) to the "keep away" boundary of the nearest icon (0 if inside a keep-away zone) */
-function distToIconZones(x: number, y: number): number {
-  return Math.max(0, minDistToIcons(x, y) - ICON_KEEP_AWAY)
-}
-
-/** Distance from (x,y) to nearest page edge (within valid margin zone) */
-function distToNearestEdge(x: number, y: number): number {
-  return Math.min(
-    x - EDGE_MARGIN,
-    1 - EDGE_MARGIN - x,
-    y - EDGE_MARGIN,
-    1 - EDGE_MARGIN - y
-  )
-}
-
-/** Score for a candidate: how much "clear space" it has (min of dist to stars, icon zones, edges). */
-function clearanceScore(
-  x: number,
-  y: number,
-  existing: Array<{ x: number; y: number }>
-): number {
-  let minDist = distToNearestEdge(x, y)
-  minDist = Math.min(minDist, distToIconZones(x, y))
-  for (const p of existing) {
-    minDist = Math.min(minDist, dist(x, y, p.x, p.y))
-  }
-  return minDist
-}
-
-/** Generate positions: valid zone, not too close to any icon (or edges/other stars); prefer open space. */
+/** Seed positions + small random jitter, clamped to [EDGE_MARGIN, 1-EDGE_MARGIN]. */
 function generateValidPositions(): Array<{ left: string; top: string }> {
-  const positions: Array<{ x: number; y: number }> = []
-
-  for (let i = 0; i < STAR_CONFIG.length; i++) {
-    let best: { x: number; y: number; score: number } | null = null
-
-    for (let k = 0; k < CANDIDATE_COUNT; k++) {
-      const x = EDGE_MARGIN + Math.random() * (1 - 2 * EDGE_MARGIN)
-      const y = EDGE_MARGIN + Math.random() * (1 - 2 * EDGE_MARGIN)
-
-      if (minDistToIcons(x, y) < ICON_KEEP_AWAY) continue
-      const tooCloseToStar = positions.some((p) => dist(x, y, p.x, p.y) < MIN_STAR_DIST)
-      if (tooCloseToStar) continue
-
-      const score = clearanceScore(x, y, positions)
-      if (score < MIN_STAR_DIST) continue
-      if (!best || score > best.score) best = { x, y, score }
+  return SEED_POSITIONS.map(([x, y]) => {
+    const jitteredX = clamp(x + (Math.random() * 2 - 1) * JITTER, EDGE_MARGIN, 1 - EDGE_MARGIN)
+    const jitteredY = clamp(y + (Math.random() * 2 - 1) * JITTER, EDGE_MARGIN, 1 - EDGE_MARGIN)
+    return {
+      left: `${jitteredX * 100}%`,
+      top: `${jitteredY * 100}%`,
     }
-
-    if (best) {
-      positions.push({ x: best.x, y: best.y })
-    } else {
-      // Fallback: random point in valid zone (not in any icon keep-away)
-      for (let attempt = 0; attempt < 50; attempt++) {
-        const x = EDGE_MARGIN + Math.random() * (1 - 2 * EDGE_MARGIN)
-        const y = EDGE_MARGIN + Math.random() * (1 - 2 * EDGE_MARGIN)
-        if (minDistToIcons(x, y) >= ICON_KEEP_AWAY) {
-          positions.push({ x, y })
-          break
-        }
-        if (attempt === 49) {
-          const angle = (i / STAR_CONFIG.length) * Math.PI * 2 + Math.random() * 0.5
-          const r = 0.35 + Math.random() * 0.15
-          positions.push({
-            x: Math.max(EDGE_MARGIN, Math.min(1 - EDGE_MARGIN, 0.5 + Math.cos(angle) * r)),
-            y: Math.max(EDGE_MARGIN, Math.min(1 - EDGE_MARGIN, 0.5 + Math.sin(angle) * r)),
-          })
-        }
-      }
-    }
-  }
-
-  const result = positions.map(({ x, y }) => ({
-    left: `${x * 100}%`,
-    top: `${y * 100}%`,
-  }))
-  while (result.length < STAR_CONFIG.length) {
-    const angle = (result.length / STAR_CONFIG.length) * Math.PI * 2
-    const r = 0.35 + Math.random() * 0.15
-    const x = Math.max(EDGE_MARGIN, Math.min(1 - EDGE_MARGIN, 0.5 + Math.cos(angle) * r))
-    const y = Math.max(EDGE_MARGIN, Math.min(1 - EDGE_MARGIN, 0.5 + Math.sin(angle) * r))
-    result.push({ left: `${x * 100}%`, top: `${y * 100}%` })
-  }
-  return result
+  })
 }
 
 export function BackgroundStars() {
@@ -156,7 +80,7 @@ export function BackgroundStars() {
           alt=""
           width={star.size}
           height={star.size}
-          className="star-wiggle absolute w-auto h-auto object-contain"
+          className="star-wiggle star-twinkle absolute w-auto h-auto object-contain"
           style={{
             left: pos.left,
             top: pos.top,
