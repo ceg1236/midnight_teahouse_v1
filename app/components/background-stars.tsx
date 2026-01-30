@@ -21,19 +21,35 @@ const STAR_CONFIG = [
   { src: '/images/star2_jenny.png', size: 22, opacity: 0.72 },
 ] as const
 
-const EDGE_MARGIN = 0.1           // 10% from page border
-const ICON_CENTER_RADIUS = 0.4   // icon circle radius – keep stars outside where icons sit (12/3/6/9)
-const MIN_STAR_DIST = 0.08       // min distance between any two stars (8% of viewport)
-const CANDIDATE_COUNT = 100      // try this many candidates per star; pick the one in most open space
+const EDGE_MARGIN = 0.1            // 10% from page border
+const ICON_KEEP_AWAY = 0.1         // stars cannot be within this distance of any icon (10% of viewport)
+const MIN_STAR_DIST = 0.08         // min distance between any two stars (8% of viewport)
+const CANDIDATE_COUNT = 100        // try this many candidates per star; pick the one in most open space
+
+/** Icon positions on the circle (12, 3, 6, 9 o'clock) in normalized 0–1 coords */
+const ICON_CENTERS: Array<[number, number]> = [
+  [0.5, 0.12],   // top
+  [0.88, 0.5],   // right
+  [0.5, 0.88],   // bottom
+  [0.12, 0.5],   // left
+]
 
 function dist(x1: number, y1: number, x2: number, y2: number) {
   return Math.hypot(x2 - x1, y2 - y1)
 }
 
-/** Distance from (x,y) to the icon circle boundary (0 if inside circle) */
-function distToIconCircle(x: number, y: number): number {
-  const d = dist(x, y, 0.5, 0.5)
-  return Math.max(0, d - ICON_CENTER_RADIUS)
+/** Min distance from (x,y) to any icon center; star is invalid if this < ICON_KEEP_AWAY */
+function minDistToIcons(x: number, y: number): number {
+  let d = Infinity
+  for (const [ix, iy] of ICON_CENTERS) {
+    d = Math.min(d, dist(x, y, ix, iy))
+  }
+  return d
+}
+
+/** Distance from (x,y) to the "keep away" boundary of the nearest icon (0 if inside a keep-away zone) */
+function distToIconZones(x: number, y: number): number {
+  return Math.max(0, minDistToIcons(x, y) - ICON_KEEP_AWAY)
 }
 
 /** Distance from (x,y) to nearest page edge (within valid margin zone) */
@@ -46,21 +62,21 @@ function distToNearestEdge(x: number, y: number): number {
   )
 }
 
-/** Score for a candidate: how much "clear space" it has (min of dist to stars, icon circle, edges). */
+/** Score for a candidate: how much "clear space" it has (min of dist to stars, icon zones, edges). */
 function clearanceScore(
   x: number,
   y: number,
   existing: Array<{ x: number; y: number }>
 ): number {
   let minDist = distToNearestEdge(x, y)
-  minDist = Math.min(minDist, distToIconCircle(x, y))
+  minDist = Math.min(minDist, distToIconZones(x, y))
   for (const p of existing) {
     minDist = Math.min(minDist, dist(x, y, p.x, p.y))
   }
   return minDist
 }
 
-/** Generate positions: valid zone only, outside icon circle, min spacing; prefer filling open space. */
+/** Generate positions: valid zone, not too close to any icon (or edges/other stars); prefer open space. */
 function generateValidPositions(): Array<{ left: string; top: string }> {
   const positions: Array<{ x: number; y: number }> = []
 
@@ -71,7 +87,7 @@ function generateValidPositions(): Array<{ left: string; top: string }> {
       const x = EDGE_MARGIN + Math.random() * (1 - 2 * EDGE_MARGIN)
       const y = EDGE_MARGIN + Math.random() * (1 - 2 * EDGE_MARGIN)
 
-      if (dist(x, y, 0.5, 0.5) <= ICON_CENTER_RADIUS) continue
+      if (minDistToIcons(x, y) < ICON_KEEP_AWAY) continue
       const tooCloseToStar = positions.some((p) => dist(x, y, p.x, p.y) < MIN_STAR_DIST)
       if (tooCloseToStar) continue
 
@@ -83,12 +99,23 @@ function generateValidPositions(): Array<{ left: string; top: string }> {
     if (best) {
       positions.push({ x: best.x, y: best.y })
     } else {
-      // Fallback: ring just outside icon circle
-      const angle = (i / STAR_CONFIG.length) * Math.PI * 2 + Math.random() * 0.5
-      const r = ICON_CENTER_RADIUS + 0.06 + Math.random() * 0.1
-      const x = Math.max(EDGE_MARGIN, Math.min(1 - EDGE_MARGIN, 0.5 + Math.cos(angle) * r))
-      const y = Math.max(EDGE_MARGIN, Math.min(1 - EDGE_MARGIN, 0.5 + Math.sin(angle) * r))
-      positions.push({ x, y })
+      // Fallback: random point in valid zone (not in any icon keep-away)
+      for (let attempt = 0; attempt < 50; attempt++) {
+        const x = EDGE_MARGIN + Math.random() * (1 - 2 * EDGE_MARGIN)
+        const y = EDGE_MARGIN + Math.random() * (1 - 2 * EDGE_MARGIN)
+        if (minDistToIcons(x, y) >= ICON_KEEP_AWAY) {
+          positions.push({ x, y })
+          break
+        }
+        if (attempt === 49) {
+          const angle = (i / STAR_CONFIG.length) * Math.PI * 2 + Math.random() * 0.5
+          const r = 0.35 + Math.random() * 0.15
+          positions.push({
+            x: Math.max(EDGE_MARGIN, Math.min(1 - EDGE_MARGIN, 0.5 + Math.cos(angle) * r)),
+            y: Math.max(EDGE_MARGIN, Math.min(1 - EDGE_MARGIN, 0.5 + Math.sin(angle) * r)),
+          })
+        }
+      }
     }
   }
 
@@ -96,10 +123,9 @@ function generateValidPositions(): Array<{ left: string; top: string }> {
     left: `${x * 100}%`,
     top: `${y * 100}%`,
   }))
-  // Ensure we always have one entry per star (pad with fallback if something went wrong)
   while (result.length < STAR_CONFIG.length) {
     const angle = (result.length / STAR_CONFIG.length) * Math.PI * 2
-    const r = ICON_CENTER_RADIUS + 0.08 + Math.random() * 0.1
+    const r = 0.35 + Math.random() * 0.15
     const x = Math.max(EDGE_MARGIN, Math.min(1 - EDGE_MARGIN, 0.5 + Math.cos(angle) * r))
     const y = Math.max(EDGE_MARGIN, Math.min(1 - EDGE_MARGIN, 0.5 + Math.sin(angle) * r))
     result.push({ left: `${x * 100}%`, top: `${y * 100}%` })
