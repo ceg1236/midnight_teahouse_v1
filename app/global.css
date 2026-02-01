@@ -370,11 +370,19 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @keyframes star-wiggle {
-  0%, 100% { transform: translate(-50%, -50%) rotate(-5.5deg); }
-  50% { transform: translate(-50%, -50%) rotate(5.5deg); }
+  0%, 100% { transform: translate(-50%, -50%) rotate(-1.5deg); }
+  50% { transform: translate(-50%, -50%) rotate(1.5deg); }
 }
 .star-wiggle {
   animation: star-wiggle 4s ease-in-out infinite;
+}
+
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.69; }
+  50% { opacity: 1; }
+}
+.star-twinkle {
+  animation: star-twinkle 2.5s ease-in-out infinite;
 }
 
 .page-icon-label {
