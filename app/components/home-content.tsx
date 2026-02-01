@@ -16,6 +16,8 @@ export type IconSlot = {
   maxHeight?: number
   /** On mobile, use wider container (e.g. for table icon) */
   mobileWider?: boolean
+  /** Optional scale factor (e.g. 1.3 = 30% bigger, 0.85 = 15% smaller) */
+  scale?: number
 }
 
 /* Desktop (md+): absolute positions for circle layout */
@@ -64,6 +66,7 @@ export function HomeContent({ slots }: { slots: IconSlot[] }) {
                   style={{
                     opacity: iconOpacity,
                     maxHeight: slot.maxHeight ? `${slot.maxHeight}px` : undefined,
+                    ...(slot.scale != null && { transform: `scale(${slot.scale})` }),
                   }}
                 >
                   <Image

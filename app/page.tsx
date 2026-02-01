@@ -19,7 +19,7 @@ const iconSlots: IconSlot[] = [
     imageNight: '/images/Candle_white_jenny_crop_v3.png',
     imageDay: '/images/Candle_blue_jenny_crop.png',
     position: 'right',
-    maxHeight: 85,
+    maxHeight: 72,
   },
   {
     id: 'kora',
@@ -38,6 +38,7 @@ const iconSlots: IconSlot[] = [
     imageDay: '/images/table_blue_jenny_crop.png',
     position: 'left', // 9:00
     mobileWider: true,
+    scale: 1.3,
   },
 ]
 
