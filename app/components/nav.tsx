@@ -50,7 +50,7 @@ export function Navbar() {
           href="/"
           className="nav-link-hover font-cursive text-lg text-[#f8f6f2]"
         >
-          home
+          {/* home */}
         </Link>
         <Link href="/" className="mx-8 text-[#f8f6f2]">
           <span className="font-cursive text-xl md:text-2xl">
@@ -61,7 +61,7 @@ export function Navbar() {
           href="/reservations"
           className="nav-link-hover font-cursive text-lg text-[#f8f6f2]"
         >
-          reservations
+          {/* reservations */}
         </Link>
         <button
           type="button"
