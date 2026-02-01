@@ -55,6 +55,7 @@ export function HomeContent({ slots }: { slots: IconSlot[] }) {
             <Link
               key={slot.id}
               href={slot.href}
+              data-background-obstacle="icon"
               className={`flex min-h-[140px] flex-col items-center justify-center gap-2 transition-transform duration-300 hover:scale-110 md:min-h-0 md:absolute md:justify-start ${positionClasses[slot.position]}`}
             >
               {image ? (
