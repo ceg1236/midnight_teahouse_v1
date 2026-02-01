@@ -33,7 +33,7 @@ export function BackgroundStars() {
     <div className="page-bg-stars" aria-hidden>
       {STAR_CONFIG.map((star, i) => {
         const pos = FIXED_POSITIONS[i]
-        if (!pos) return null
+        if (!star || !pos) return null
         return (
           <Image
             key={i}
