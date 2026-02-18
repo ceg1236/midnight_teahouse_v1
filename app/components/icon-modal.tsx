@@ -1,38 +1,169 @@
 'use client'
 
-import { useEffect } from 'react'
+import Image from 'next/image'
+import { useCallback, useEffect, useRef, useState } from 'react'
+
+export type IconModalSlot = {
+  id: string
+  label: string
+  imageNight: string
+  imageDay: string
+  maxHeight?: number
+  mobileWider?: boolean
+  scale?: number
+}
 
 type IconModalProps = {
   isOpen: boolean
   onClose: () => void
+  selectedSlot: IconModalSlot | null
+  iconSourceRect: DOMRect | null
+  iconRefs: React.RefObject<Map<string, HTMLDivElement>>
+  displayTheme: 'day' | 'night'
 }
 
-export function IconModal({ isOpen, onClose }: IconModalProps) {
+const TRANSITION_MS = 400
+
+export function IconModal({
+  isOpen,
+  onClose,
+  selectedSlot,
+  iconSourceRect,
+  iconRefs,
+  displayTheme,
+}: IconModalProps) {
+  const headerRef = useRef<HTMLDivElement>(null)
+  const [iconPosition, setIconPosition] = useState<{
+    left: number
+    top: number
+    width: number
+    height: number
+  } | null>(null)
+  const [phase, setPhase] = useState<'idle' | 'entering' | 'visible' | 'exiting'>('idle')
+
+  const getHeaderRect = useCallback(() => {
+    return headerRef.current?.getBoundingClientRect() ?? null
+  }, [])
+
+  const getIconTargetRect = useCallback(() => {
+    if (!selectedSlot) return null
+    const el = iconRefs.current?.get(selectedSlot.id)
+    return el?.getBoundingClientRect() ?? null
+  }, [selectedSlot, iconRefs])
+
+  // Opening: animate from source to header
+  useEffect(() => {
+    if (!isOpen || !selectedSlot || !iconSourceRect) return
+
+    setPhase('entering')
+    setIconPosition({
+      left: iconSourceRect.left,
+      top: iconSourceRect.top,
+      width: iconSourceRect.width,
+      height: iconSourceRect.height,
+    })
+
+    const raf = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const headerRect = getHeaderRect()
+        if (headerRect) {
+          const iconW = Math.min(iconSourceRect.width, 80)
+          const iconH = Math.min(iconSourceRect.height, 80)
+          setIconPosition({
+            left: headerRect.left + (headerRect.width - iconW) / 2,
+            top: headerRect.top + 16,
+            width: iconW,
+            height: iconH,
+          })
+        }
+        setTimeout(() => setPhase('visible'), TRANSITION_MS)
+      })
+    })
+    return () => cancelAnimationFrame(raf)
+  }, [isOpen, selectedSlot, iconSourceRect, getHeaderRect])
+
+  const handleClose = useCallback(() => {
+    if (!selectedSlot) {
+      onClose()
+      return
+    }
+
+    setPhase('exiting')
+    const targetRect = getIconTargetRect()
+    if (targetRect) {
+      setIconPosition({
+        left: targetRect.left,
+        top: targetRect.top,
+        width: targetRect.width,
+        height: targetRect.height,
+      })
+    }
+
+    setTimeout(() => {
+      setPhase('idle')
+      setIconPosition(null)
+      onClose()
+    }, TRANSITION_MS)
+  }, [selectedSlot, getIconTargetRect, onClose])
+
   useEffect(() => {
     if (!isOpen) return
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') handleClose()
     }
     window.addEventListener('keydown', handleEscape)
     return () => window.removeEventListener('keydown', handleEscape)
-  }, [isOpen, onClose])
+  }, [isOpen, handleClose])
+
+  const image =
+    selectedSlot && displayTheme === 'day'
+      ? selectedSlot.imageDay
+      : selectedSlot?.imageNight
 
   return (
     <div
       className={`icon-modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 transition-opacity duration-300 ease-out ${isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
-      onClick={onClose}
+      onClick={handleClose}
       role="dialog"
       aria-modal="true"
       aria-label="Modal"
       aria-hidden={!isOpen}
     >
       <div
-        className={`icon-modal-content relative max-h-[85vh] w-full max-w-2xl overflow-auto rounded-3xl border-2 border-[#f8f6f2] p-8 transition-all duration-300 ease-out ${isOpen ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-4 opacity-0 scale-[0.98]'}`}
+        className={`icon-modal-content relative max-h-[85vh] w-full max-w-2xl overflow-auto rounded-3xl border-2 border-[#f8f6f2] pt-20 pb-8 pl-8 pr-8 transition-all duration-300 ease-out ${isOpen ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-4 opacity-0 scale-[0.98]'}`}
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Header area - ref for icon target position */}
+        <div
+          ref={headerRef}
+          className="absolute left-0 right-0 top-0 flex h-20 items-center justify-center"
+        />
+
+        {/* Floating icon - animates between source and header */}
+        {selectedSlot && image && iconPosition && (
+          <div
+            className="icon-modal-floating-icon pointer-events-none fixed z-[60] flex items-center justify-center transition-all ease-out"
+            style={{
+              left: iconPosition.left,
+              top: iconPosition.top,
+              width: iconPosition.width,
+              height: iconPosition.height,
+              transitionDuration: `${TRANSITION_MS}ms`,
+            }}
+          >
+            <Image
+              src={image}
+              alt={selectedSlot.label}
+              width={120}
+              height={120}
+              className="h-full w-full object-contain"
+            />
+          </div>
+        )}
+
         <button
           type="button"
-          onClick={onClose}
+          onClick={handleClose}
           className="absolute right-4 top-4 rounded-full p-2 text-[#f8f6f2] transition-opacity hover:opacity-80"
           aria-label="Close modal"
         >
@@ -52,7 +183,11 @@ export function IconModal({ isOpen, onClose }: IconModalProps) {
           </svg>
         </button>
         <div className="pr-10">
-          {/* Placeholder content for testing */}
+          {selectedSlot && (
+            <h2 className="page-icon-label mb-4 font-cursive text-2xl">
+              {selectedSlot.label}
+            </h2>
+          )}
           <p className="font-cursive text-[#f8f6f2] text-lg">
             Modal content will go here.
           </p>

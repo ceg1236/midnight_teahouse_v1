@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTheme } from '../context/theme-context'
 import { IconModal } from './icon-modal'
 
@@ -37,6 +37,9 @@ export function HomeContent({ slots }: { slots: IconSlot[] }) {
   const [displayTheme, setDisplayTheme] = useState(theme)
   const [iconOpacity, setIconOpacity] = useState(1)
   const [modalOpen, setModalOpen] = useState(false)
+  const [selectedSlot, setSelectedSlot] = useState<IconSlot | null>(null)
+  const [iconSourceRect, setIconSourceRect] = useState<DOMRect | null>(null)
+  const iconRefs = useRef<Map<string, HTMLDivElement>>(new Map())
 
   useEffect(() => {
     if (theme === displayTheme) return
@@ -50,7 +53,18 @@ export function HomeContent({ slots }: { slots: IconSlot[] }) {
 
   return (
     <section className="relative min-h-screen w-full flex items-center justify-center px-4 py-24">
-      <IconModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+      <IconModal
+        isOpen={modalOpen}
+        onClose={() => {
+          setModalOpen(false)
+          setSelectedSlot(null)
+          setIconSourceRect(null)
+        }}
+        selectedSlot={selectedSlot}
+        iconSourceRect={iconSourceRect}
+        iconRefs={iconRefs}
+        displayTheme={displayTheme}
+      />
       {/* Mobile: vertical stack. Desktop (md+): circle with absolute positions */}
       <div className="w-full max-w-4xl flex flex-col items-center gap-16 md:relative md:aspect-square md:max-h-[min(80vw,70vh)] md:gap-0">
         {slots.map((slot) => {
@@ -65,20 +79,33 @@ export function HomeContent({ slots }: { slots: IconSlot[] }) {
                 ['--icon-height' as string]: `${slot.maxHeight ?? 120}px`,
                 gap: `calc(1.25rem * ${slot.scale ?? 1})`,
               }}
-              onClick={() => setModalOpen(true)}
+              onClick={() => {
+                const rect = iconRefs.current.get(slot.id)?.getBoundingClientRect()
+                setSelectedSlot(slot)
+                setIconSourceRect(rect ?? null)
+                setModalOpen(true)
+              }}
             >
               {image ? (
-                <Image
-                  src={image}
-                  alt={slot.label}
-                  width={120}
-                  height={120}
-                  className={`max-h-[120px] object-contain transition-opacity duration-300 md:w-28 md:max-h-[var(--icon-height)] ${slot.mobileWider ? 'w-40' : 'w-24'}`}
+                <div
+                  ref={(el) => {
+                    if (el) iconRefs.current.set(slot.id, el)
+                  }}
+                  className="flex items-center justify-center transition-opacity duration-300"
                   style={{
-                    opacity: iconOpacity,
+                    opacity:
+                      modalOpen && selectedSlot?.id === slot.id ? 0 : iconOpacity,
                     ...(slot.scale != null && { transform: `scale(${slot.scale})` }),
                   }}
-                />
+                >
+                  <Image
+                    src={image}
+                    alt={slot.label}
+                    width={120}
+                    height={120}
+                    className={`max-h-[120px] object-contain transition-opacity duration-300 md:w-28 md:max-h-[var(--icon-height)] ${slot.mobileWider ? 'w-40' : 'w-24'}`}
+                  />
+                </div>
               ) : (
                 <span className="text-[#f8f6f2]/40 text-2xl">+</span>
               )}
