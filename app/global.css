@@ -408,6 +408,16 @@ h1, h2, h3, h4, h5, h6 {
   color: #162143;
 }
 
+/* Icon modal: blurred transparent beige, stylistically matching */
+.icon-modal-backdrop {
+  background-color: rgba(22, 33, 67, 0.5);
+  backdrop-filter: blur(4px);
+}
+.icon-modal-content {
+  background: rgba(248, 246, 242, 0.12);
+  backdrop-filter: blur(24px);
+}
+
 /* Optional: add .page-bg-dots for a dot-grid texture instead of noise */
 .page-bg-dots {
   background-image: radial-gradient(circle, rgba(0,0,0,0.06) 1px, transparent 1px);

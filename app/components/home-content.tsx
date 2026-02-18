@@ -1,9 +1,9 @@
 'use client'
 
-import Link from 'next/link'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { useTheme } from '../context/theme-context'
+import { IconModal } from './icon-modal'
 
 export type IconSlot = {
   id: string
@@ -36,6 +36,7 @@ export function HomeContent({ slots }: { slots: IconSlot[] }) {
   const { theme } = useTheme()
   const [displayTheme, setDisplayTheme] = useState(theme)
   const [iconOpacity, setIconOpacity] = useState(1)
+  const [modalOpen, setModalOpen] = useState(false)
 
   useEffect(() => {
     if (theme === displayTheme) return
@@ -49,17 +50,22 @@ export function HomeContent({ slots }: { slots: IconSlot[] }) {
 
   return (
     <section className="relative min-h-screen w-full flex items-center justify-center px-4 py-24">
+      <IconModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
       {/* Mobile: vertical stack. Desktop (md+): circle with absolute positions */}
       <div className="w-full max-w-4xl flex flex-col items-center gap-16 md:relative md:aspect-square md:max-h-[min(80vw,70vh)] md:gap-0">
         {slots.map((slot) => {
           const image = displayTheme === 'day' ? slot.imageDay : slot.imageNight
           return (
-            <Link
+            <button
               key={slot.id}
-              href={slot.href}
+              type="button"
               data-background-obstacle="icon"
-              className={`flex min-h-[140px] flex-col items-center justify-center gap-5 transition-transform duration-300 hover:scale-110 md:min-h-0 md:absolute md:justify-start ${positionClasses[slot.position]}`}
-              style={{ ['--icon-height' as string]: `${slot.maxHeight ?? 120}px` }}
+              className={`flex min-h-[140px] cursor-pointer flex-col items-center justify-center border-none bg-transparent p-0 transition-transform duration-300 hover:scale-110 md:min-h-0 md:absolute md:justify-start ${positionClasses[slot.position]}`}
+              style={{
+                ['--icon-height' as string]: `${slot.maxHeight ?? 120}px`,
+                gap: `calc(1.25rem * ${slot.scale ?? 1})`,
+              }}
+              onClick={() => setModalOpen(true)}
             >
               {image ? (
                 <Image
@@ -79,7 +85,7 @@ export function HomeContent({ slots }: { slots: IconSlot[] }) {
               <span className="page-icon-label font-cursive text-base whitespace-nowrap md:text-xl">
                 {slot.label}
               </span>
-            </Link>
+            </button>
           )
         })}
       </div>
