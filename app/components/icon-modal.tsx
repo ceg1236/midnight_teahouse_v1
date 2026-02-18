@@ -17,18 +17,17 @@ export function IconModal({ isOpen, onClose }: IconModalProps) {
     return () => window.removeEventListener('keydown', handleEscape)
   }, [isOpen, onClose])
 
-  if (!isOpen) return null
-
   return (
     <div
-      className="icon-modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4"
+      className={`icon-modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 transition-opacity duration-300 ease-out ${isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-label="Modal"
+      aria-hidden={!isOpen}
     >
       <div
-        className="icon-modal-content relative max-h-[85vh] w-full max-w-2xl overflow-auto rounded-3xl border-2 border-[#f8f6f2] p-8"
+        className={`icon-modal-content relative max-h-[85vh] w-full max-w-2xl overflow-auto rounded-3xl border-2 border-[#f8f6f2] p-8 transition-all duration-300 ease-out ${isOpen ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-4 opacity-0 scale-[0.98]'}`}
         onClick={(e) => e.stopPropagation()}
       >
         <button
