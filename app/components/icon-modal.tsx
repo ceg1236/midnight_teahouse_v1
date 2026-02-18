@@ -63,23 +63,30 @@ export function IconModal({
       height: iconSourceRect.height,
     })
 
+    let timeoutId: ReturnType<typeof setTimeout> | undefined
     const raf = requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        const headerRect = getHeaderRect()
-        if (headerRect) {
-          const iconW = Math.min(iconSourceRect.width, 80)
-          const iconH = Math.min(iconSourceRect.height, 80)
-          setIconPosition({
-            left: headerRect.left + (headerRect.width - iconW) / 2,
-            top: headerRect.top + 16,
-            width: iconW,
-            height: iconH,
-          })
-        }
-        setTimeout(() => setPhase('visible'), TRANSITION_MS)
+        // Small delay so modal is fully laid out before measuring header
+        timeoutId = setTimeout(() => {
+          const headerRect = getHeaderRect()
+          if (headerRect && headerRect.width > 0) {
+            const iconW = Math.min(iconSourceRect.width, 80)
+            const iconH = Math.min(iconSourceRect.height, 80)
+            setIconPosition({
+              left: headerRect.left + (headerRect.width - iconW) / 2,
+              top: headerRect.top + 16,
+              width: iconW,
+              height: iconH,
+            })
+          }
+          setTimeout(() => setPhase('visible'), TRANSITION_MS)
+        }, 50)
       })
     })
-    return () => cancelAnimationFrame(raf)
+    return () => {
+      cancelAnimationFrame(raf)
+      if (timeoutId != null) clearTimeout(timeoutId)
+    }
   }, [isOpen, selectedSlot, iconSourceRect, getHeaderRect])
 
   const handleClose = useCallback(() => {
@@ -115,6 +122,17 @@ export function IconModal({
     return () => window.removeEventListener('keydown', handleEscape)
   }, [isOpen, handleClose])
 
+  // Lock body scroll when modal is open to prevent background scroll / border artifact
+  useEffect(() => {
+    if (isOpen) {
+      const prev = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+      return () => {
+        document.body.style.overflow = prev
+      }
+    }
+  }, [isOpen])
+
   const image =
     selectedSlot && displayTheme === 'day'
       ? selectedSlot.imageDay
@@ -122,15 +140,37 @@ export function IconModal({
 
   return (
     <div
-      className={`icon-modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 transition-opacity duration-300 ease-out ${isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
+      className={`icon-modal-backdrop fixed inset-0 z-50 flex items-center justify-center overflow-hidden p-4 transition-opacity duration-300 ease-out ${isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
       onClick={handleClose}
       role="dialog"
       aria-modal="true"
       aria-label="Modal"
       aria-hidden={!isOpen}
     >
+      {/* Floating icon - outside modal content so position:fixed works (parent transform breaks it) */}
+      {selectedSlot && image && iconPosition && (
+        <div
+          className="icon-modal-floating-icon pointer-events-none fixed z-[60] flex items-center justify-center transition-all ease-out"
+          style={{
+            left: iconPosition.left,
+            top: iconPosition.top,
+            width: iconPosition.width,
+            height: iconPosition.height,
+            transitionDuration: `${TRANSITION_MS}ms`,
+          }}
+        >
+          <Image
+            src={image}
+            alt={selectedSlot.label}
+            width={120}
+            height={120}
+            className="h-full w-full object-contain"
+          />
+        </div>
+      )}
+
       <div
-        className={`icon-modal-content relative max-h-[85vh] w-full max-w-2xl overflow-auto rounded-3xl border-2 border-[#f8f6f2] pt-20 pb-8 pl-8 pr-8 transition-all duration-300 ease-out ${isOpen ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-4 opacity-0 scale-[0.98]'}`}
+        className={`icon-modal-content relative my-auto w-full max-w-2xl max-h-[85vh] flex-shrink-0 overflow-y-auto rounded-3xl border-2 border-[#f8f6f2] pt-20 pb-8 pl-8 pr-8 transition-all duration-300 ease-out ${isOpen ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-4 opacity-0 scale-[0.98]'}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header area - ref for icon target position */}
@@ -138,28 +178,6 @@ export function IconModal({
           ref={headerRef}
           className="absolute left-0 right-0 top-0 flex h-20 items-center justify-center"
         />
-
-        {/* Floating icon - animates between source and header */}
-        {selectedSlot && image && iconPosition && (
-          <div
-            className="icon-modal-floating-icon pointer-events-none fixed z-[60] flex items-center justify-center transition-all ease-out"
-            style={{
-              left: iconPosition.left,
-              top: iconPosition.top,
-              width: iconPosition.width,
-              height: iconPosition.height,
-              transitionDuration: `${TRANSITION_MS}ms`,
-            }}
-          >
-            <Image
-              src={image}
-              alt={selectedSlot.label}
-              width={120}
-              height={120}
-              className="h-full w-full object-contain"
-            />
-          </div>
-        )}
 
         <button
           type="button"
