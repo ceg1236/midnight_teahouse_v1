@@ -7,7 +7,7 @@ const iconSlots: IconSlot[] = [
   {
     id: 'tea',
     href: '/tea',
-    label: '',
+    label: 'Tea',
     imageNight: '/images/Teacup_white_jenny_crop.png',
     imageDay: '/images/teacup_blue_jenny_crop_v2.png',
     position: 'top',
@@ -15,7 +15,7 @@ const iconSlots: IconSlot[] = [
   {
     id: 'candle',
     href: '/candle',
-    label: '',
+    label: 'Ambiance',
     imageNight: '/images/Candle_white_jenny_crop_v3.png',
     imageDay: '/images/Candle_blue_jenny_crop.png',
     position: 'right',
@@ -24,7 +24,7 @@ const iconSlots: IconSlot[] = [
   {
     id: 'kora',
     href: '/kora',
-    label: '',
+    label: 'Music',
     imageNight: '/images/kora_white_jenny_crop_v2.png',
     imageDay: '/images/kora_blue_jenny_crop_v2.png',
     position: 'bottom',
@@ -34,7 +34,7 @@ const iconSlots: IconSlot[] = [
   {
     id: 'table',
     href: '/table',
-    label: '',
+    label: 'Booking',
     imageNight: '/images/table_white_jenny_crop.png',
     imageDay: '/images/table_blue_jenny_crop.png',
     position: 'left', // 9:00

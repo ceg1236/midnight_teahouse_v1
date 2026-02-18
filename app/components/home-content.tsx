@@ -58,30 +58,25 @@ export function HomeContent({ slots }: { slots: IconSlot[] }) {
               key={slot.id}
               href={slot.href}
               data-background-obstacle="icon"
-              className={`flex min-h-[140px] flex-col items-center justify-center gap-2 transition-transform duration-300 hover:scale-110 md:min-h-0 md:absolute md:justify-start ${positionClasses[slot.position]}`}
+              className={`flex min-h-[140px] flex-col items-center justify-center gap-5 transition-transform duration-300 hover:scale-110 md:min-h-0 md:absolute md:justify-start ${positionClasses[slot.position]}`}
+              style={{ ['--icon-height' as string]: `${slot.maxHeight ?? 120}px` }}
             >
               {image ? (
-                <span
-                  className={`inline-flex h-[120px] w-24 items-center justify-center transition-opacity duration-300 md:h-auto md:w-28 ${slot.mobileWider ? 'w-40' : ''}`}
+                <Image
+                  src={image}
+                  alt={slot.label}
+                  width={120}
+                  height={120}
+                  className={`max-h-[120px] object-contain transition-opacity duration-300 md:w-28 md:max-h-[var(--icon-height)] ${slot.mobileWider ? 'w-40' : 'w-24'}`}
                   style={{
                     opacity: iconOpacity,
-                    maxHeight: slot.maxHeight ? `${slot.maxHeight}px` : undefined,
                     ...(slot.scale != null && { transform: `scale(${slot.scale})` }),
                   }}
-                >
-                  <Image
-                    src={image}
-                    alt={slot.label}
-                    width={120}
-                    height={120}
-                    className="max-h-[120px] w-full object-contain md:max-h-none"
-                    style={slot.maxHeight ? { maxHeight: `${slot.maxHeight}px` } : undefined}
-                  />
-                </span>
+                />
               ) : (
                 <span className="text-[#f8f6f2]/40 text-2xl">+</span>
               )}
-              <span className="page-icon-label hidden font-cursive text-[#f8f6f2] text-lg md:block md:text-xl whitespace-nowrap">
+              <span className="page-icon-label font-cursive text-base whitespace-nowrap md:text-xl">
                 {slot.label}
               </span>
             </Link>
