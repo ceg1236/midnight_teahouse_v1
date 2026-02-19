@@ -63,7 +63,7 @@ export function HomeContent({ slots }: { slots: IconSlot[] }) {
   }, [modalOpen])
 
   return (
-    <section className="relative min-h-screen w-full flex items-center justify-center px-4 py-24">
+    <section className="relative min-h-screen w-full flex items-center justify-center px-4 py-12 md:py-24">
       <IconModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -73,7 +73,7 @@ export function HomeContent({ slots }: { slots: IconSlot[] }) {
         displayTheme={displayTheme}
       />
       {/* Mobile: vertical stack. Desktop (md+): circle with absolute positions */}
-      <div className="w-full max-w-4xl flex flex-col items-center gap-16 md:relative md:aspect-square md:max-h-[min(80vw,70vh)] md:gap-0">
+      <div className="w-full max-w-4xl flex flex-col items-center gap-6 md:relative md:aspect-square md:max-h-[min(80vw,70vh)] md:gap-0">
         {slots.map((slot) => {
           const image = displayTheme === 'day' ? slot.imageDay : slot.imageNight
           return (
@@ -81,10 +81,10 @@ export function HomeContent({ slots }: { slots: IconSlot[] }) {
               key={slot.id}
               type="button"
               data-background-obstacle="icon"
-              className={`flex min-h-[140px] cursor-pointer flex-col items-center justify-center border-none bg-transparent p-0 transition-transform duration-300 hover:scale-110 md:min-h-0 md:absolute md:justify-start ${positionClasses[slot.position]}`}
+              className={`icon-slot-button flex min-h-[88px] cursor-pointer flex-col items-center justify-center border-none bg-transparent p-0 transition-transform duration-300 hover:scale-110 md:min-h-0 md:absolute md:justify-start ${positionClasses[slot.position]}`}
               style={{
                 ['--icon-height' as string]: `${slot.maxHeight ?? 120}px`,
-                gap: `calc(1.25rem * ${slot.scale ?? 1})`,
+                ['--slot-scale' as string]: String(slot.scale ?? 1),
               }}
               onClick={() => {
                 const rect = iconRefs.current.get(slot.id)?.getBoundingClientRect()
@@ -98,11 +98,10 @@ export function HomeContent({ slots }: { slots: IconSlot[] }) {
                   ref={(el) => {
                     if (el) iconRefs.current.set(slot.id, el)
                   }}
-                  className="flex items-center justify-center transition-opacity duration-300"
+                  className="icon-slot-icon flex items-center justify-center transition-opacity duration-300"
                   style={{
                     opacity:
                       modalOpen && selectedSlot?.id === slot.id ? 0 : iconOpacity,
-                    ...(slot.scale != null && { transform: `scale(${slot.scale})` }),
                   }}
                 >
                   <Image
@@ -110,13 +109,13 @@ export function HomeContent({ slots }: { slots: IconSlot[] }) {
                     alt={slot.label}
                     width={120}
                     height={120}
-                    className={`max-h-[120px] object-contain transition-opacity duration-300 md:w-28 md:max-h-[var(--icon-height)] ${slot.mobileWider ? 'w-40' : 'w-24'}`}
+                    className={`max-h-[72px] w-20 object-contain transition-opacity duration-300 md:max-h-[var(--icon-height)] md:w-28 ${slot.mobileWider ? 'md:w-40' : ''}`}
                   />
                 </div>
               ) : (
                 <span className="text-[#f8f6f2]/40 text-2xl">+</span>
               )}
-              <span className="page-icon-label font-cursive text-base whitespace-nowrap md:text-xl">
+              <span className="page-icon-label font-cursive text-lg whitespace-nowrap md:text-xl">
                 {slot.label}
               </span>
             </button>
