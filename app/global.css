@@ -416,6 +416,11 @@ h1, h2, h3, h4, h5, h6 {
 .icon-modal-content {
   background: rgba(248, 246, 242, 0.12);
   backdrop-filter: blur(24px);
+  /* Faded gradient transition to dark blue instead of solid beige border */
+  box-shadow:
+    0 0 0 1px rgba(248, 246, 242, 0.45),
+    0 0 0 3px rgba(248, 246, 242, 0.15),
+    0 0 24px 6px rgba(22, 33, 67, 0.5);
 }
 
 /* Optional: add .page-bg-dots for a dot-grid texture instead of noise */
