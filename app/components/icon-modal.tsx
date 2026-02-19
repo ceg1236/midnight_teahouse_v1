@@ -106,9 +106,9 @@ export function IconModal({
       })
     }
 
+    // Wait for icon to finish sliding back, then close; icon fades with backdrop (no abrupt removal)
     setTimeout(() => {
       setPhase('idle')
-      setIconPosition(null)
       onClose()
     }, TRANSITION_MS)
   }, [selectedSlot, getIconTargetRect, onClose])
@@ -121,6 +121,18 @@ export function IconModal({
     window.addEventListener('keydown', handleEscape)
     return () => window.removeEventListener('keydown', handleEscape)
   }, [isOpen, handleClose])
+
+  // Reset icon state after backdrop fade completes – removing the icon during fade causes flicker
+  const BACKDROP_FADE_MS = 300
+  useEffect(() => {
+    if (!isOpen) {
+      const t = setTimeout(() => {
+        setIconPosition(null)
+        setPhase('idle')
+      }, BACKDROP_FADE_MS)
+      return () => clearTimeout(t)
+    }
+  }, [isOpen])
 
   // Lock body scroll when modal is open to prevent background scroll / border artifact
   useEffect(() => {
@@ -170,7 +182,7 @@ export function IconModal({
       )}
 
       <div
-        className={`icon-modal-content relative my-auto w-full max-w-2xl max-h-[85vh] flex-shrink-0 overflow-y-auto rounded-3xl border-2 border-[#f8f6f2] pt-20 pb-8 pl-8 pr-8 transition-all duration-300 ease-out ${isOpen ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-4 opacity-0 scale-[0.98]'}`}
+        className={`icon-modal-content relative my-auto w-full max-w-2xl max-h-[85vh] flex-shrink-0 overflow-y-auto rounded-3xl border-2 border-[#f8f6f2] pt-20 pb-8 pl-8 pr-8 transition-opacity duration-300 ease-out ${isOpen ? 'opacity-100' : 'opacity-0'}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header area - ref for icon target position */}

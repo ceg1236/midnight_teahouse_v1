@@ -51,15 +51,22 @@ export function HomeContent({ slots }: { slots: IconSlot[] }) {
     return () => clearTimeout(t)
   }, [theme, displayTheme])
 
+  // Clear selected slot after backdrop fade so floating icon stays visible during close
+  useEffect(() => {
+    if (!modalOpen) {
+      const t = setTimeout(() => {
+        setSelectedSlot(null)
+        setIconSourceRect(null)
+      }, 350)
+      return () => clearTimeout(t)
+    }
+  }, [modalOpen])
+
   return (
     <section className="relative min-h-screen w-full flex items-center justify-center px-4 py-24">
       <IconModal
         isOpen={modalOpen}
-        onClose={() => {
-          setModalOpen(false)
-          setSelectedSlot(null)
-          setIconSourceRect(null)
-        }}
+        onClose={() => setModalOpen(false)}
         selectedSlot={selectedSlot}
         iconSourceRect={iconSourceRect}
         iconRefs={iconRefs}
