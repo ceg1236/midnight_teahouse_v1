@@ -115,7 +115,7 @@ export function HomeContent({ slots }: { slots: IconSlot[] }) {
               ) : (
                 <span className="text-[#f8f6f2]/40 text-2xl">+</span>
               )}
-              <span className="page-icon-label font-cursive text-3xl whitespace-nowrap md:text-xl">
+              <span className="page-icon-label font-cursive text-3xl whitespace-nowrap md:text-4xl">
                 {slot.label}
               </span>
             </button>
