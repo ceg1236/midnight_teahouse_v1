@@ -390,9 +390,9 @@ h1, h2, h3, h4, h5, h6 {
   transition: color 1.5s ease;
 }
 
-/* Mobile: scale icons down so layout fits; desktop: use slot scale */
+/* Mobile: scale 1; desktop: use slot scale */
 .icon-slot-icon {
-  transform: scale(0.9);
+  transform: scale(1);
 }
 @media (min-width: 768px) {
   .icon-slot-icon {
