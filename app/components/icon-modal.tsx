@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { iconModalContent, type IconModalId } from '../../content/modals'
 
 export type IconModalSlot = {
   id: string
@@ -219,7 +220,10 @@ export function IconModal({
             </h2>
           )}
           <p className="font-cursive text-[#f8f6f2] text-lg">
-          Master cleanse austin mixtape etsy slow-carb synth food truck hell of lumbersexual deep v microdosing. Poke hella humblebrag farm-to-table tbh. Humblebrag gorpcore unicorn, poke flexitarian subway tile bicycle rights gatekeep VHS lo-fi ugh adaptogen cupping man bun chillwave. Brooklyn blog DIY, gochujang gorpcore neutra organic next level readymade four loko bruh intelligentsia.
+            {selectedSlot &&
+            selectedSlot.id in iconModalContent
+              ? iconModalContent[selectedSlot.id as IconModalId].body
+              : ''}
           </p>
         </div>
       </div>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { titleModalContent } from '../../content/modals'
 
 type TitleModalProps = {
   isOpen: boolean
@@ -166,11 +167,14 @@ export function TitleModal({
           </svg>
         </button>
         <div className="pr-10">
-          <p className="font-cursive text-[#f8f6f2] text-lg">
-          Iceland af vinyl bruh. Stumptown hella celiac literally lyft gentrify vegan tattooed raclette taxidermy typewriter gastropub. Listicle vice tacos, artisan readymade actually vibecession locavore crucifix stumptown godard salvia tousled iPhone vaporware. Yes plz knausgaard PBR&B succulents helvetica four dollar toast shoreditch biodiesel dreamcatcher vinyl. Woke flannel chartreuse XOXO, poutine lyft roof party mixtape jean shorts glossier master cleanse cloud bread deep v tonx tbh. Succulents hashtag heirloom four loko marxism migas hell of ennui bitters Brooklyn pickled listicle bespoke schlitz. Selfies retro twee swag scenester ethical JOMO craft beer lyft.
-
-Tattooed authentic knausgaard ascot put a bird on it, shabby chic roof party subway tile truffaut trust fund single-origin coffee marxism. Ennui same jianbing four dollar toast snackwave live-edge jawn butcher biodiesel typewriter palo santo. Fingerstache affogato tbh shoreditch meggings yes plz roof party. Semiotics plaid PBR&B ennui vice, raclette yes plz solarpunk listicle banh mi biodiesel everyday carry. Twee roof party mixtape, kogi truffaut yes plz four dollar toast big mood neutral milk hotel ugh.
-          </p>
+          <div className="font-cursive text-[#f8f6f2] text-lg space-y-4">
+            {titleModalContent.body
+              .trim()
+              .split(/\n\n+/)
+              .map((paragraph, i) => (
+                <p key={i}>{paragraph}</p>
+              ))}
+          </div>
         </div>
       </div>
     </div>
