@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useTheme } from '../context/theme-context'
+import { useTitleModal } from '../context/title-modal-context'
 
 function SunIcon({ className }: { className?: string }) {
   return (
@@ -42,6 +43,7 @@ function MoonIcon({ className }: { className?: string }) {
 
 export function Navbar() {
   const { theme, setTheme } = useTheme()
+  const { titleRef, openTitleModal, titleModalOpen } = useTitleModal()
 
   return (
     <nav className="site-nav fixed top-0 left-0 right-0 z-50 bg-[#162143] backdrop-blur-sm">
@@ -52,11 +54,18 @@ export function Navbar() {
         >
           {/* home */}
         </Link>
-        <Link href="/" className="mx-8 text-[#f8f6f2]">
-          <span className="font-cursive text-xl md:text-2xl">
+        <button
+          type="button"
+          onClick={openTitleModal}
+          className="mx-8 cursor-pointer border-none bg-transparent p-0 text-[#f8f6f2]"
+        >
+          <span
+            ref={titleRef}
+            className={`font-cursive text-xl md:text-2xl transition-opacity duration-300 ${titleModalOpen ? 'opacity-0' : 'opacity-100'}`}
+          >
             midnight teahouse
           </span>
-        </Link>
+        </button>
         <Link
           href="/reservations"
           className="nav-link-hover font-cursive text-lg text-[#f8f6f2]"

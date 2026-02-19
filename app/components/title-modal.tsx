@@ -1,85 +1,63 @@
 'use client'
 
-import Image from 'next/image'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-export type IconModalSlot = {
-  id: string
-  label: string
-  imageNight: string
-  imageDay: string
-  maxHeight?: number
-  mobileWider?: boolean
-  scale?: number
-}
-
-type IconModalProps = {
+type TitleModalProps = {
   isOpen: boolean
   onClose: () => void
-  selectedSlot: IconModalSlot | null
-  iconSourceRect: DOMRect | null
-  iconRefs: React.RefObject<Map<string, HTMLDivElement>>
-  displayTheme: 'day' | 'night'
+  titleSourceRect: DOMRect | null
+  titleRef: React.RefObject<HTMLSpanElement>
 }
 
 const TRANSITION_MS = 400
+const BACKDROP_FADE_MS = 300
 
-export function IconModal({
+export function TitleModal({
   isOpen,
   onClose,
-  selectedSlot,
-  iconSourceRect,
-  iconRefs,
-  displayTheme,
-}: IconModalProps) {
+  titleSourceRect,
+  titleRef,
+}: TitleModalProps) {
   const headerRef = useRef<HTMLDivElement>(null)
-  const [iconPosition, setIconPosition] = useState<{
+  const [textPosition, setTextPosition] = useState<{
     left: number
     top: number
     width: number
     height: number
   } | null>(null)
-  const [phase, setPhase] = useState<'idle' | 'entering' | 'visible' | 'exiting'>('idle')
 
   const getHeaderRect = useCallback(() => {
     return headerRef.current?.getBoundingClientRect() ?? null
   }, [])
 
-  const getIconTargetRect = useCallback(() => {
-    if (!selectedSlot) return null
-    const el = iconRefs.current?.get(selectedSlot.id)
-    return el?.getBoundingClientRect() ?? null
-  }, [selectedSlot, iconRefs])
+  const getTitleTargetRect = useCallback(() => {
+    return titleRef.current?.getBoundingClientRect() ?? null
+  }, [titleRef])
 
   // Opening: animate from source to header
   useEffect(() => {
-    if (!isOpen || !selectedSlot || !iconSourceRect) return
+    if (!isOpen || !titleSourceRect) return
 
-    setPhase('entering')
-    setIconPosition({
-      left: iconSourceRect.left,
-      top: iconSourceRect.top,
-      width: iconSourceRect.width,
-      height: iconSourceRect.height,
+    setTextPosition({
+      left: titleSourceRect.left,
+      top: titleSourceRect.top,
+      width: titleSourceRect.width,
+      height: titleSourceRect.height,
     })
 
     let timeoutId: ReturnType<typeof setTimeout> | undefined
     const raf = requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        // Small delay so modal is fully laid out before measuring header
         timeoutId = setTimeout(() => {
           const headerRect = getHeaderRect()
           if (headerRect && headerRect.width > 0) {
-            const iconW = Math.min(iconSourceRect.width, 80)
-            const iconH = Math.min(iconSourceRect.height, 80)
-            setIconPosition({
-              left: headerRect.left + (headerRect.width - iconW) / 2,
+            setTextPosition({
+              left: headerRect.left + (headerRect.width - titleSourceRect.width) / 2,
               top: headerRect.top + 16,
-              width: iconW,
-              height: iconH,
+              width: titleSourceRect.width,
+              height: titleSourceRect.height,
             })
           }
-          setTimeout(() => setPhase('visible'), TRANSITION_MS)
         }, 50)
       })
     })
@@ -87,18 +65,12 @@ export function IconModal({
       cancelAnimationFrame(raf)
       if (timeoutId != null) clearTimeout(timeoutId)
     }
-  }, [isOpen, selectedSlot, iconSourceRect, getHeaderRect])
+  }, [isOpen, titleSourceRect, getHeaderRect])
 
   const handleClose = useCallback(() => {
-    if (!selectedSlot) {
-      onClose()
-      return
-    }
-
-    setPhase('exiting')
-    const targetRect = getIconTargetRect()
+    const targetRect = getTitleTargetRect()
     if (targetRect) {
-      setIconPosition({
+      setTextPosition({
         left: targetRect.left,
         top: targetRect.top,
         width: targetRect.width,
@@ -106,12 +78,10 @@ export function IconModal({
       })
     }
 
-    // Wait for icon to finish sliding back, then close; icon fades with backdrop (no abrupt removal)
     setTimeout(() => {
-      setPhase('idle')
       onClose()
     }, TRANSITION_MS)
-  }, [selectedSlot, getIconTargetRect, onClose])
+  }, [getTitleTargetRect, onClose])
 
   useEffect(() => {
     if (!isOpen) return
@@ -122,19 +92,13 @@ export function IconModal({
     return () => window.removeEventListener('keydown', handleEscape)
   }, [isOpen, handleClose])
 
-  // Reset icon state after backdrop fade completes – removing the icon during fade causes flicker
-  const BACKDROP_FADE_MS = 300
   useEffect(() => {
     if (!isOpen) {
-      const t = setTimeout(() => {
-        setIconPosition(null)
-        setPhase('idle')
-      }, BACKDROP_FADE_MS)
+      const t = setTimeout(() => setTextPosition(null), BACKDROP_FADE_MS)
       return () => clearTimeout(t)
     }
   }, [isOpen])
 
-  // Lock body scroll when modal is open to prevent background scroll / border artifact
   useEffect(() => {
     if (isOpen) {
       const prev = document.body.style.overflow
@@ -145,11 +109,6 @@ export function IconModal({
     }
   }, [isOpen])
 
-  const image =
-    selectedSlot && displayTheme === 'day'
-      ? selectedSlot.imageDay
-      : selectedSlot?.imageNight
-
   return (
     <div
       className={`icon-modal-backdrop fixed inset-0 z-50 flex items-center justify-center overflow-hidden p-4 transition-opacity duration-300 ease-out ${isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
@@ -159,25 +118,20 @@ export function IconModal({
       aria-label="Modal"
       aria-hidden={!isOpen}
     >
-      {/* Floating icon - outside modal content so position:fixed works (parent transform breaks it) */}
-      {selectedSlot && image && iconPosition && (
+      {textPosition && (
         <div
-          className="icon-modal-floating-icon pointer-events-none fixed z-[60] flex items-center justify-center transition-all ease-out"
+          className="pointer-events-none fixed z-[60] flex items-center justify-center transition-all ease-out"
           style={{
-            left: iconPosition.left,
-            top: iconPosition.top,
-            width: iconPosition.width,
-            height: iconPosition.height,
+            left: textPosition.left,
+            top: textPosition.top,
+            width: textPosition.width,
+            height: textPosition.height,
             transitionDuration: `${TRANSITION_MS}ms`,
           }}
         >
-          <Image
-            src={image}
-            alt={selectedSlot.label}
-            width={120}
-            height={120}
-            className="h-full w-full object-contain"
-          />
+          <span className="font-cursive text-xl text-[#f8f6f2] md:text-2xl whitespace-nowrap">
+            midnight teahouse
+          </span>
         </div>
       )}
 
@@ -185,7 +139,6 @@ export function IconModal({
         className={`icon-modal-content relative my-auto w-full max-w-2xl max-h-[85vh] flex-shrink-0 overflow-y-auto rounded-3xl border-2 border-[#f8f6f2] pt-20 pb-8 pl-8 pr-8 transition-opacity duration-300 ease-out ${isOpen ? 'opacity-100' : 'opacity-0'}`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header area - ref for icon target position */}
         <div
           ref={headerRef}
           className="absolute left-0 right-0 top-0 flex h-20 items-center justify-center"
@@ -213,13 +166,10 @@ export function IconModal({
           </svg>
         </button>
         <div className="pr-10">
-          {selectedSlot && (
-            <h2 className="page-icon-label mb-4 font-cursive text-2xl">
-              {selectedSlot.label}
-            </h2>
-          )}
           <p className="font-cursive text-[#f8f6f2] text-lg">
-          Master cleanse austin mixtape etsy slow-carb synth food truck hell of lumbersexual deep v microdosing. Poke hella humblebrag farm-to-table tbh. Humblebrag gorpcore unicorn, poke flexitarian subway tile bicycle rights gatekeep VHS lo-fi ugh adaptogen cupping man bun chillwave. Brooklyn blog DIY, gochujang gorpcore neutra organic next level readymade four loko bruh intelligentsia.
+          Iceland af vinyl bruh. Stumptown hella celiac literally lyft gentrify vegan tattooed raclette taxidermy typewriter gastropub. Listicle vice tacos, artisan readymade actually vibecession locavore crucifix stumptown godard salvia tousled iPhone vaporware. Yes plz knausgaard PBR&B succulents helvetica four dollar toast shoreditch biodiesel dreamcatcher vinyl. Woke flannel chartreuse XOXO, poutine lyft roof party mixtape jean shorts glossier master cleanse cloud bread deep v tonx tbh. Succulents hashtag heirloom four loko marxism migas hell of ennui bitters Brooklyn pickled listicle bespoke schlitz. Selfies retro twee swag scenester ethical JOMO craft beer lyft.
+
+Tattooed authentic knausgaard ascot put a bird on it, shabby chic roof party subway tile truffaut trust fund single-origin coffee marxism. Ennui same jianbing four dollar toast snackwave live-edge jawn butcher biodiesel typewriter palo santo. Fingerstache affogato tbh shoreditch meggings yes plz roof party. Semiotics plaid PBR&B ennui vice, raclette yes plz solarpunk listicle banh mi biodiesel everyday carry. Twee roof party mixtape, kogi truffaut yes plz four dollar toast big mood neutral milk hotel ugh.
           </p>
         </div>
       </div>
