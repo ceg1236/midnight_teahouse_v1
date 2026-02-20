@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { TitleModal } from '../components/title-modal'
+import type { TitleModalSection } from '../../content/parse'
 
 type TitleModalContextValue = {
   titleRef: React.RefObject<HTMLSpanElement>
@@ -11,7 +12,12 @@ type TitleModalContextValue = {
 
 const TitleModalContext = createContext<TitleModalContextValue | null>(null)
 
-export function TitleModalProvider({ children }: { children: React.ReactNode }) {
+type TitleModalProviderProps = {
+  children: React.ReactNode
+  titleContent: TitleModalSection[]
+}
+
+export function TitleModalProvider({ children, titleContent }: TitleModalProviderProps) {
   const [titleModalOpen, setTitleModalOpen] = useState(false)
   const [titleSourceRect, setTitleSourceRect] = useState<DOMRect | null>(null)
   const titleRef = useRef<HTMLSpanElement>(null)
@@ -37,6 +43,7 @@ export function TitleModalProvider({ children }: { children: React.ReactNode }) 
         onClose={() => setTitleModalOpen(false)}
         titleSourceRect={titleSourceRect}
         titleRef={titleRef}
+        sections={titleContent}
       />
     </TitleModalContext.Provider>
   )

@@ -523,6 +523,22 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Font Classes */
+@font-face {
+  font-family: 'Playwrite US Modern';
+  src: url('/fonts/PlaywriteUSModern-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Vend Sans';
+  src: url('/fonts/VendSans-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 .font-heading {
   font-family: 'Crimson Text', serif;
   font-weight: 400;
@@ -536,6 +552,18 @@ h1, h2, h3, h4, h5, h6 {
 .font-cursive {
   font-family: 'Dancing Script', cursive;
   font-weight: 500;
+}
+
+/* Modal: Playwrite for greeting, questions, sign-off */
+.font-modal-accent {
+  font-family: 'Playwrite US Modern', cursive;
+  font-weight: 400;
+}
+
+/* Modal: Vend Sans for body paragraphs */
+.font-modal-body {
+  font-family: 'Vend Sans', sans-serif;
+  font-weight: 400;
 }
 
 /* Nav link hover: smooth skew */

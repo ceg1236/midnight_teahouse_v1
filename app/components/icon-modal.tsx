@@ -2,7 +2,6 @@
 
 import Image from 'next/image'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { iconModalContent, type IconModalId } from '../../content/modals'
 
 export type IconModalSlot = {
   id: string
@@ -21,6 +20,7 @@ type IconModalProps = {
   iconSourceRect: DOMRect | null
   iconRefs: React.RefObject<Map<string, HTMLDivElement>>
   displayTheme: 'day' | 'night'
+  iconContent: Record<string, string>
 }
 
 const TRANSITION_MS = 400
@@ -32,6 +32,7 @@ export function IconModal({
   iconSourceRect,
   iconRefs,
   displayTheme,
+  iconContent,
 }: IconModalProps) {
   const headerRef = useRef<HTMLDivElement>(null)
   const [iconPosition, setIconPosition] = useState<{
@@ -219,12 +220,15 @@ export function IconModal({
               {selectedSlot.label}
             </h2>
           )}
-          <p className="font-cursive text-[#f8f6f2] text-lg">
-            {selectedSlot &&
-            selectedSlot.id in iconModalContent
-              ? iconModalContent[selectedSlot.id as IconModalId].body
-              : ''}
-          </p>
+          <div className="font-modal-body text-[#f8f6f2] text-lg space-y-4">
+            {(selectedSlot ? iconContent[selectedSlot.id] ?? '' : '')
+              .trim()
+              .split(/\n\n+/)
+              .filter(Boolean)
+              .map((para, j) => (
+                <p key={j}>{para}</p>
+              ))}
+          </div>
         </div>
       </div>
     </div>

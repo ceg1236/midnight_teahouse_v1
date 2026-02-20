@@ -12,6 +12,7 @@
 - **Commit messages**: Keep them simple but descriptive of the main change.
   - Format: Brief description of what was changed
   - Do not add "Co-authored-by: Cursor <cursoragent@cursor.com>" or equivalent AI branding content
+  - DO NOT ADD A --trailer on commits
   - Examples:
     - "Update header styling and add custom fonts"
     - "Add hover animations to navigation"

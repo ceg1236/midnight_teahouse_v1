@@ -1,13 +1,14 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { titleModalContent } from '../../content/modals'
+import type { TitleModalSection } from '../../content/parse'
 
 type TitleModalProps = {
   isOpen: boolean
   onClose: () => void
   titleSourceRect: DOMRect | null
   titleRef: React.RefObject<HTMLSpanElement>
+  sections: TitleModalSection[]
 }
 
 const TRANSITION_MS = 400
@@ -18,6 +19,7 @@ export function TitleModal({
   onClose,
   titleSourceRect,
   titleRef,
+  sections,
 }: TitleModalProps) {
   const headerRef = useRef<HTMLDivElement>(null)
   const [textPosition, setTextPosition] = useState<{
@@ -166,15 +168,18 @@ export function TitleModal({
             <path d="m6 6 12 12" />
           </svg>
         </button>
-        <div className="pr-10">
-          <div className="font-cursive text-[#f8f6f2] text-lg space-y-4">
-            {titleModalContent.body
-              .trim()
-              .split(/\n\n+/)
-              .map((paragraph, i) => (
-                <p key={i}>{paragraph}</p>
-              ))}
-          </div>
+        <div className="pr-10 space-y-4 text-[#f8f6f2] text-lg">
+          {sections.map((section, i) => {
+            const isAccent = section.type === 'greeting' || section.type === 'question' || section.type === 'signOff'
+            const fontClass = isAccent ? 'font-modal-accent' : 'font-modal-body'
+            return (
+              <div key={i} className={fontClass}>
+                {section.text.split(/\n\n+/).map((para, j) => (
+                  <p key={j} className={j > 0 ? 'mt-4' : ''}>{para}</p>
+                ))}
+              </div>
+            )
+          })}
         </div>
       </div>
     </div>

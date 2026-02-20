@@ -32,7 +32,12 @@ const positionClasses: Record<string, string> = {
   left: 'md:top-1/2 md:-translate-y-1/2 md:left-[12%]',
 }
 
-export function HomeContent({ slots }: { slots: IconSlot[] }) {
+type HomeContentProps = {
+  slots: IconSlot[]
+  iconContent: Record<string, string>
+}
+
+export function HomeContent({ slots, iconContent }: HomeContentProps) {
   const { theme } = useTheme()
   const [displayTheme, setDisplayTheme] = useState(theme)
   const [iconOpacity, setIconOpacity] = useState(1)
@@ -71,6 +76,7 @@ export function HomeContent({ slots }: { slots: IconSlot[] }) {
         iconSourceRect={iconSourceRect}
         iconRefs={iconRefs}
         displayTheme={displayTheme}
+        iconContent={iconContent}
       />
       {/* Mobile: vertical stack. Desktop (md+): circle with absolute positions */}
       <div className="w-full max-w-4xl flex flex-col items-center gap-6 md:relative md:aspect-square md:max-h-[min(80vw,70vh)] md:gap-0">
@@ -115,7 +121,7 @@ export function HomeContent({ slots }: { slots: IconSlot[] }) {
               ) : (
                 <span className="text-[#f8f6f2]/40 text-2xl">+</span>
               )}
-              <span className="page-icon-label font-cursive text-3xl whitespace-nowrap md:text-4xl">
+              <span className="page-icon-label font-cursive text-3xl whitespace-nowrap md:text-3xl">
                 {slot.label}
               </span>
             </button>

@@ -5,6 +5,7 @@ import { GeistMono } from 'geist/font/mono'
 import { Navbar } from './components/nav'
 import { ThemeProvider } from './context/theme-context'
 import { TitleModalProvider } from './context/title-modal-context'
+import { getTitleModalContent } from '../content/parse'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { baseUrl } from './sitemap'
@@ -52,7 +53,7 @@ export default function RootLayout({
       <body className="antialiased">
         <div id="root">
           <ThemeProvider>
-            <TitleModalProvider>
+            <TitleModalProvider titleContent={getTitleModalContent()}>
               <Navbar />
               {children}
             </TitleModalProvider>

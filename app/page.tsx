@@ -2,6 +2,7 @@ import { BackgroundPollen } from './components/background-pollen'
 import { BackgroundStars } from './components/background-stars'
 import { HomeContent } from './components/home-content'
 import type { IconSlot } from './components/home-content'
+import { getIconModalContent } from '../content/parse'
 
 const iconSlots: IconSlot[] = [
   {
@@ -44,6 +45,9 @@ const iconSlots: IconSlot[] = [
 ]
 
 export default function Page() {
+  const iconContent = Object.fromEntries(
+    iconSlots.map((slot) => [slot.id, getIconModalContent(slot.id)])
+  )
   return (
     <div className="page-bg">
       <div className="page-bg-night" aria-hidden />
@@ -51,7 +55,7 @@ export default function Page() {
       <BackgroundStars />
       <BackgroundPollen />
       <div className="relative z-10">
-        <HomeContent slots={iconSlots} />
+        <HomeContent slots={iconSlots} iconContent={iconContent} />
       </div>
     </div>
   )
