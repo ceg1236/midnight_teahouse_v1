@@ -17,7 +17,7 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
   const [step, setStep] = useState<Step>('welcome')
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [selectedTier, setSelectedTier] = useState<string | null>(null)
-  const [formData, setFormData] = useState({ name: '', email: '', dietary: '', notes: '' })
+  const [formData, setFormData] = useState({ name: '', email: '', notes: '' })
   const [deviceType, setDeviceType] = useState<'mobile' | 'desktop'>('desktop')
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -27,12 +27,6 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
   }, [])
 
   const stepIndex = STEPS.indexOf(step)
-  const canProceed =
-    (step === 'welcome') ||
-    (step === 'date' && selectedDate) ||
-    (step === 'tier' && selectedTier) ||
-    (step === 'form' && formData.name && formData.email) ||
-    step === 'payment'
 
   const handleNext = () => {
     const i = stepIndex + 1
@@ -63,11 +57,11 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
         ))}
       </div>
 
-      {/* Step content */}
-      <div className="invite-step flex flex-1 flex-col items-center justify-center px-6 pb-24 pt-16 md:pb-12 md:pt-20">
+      {/* Step content - key triggers fade-in on step change */}
+      <div key={step} className="invite-step invite-step-enter relative flex flex-1 flex-col items-center justify-center px-6 pb-12 pt-16 md:pt-20">
         {step === 'welcome' && (
           <div className="invite-welcome invite-welcome-step mx-auto flex max-w-4xl flex-col items-center justify-center gap-4 md:gap-5">
-            <h1 className="font-invite text-center text-2xl text-inherit md:text-3xl lg:text-4xl">
+            <h1 className="font-invite text-center text-3xl text-inherit md:text-3xl lg:text-4xl">
               Spring Fling at the Teahouse
             </h1>
             {/* Text body flanked by images */}
@@ -83,8 +77,8 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
                 />
               </div>
               <div className="flex flex-1 flex-col items-center">
-                {/* Invite text - tweak size: text-base/text-lg, space-y-2/3, leading-snug/relaxed */}
-                <div className="font-invite space-y-3 text-center text-base leading-relaxed md:text-lg">
+                {/* Invite text - tweak: text-lg/xl on mobile, md:text-lg/xl on desktop */}
+                <div className="font-invite space-y-3 text-center text-lg leading-relaxed md:text-xl">
                   {welcomeContent.split(/\n\n+/).map((para, i) => (
                     <p key={i}>{para}</p>
                   ))}
@@ -92,7 +86,7 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="invite-reserve mt-4 rounded-lg bg-[#f8f6f2] px-8 py-3 font-invite text-[#162143]"
+                  className="invite-reserve mt-4 rounded-lg bg-[#f8f6f2] px-10 py-4 font-invite text-xl text-[#162143] md:text-2xl"
                 >
                   Reserve
                 </button>
@@ -108,21 +102,21 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
                 />
               </div>
             </div>
-            {/* Mobile: images below text */}
-            <div className="flex gap-4 md:hidden">
+            {/* Mobile images: Option B - compact thumbnails. Alternatives: remove div (no images), or use opacity-30 for subtle bg */}
+            <div className="flex justify-center gap-3 md:hidden">
               <Image
                 src="/images/xf_flowers_tea/xf_white_flowers_2.jpg"
                 alt=""
-                width={80}
-                height={100}
+                width={56}
+                height={56}
                 className="rounded-lg object-cover"
                 aria-hidden
               />
               <Image
                 src="/images/xf_flowers_tea/xf_plant_yellow_3.jpg"
                 alt=""
-                width={80}
-                height={100}
+                width={56}
+                height={56}
                 className="rounded-lg object-cover"
                 aria-hidden
               />
@@ -131,7 +125,24 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
         )}
 
         {step === 'date' && (
-          <div className="invite-dates mx-auto flex max-w-md flex-col gap-6">
+          <div className="invite-dates mx-auto flex w-full max-w-2xl flex-col gap-4 px-2">
+            <button
+              type="button"
+              onClick={handleBack}
+              className="self-start font-invite text-[#f8f6f2] hover:opacity-80"
+              aria-label="Go back"
+            >
+              ← Back
+            </button>
+            <div className="relative mx-auto aspect-[16/10] w-full max-w-md overflow-hidden rounded-lg">
+              <Image
+                src="/images/art_tea.jpg"
+                alt="An intimate evening of tea and connection"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 448px"
+              />
+            </div>
             <h2 className="font-invite text-center text-2xl">
               Choose your evening
             </h2>
@@ -140,7 +151,10 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
                 <button
                   key={d.id}
                   type="button"
-                  onClick={() => setSelectedDate(d.id)}
+                  onClick={() => {
+                    setSelectedDate(d.id)
+                    handleNext()
+                  }}
                   className={`rounded-xl border-2 px-6 py-4 text-left font-invite transition-colors ${
                     selectedDate === d.id
                       ? 'border-[#f8f6f2] bg-[#f8f6f2]/10'
@@ -155,7 +169,24 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
         )}
 
         {step === 'tier' && (
-          <div className="invite-tiers mx-auto flex max-w-lg flex-col gap-6">
+          <div className="invite-tiers mx-auto flex w-full max-w-2xl flex-col gap-4 px-2">
+            <button
+              type="button"
+              onClick={handleBack}
+              className="self-start font-invite text-[#f8f6f2] hover:opacity-80"
+              aria-label="Go back"
+            >
+              ← Back
+            </button>
+            <div className="relative mx-auto aspect-[16/10] w-full max-w-md overflow-hidden rounded-lg">
+              <Image
+                src="/images/xf_flowers_tea/xf_teacup.jpg"
+                alt="Tea and connection"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 448px"
+              />
+            </div>
             <h2 className="font-invite text-center text-2xl">
               Select your experience
             </h2>
@@ -164,7 +195,10 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
                 <button
                   key={t.id}
                   type="button"
-                  onClick={() => setSelectedTier(t.id)}
+                  onClick={() => {
+                    setSelectedTier(t.id)
+                    handleNext()
+                  }}
                   className={`flex flex-col rounded-xl border-2 p-5 text-center transition-colors ${
                     selectedTier === t.id
                       ? 'border-[#f8f6f2] bg-[#f8f6f2]/10'
@@ -183,7 +217,15 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
         )}
 
         {step === 'form' && (
-          <div className="invite-form mx-auto w-full max-w-md space-y-6">
+          <div className="invite-form mx-auto flex w-full max-w-md flex-col gap-4">
+            <button
+              type="button"
+              onClick={handleBack}
+              className="self-start font-invite text-[#f8f6f2] hover:opacity-80"
+              aria-label="Go back"
+            >
+              ← Back
+            </button>
             <h2 className="font-invite text-center text-2xl">
               A few details
             </h2>
@@ -223,17 +265,6 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
                 />
               </label>
               <label className="font-invite">
-                Dietary preferences
-                <input
-                  type="text"
-                  name="dietary"
-                  value={formData.dietary}
-                  onChange={(e) => setFormData((d) => ({ ...d, dietary: e.target.value }))}
-                  className="invite-input mt-1 w-full rounded-lg border border-[#f8f6f2]/40 bg-[#f8f6f2]/5 px-4 py-3 text-inherit placeholder:text-inherit/50 focus:border-[#f8f6f2] focus:outline-none"
-                  placeholder="Vegetarian, allergies, etc."
-                />
-              </label>
-              <label className="font-invite">
                 Notes
                 <textarea
                   name="notes"
@@ -244,12 +275,26 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
                   placeholder="Anything else we should know?"
                 />
               </label>
+              <button
+                type="submit"
+                className="invite-reserve mt-2 w-full rounded-lg bg-[#f8f6f2] px-8 py-4 font-invite text-xl text-[#162143]"
+              >
+                Continue
+              </button>
             </form>
           </div>
         )}
 
         {step === 'payment' && (
           <div className="invite-payment mx-auto flex max-w-md flex-col items-center gap-6 text-center">
+            <button
+              type="button"
+              onClick={handleBack}
+              className="self-start font-invite text-[#f8f6f2] hover:opacity-80"
+              aria-label="Go back"
+            >
+              ← Back
+            </button>
             <h2 className="font-invite text-2xl">
               Complete your reservation
             </h2>
@@ -262,49 +307,16 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
             <p className="font-invite text-sm opacity-70">
               Stripe payment will be integrated here. For now, this completes the flow.
             </p>
+            <button
+              type="button"
+              onClick={handleNext}
+              className="invite-reserve rounded-lg bg-[#f8f6f2] px-10 py-4 font-invite text-xl text-[#162143]"
+            >
+              Reserve (Stripe placeholder)
+            </button>
           </div>
         )}
       </div>
-
-      {/* Nav buttons - hidden on welcome step */}
-      {step !== 'welcome' && (
-      <div className="invite-nav fixed bottom-0 left-0 right-0 z-20 flex justify-between gap-4 border-t border-[#f8f6f2]/20 bg-[#162143]/95 px-6 py-4 backdrop-blur-sm md:px-8">
-        <button
-          type="button"
-          onClick={handleBack}
-          disabled={stepIndex === 0}
-          className="font-invite rounded-lg px-6 py-2 disabled:opacity-30"
-        >
-          Back
-        </button>
-        {step === 'form' ? (
-          <button
-            type="submit"
-            form="invite-form"
-            className="invite-next rounded-lg bg-[#f8f6f2] px-6 py-2 font-invite text-[#162143]"
-          >
-            Next
-          </button>
-        ) : step === 'payment' ? (
-          <button
-            type="button"
-            onClick={handleNext}
-            className="invite-next rounded-lg bg-[#f8f6f2] px-6 py-2 font-invite text-[#162143]"
-          >
-            Reserve (Stripe placeholder)
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={handleNext}
-            disabled={!canProceed}
-            className="invite-next rounded-lg bg-[#f8f6f2] px-6 py-2 font-invite text-[#162143] disabled:opacity-50"
-          >
-            Next
-          </button>
-        )}
-      </div>
-      )}
     </div>
   )
 }

@@ -3,13 +3,13 @@
  */
 
 export const eventDates = [
-  { id: 'mar-7', label: 'Friday, March 7', value: '2025-03-07' },
-  { id: 'mar-8', label: 'Saturday, March 8', value: '2025-03-08' },
-  { id: 'mar-9', label: 'Sunday, March 9', value: '2025-03-09' },
+  { id: 'mar-18', label: 'Wednesday, March 18', value: '2025-03-18' },
+  { id: 'mar-19', label: 'Thursday, March 19', value: '2025-03-19' },
+  { id: 'mar-20', label: 'Friday, March 20', value: '2025-03-20' },
 ] as const
 
 export const eventTiers = [
-  { id: 'evening', label: 'Evening', description: 'Tea service & live music', price: 75 },
-  { id: 'full', label: 'Full Experience', description: 'Evening + curated tasting', price: 120 },
-  { id: 'vip', label: 'VIP', description: 'Full + reserved seating & gift', price: 175 },
+  { id: 'supported', label: 'Supported', description: 'Pay what feels right, we believe in accessibility.', price: 20 },
+  { id: 'community', label: 'Community', description: 'The heart of our gathering, your support sustains the experience.', price: 40 },
+  { id: 'patron', label: 'Patron', description: 'Your generosity helps us grow and supports others to attend.', price: 60 },
 ] as const

@@ -16,9 +16,9 @@ const STAR_CONFIG = [
 const STAR_POSITIONS: Array<[number, number]> = [
   [0.12, 0.14],   // top-left
   [0.78, 0.14],   // top-right
-  [0.9, 0.29],   // top-center
-  [0.88, 0.86],   // bottom-right
-  [0.12, 0.86],   // bottom-left
+  [0.93, 0.29],   // top-center
+  [0.88, 0.89],   // bottom-right
+  [0.08, 0.91],   // bottom-left
   [0.18, 0.22],   // diagonal pair
   [0.26, 0.30],   // diagonal pair (near above)
 ]
