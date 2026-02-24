@@ -46,6 +46,12 @@ export function getTitleModalContent(): TitleModalSection[] {
   return parseTitleModalDoc(raw)
 }
 
+export function getEventInviteContent(): string {
+  const filePath = path.join(process.cwd(), 'content', 'event-invite.md')
+  const raw = fs.readFileSync(filePath, 'utf-8')
+  return raw.replace(/^#\s*Welcome\s*\n+/i, '').trim()
+}
+
 export function getIconModalContent(slotId: string): string {
   const filePath = path.join(process.cwd(), 'content', 'modals', `${slotId}.md`)
   try {

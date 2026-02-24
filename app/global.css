@@ -539,6 +539,14 @@ h1, h2, h3, h4, h5, h6 {
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'Hubballi';
+  src: url('/fonts/Hubballi-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 .font-heading {
   font-family: 'Crimson Text', serif;
   font-weight: 400;
@@ -564,6 +572,53 @@ h1, h2, h3, h4, h5, h6 {
 .font-modal-body {
   font-family: 'Vend Sans', sans-serif;
   font-weight: 400;
+}
+
+/* Event invite: Hubballi for body text */
+.font-invite {
+  font-family: 'Hubballi', sans-serif;
+  font-weight: 400;
+}
+
+/* Event invite wizard - welcome step fits viewport on desktop */
+.invite-wizard .invite-welcome-step {
+  max-height: calc(100dvh - 140px);
+  max-height: calc(100vh - 140px);
+}
+@media (min-width: 768px) {
+  .invite-wizard .invite-welcome-step {
+    overflow: hidden;
+  }
+}
+@media (max-width: 767px) {
+  .invite-wizard .invite-welcome-step {
+    overflow-y: auto;
+  }
+}
+
+/* Event invite wizard - theme-aware text */
+.invite-wizard {
+  color: #f8f6f2;
+}
+[data-theme='day'] .invite-wizard {
+  color: #162143;
+}
+.invite-wizard .invite-input::placeholder {
+  color: rgba(248, 246, 242, 0.5);
+}
+[data-theme='day'] .invite-wizard .invite-input::placeholder {
+  color: rgba(22, 33, 67, 0.5);
+}
+.invite-wizard .invite-input {
+  color: inherit;
+}
+[data-theme='day'] .invite-wizard .invite-input {
+  border-color: rgba(22, 33, 67, 0.4);
+  background-color: rgba(22, 33, 67, 0.05);
+}
+[data-theme='day'] .invite-wizard .invite-input:focus {
+  border-color: #162143;
+  outline: none;
 }
 
 /* Nav link hover: smooth skew */
