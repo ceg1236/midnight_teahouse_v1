@@ -216,11 +216,11 @@ export function IconModal({
         </button>
         <div className="pr-10">
           {selectedSlot && (
-            <h2 className="page-icon-label mb-4 font-cursive text-2xl">
+            <h2 className="page-icon-label mb-4 font-invite text-2xl">
               {selectedSlot.label}
             </h2>
           )}
-          <div className="font-modal-body text-[#f8f6f2] text-lg space-y-4">
+          <div className="font-invite text-[#f8f6f2] text-lg space-y-4">
             {(selectedSlot ? iconContent[selectedSlot.id] ?? '' : '')
               .trim()
               .split(/\n\n+/)

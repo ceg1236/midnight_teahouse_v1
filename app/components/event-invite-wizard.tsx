@@ -155,7 +155,7 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
                     setSelectedDate(d.id)
                     handleNext()
                   }}
-                  className={`rounded-xl border-2 px-6 py-4 text-left font-invite transition-colors ${
+                  className={`rounded-xl border-2 px-6 py-4 text-left font-invite text-lg transition-colors ${
                     selectedDate === d.id
                       ? 'border-[#f8f6f2] bg-[#f8f6f2]/10'
                       : 'border-[#f8f6f2]/30 hover:border-[#f8f6f2]/50'
@@ -205,11 +205,11 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
                       : 'border-[#f8f6f2]/30 hover:border-[#f8f6f2]/50'
                   }`}
                 >
-                  <span className="font-invite text-lg">{t.label}</span>
-                  <span className="font-invite mt-1 text-sm opacity-80">
+                  <span className="font-invite text-xl">{t.label}</span>
+                  <span className="font-invite mt-1 text-base opacity-80">
                     {t.description}
                   </span>
-                  <span className="font-invite mt-2">${t.price}</span>
+                  <span className="font-invite mt-2 text-xl">${t.price}</span>
                 </button>
               ))}
             </div>

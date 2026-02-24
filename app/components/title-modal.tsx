@@ -168,12 +168,11 @@ export function TitleModal({
             <path d="m6 6 12 12" />
           </svg>
         </button>
-        <div className="pr-10 space-y-4 text-[#f8f6f2] text-lg">
+        <div className="pr-10 space-y-4 text-[#f8f6f2]">
           {sections.map((section, i) => {
             const isAccent = section.type === 'greeting' || section.type === 'question' || section.type === 'signOff'
-            const fontClass = isAccent ? 'font-modal-accent' : 'font-modal-body'
             return (
-              <div key={i} className={fontClass}>
+              <div key={i} className={`font-invite ${isAccent ? 'text-xl md:text-2xl' : 'text-lg'}`}>
                 {section.text.split(/\n\n+/).map((para, j) => (
                   <p key={j} className={j > 0 ? 'mt-4' : ''}>{para}</p>
                 ))}

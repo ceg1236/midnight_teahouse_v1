@@ -9,7 +9,7 @@ export const eventDates = [
 ] as const
 
 export const eventTiers = [
-  { id: 'supported', label: 'Supported', description: 'Pay what feels right, we believe in accessibility.', price: 20 },
+  { id: 'supported', label: 'Supported', description: 'An accessible option, we don\'t want price to keep people out.', price: 20 },
   { id: 'community', label: 'Community', description: 'The heart of our gathering, your support sustains the experience.', price: 40 },
   { id: 'patron', label: 'Patron', description: 'Your generosity helps us grow and supports others to attend.', price: 60 },
 ] as const
