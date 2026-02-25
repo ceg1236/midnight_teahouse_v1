@@ -40,7 +40,8 @@ export async function POST(req: NextRequest) {
 
   const date = eventDates.find((d) => d.id === metadata.dateId)
   const tier = eventTiers.find((t) => t.id === metadata.tierId)
-  const ticketTier = date && tier ? `${date.label} · ${tier.label}` : metadata.tierId
+  const ticketDate = date?.label ?? metadata.dateId
+  const ticketTier = tier?.label ?? metadata.tierId
   const paymentId =
     typeof session.payment_intent === 'string'
       ? session.payment_intent
@@ -50,6 +51,7 @@ export async function POST(req: NextRequest) {
     new Date().toISOString(),
     String(metadata.name),
     String(metadata.email),
+    String(ticketDate),
     String(ticketTier),
     String(metadata.notes ?? ''),
     String(metadata.device ?? 'desktop'),
@@ -67,7 +69,8 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  const range = `${sheetName}!A:G`
+  // Append to data rows (A2:H) to avoid Table header validation conflicts
+  const range = `${sheetName}!A2:H`
   try {
     const auth = new google.auth.GoogleAuth({
       keyFile: credentialsPath,
