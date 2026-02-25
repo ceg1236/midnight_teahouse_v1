@@ -106,6 +106,15 @@ export async function POST(req: NextRequest) {
         notes: notes.slice(0, 500), // Stripe metadata values max 500 chars
         device: deviceType,
       },
+      payment_intent_data: {
+        metadata: {
+          dateId: date.id,
+          tierId: tier.id,
+          name: trimmedName,
+          email: trimmedEmail,
+          device: deviceType,
+        },
+      },
       customer_email: trimmedEmail,
       success_url: successUrl,
       cancel_url: cancelUrl,

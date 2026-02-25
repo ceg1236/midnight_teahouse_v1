@@ -48,16 +48,17 @@ export async function POST(req: NextRequest) {
 
   const row = [
     new Date().toISOString(),
-    metadata.name,
-    metadata.email,
-    ticketTier,
-    metadata.notes ?? '',
-    metadata.device ?? 'desktop',
-    paymentId,
+    String(metadata.name),
+    String(metadata.email),
+    String(ticketTier),
+    String(metadata.notes ?? ''),
+    String(metadata.device ?? 'desktop'),
+    String(paymentId),
   ]
 
   const spreadsheetId = process.env.SPREADSHEET_ID
   const credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS
+  const sheetName = process.env.SPREADSHEET_SHEET_NAME || 'Sheet1'
   if (!spreadsheetId || !credentialsPath) {
     console.error('SPREADSHEET_ID or GOOGLE_APPLICATION_CREDENTIALS not set')
     return NextResponse.json(
@@ -66,6 +67,7 @@ export async function POST(req: NextRequest) {
     )
   }
 
+  const range = `${sheetName}!A:G`
   try {
     const auth = new google.auth.GoogleAuth({
       keyFile: credentialsPath,
@@ -74,12 +76,17 @@ export async function POST(req: NextRequest) {
     const sheets = google.sheets({ version: 'v4', auth })
     await sheets.spreadsheets.values.append({
       spreadsheetId,
-      range: 'Sheet1!A:G',
+      range,
       valueInputOption: 'USER_ENTERED',
+      insertDataOption: 'INSERT_ROWS',
       requestBody: { values: [row] },
     })
-  } catch (err) {
-    console.error('Failed to append to Google Sheet:', err)
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err)
+    const details = err && typeof err === 'object' && 'response' in err
+      ? JSON.stringify((err as { response?: unknown }).response)
+      : ''
+    console.error('Failed to append to Google Sheet:', msg, details)
     return NextResponse.json(
       { error: 'Failed to write to sheet' },
       { status: 500 }
