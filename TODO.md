@@ -10,10 +10,10 @@ Reference this list as we build. Check off items as they're completed.
   - Create checkout session with form data as `metadata` (name, email, date, tier, notes)
   - Form data only sent on successful payment (metadata is attached to payment)
 - [ ] **Spreadsheet as data source** – Google Sheets for ticket holder list (see section 7)
-- [ ] **Webhook handler** (`checkout.session.completed`)
-  - Append row to spreadsheet (timestamp, date, tier, name, email, notes, stripe_payment_id)
-  - Add paid attendees to existing email list (CRM API)
-  - Optional: custom confirmation email (Stripe sends receipt; we send event-specific welcome)
+- [x] **Webhook handler** (`checkout.session.completed`)
+  - Append row to spreadsheet (timestamp, name, email, ticket tier, notes, device, stripe_payment_id)
+  - [ ] Add paid attendees to existing email list (CRM API)
+  - [ ] Optional: custom confirmation email (Stripe sends receipt; we send event-specific welcome)
 
 ---
 
@@ -85,7 +85,7 @@ Reference this list as we build. Check off items as they're completed.
   - Column order: `Timestamp` | `Name` | `Email` | `Ticket tier` | `Notes` | `Device` | `Stripe Payment ID`
   - Ticket tier = date + tier label (e.g. "Wednesday, March 18 · Community")
   - Device = mobile | tablet | desktop (from form)
-- [ ] **Write pattern** – append-only from webhook (one row per successful payment)
+- [x] **Write pattern** – append-only from webhook (one row per successful payment)
 - [ ] **Security** – server-only access, never expose sheet ID or credentials to client
 - [ ] **Rate limits** – ~100 writes/100 sec (fine for small events)
 - [ ] **Backup** – use version history; periodic export to CSV
