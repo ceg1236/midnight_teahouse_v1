@@ -56,7 +56,7 @@ Reference this list as we build. Check off items as they're completed.
 - [ ] **Loading states** – show spinner during submit and payment redirect
 - [ ] **Error handling** – show clear messages on network/API/Stripe failures
 - [ ] **Double-submit prevention** – disable button after click, consider idempotency key
-- [ ] **Session persistence** (optional) – save progress to `sessionStorage` so refresh doesn't lose flow
+- [x] **Session persistence** – save date/tier/form to `sessionStorage`; restore on back from Stripe; clear on success page
 
 ---
 

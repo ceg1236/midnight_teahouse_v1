@@ -4,6 +4,8 @@ import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 import type { eventDates, eventTiers } from '../../content/event-invite.config'
 
+const STORAGE_KEY = 'teahouse_reservation'
+
 type EventInviteWizardProps = {
   welcomeContent: string
   dates: readonly (typeof eventDates)[number][]
@@ -14,6 +16,40 @@ function scrollToSection(ref: React.RefObject<HTMLElement | null>) {
   ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
+function loadPersisted(
+  dates: readonly { id: string }[],
+  tiers: readonly { id: string }[]
+): { date: string | null; tier: string | null; form: { name: string; email: string; notes: string } } {
+  if (typeof window === 'undefined') return { date: null, tier: null, form: { name: '', email: '', notes: '' } }
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY)
+    if (!raw) return { date: null, tier: null, form: { name: '', email: '', notes: '' } }
+    const data = JSON.parse(raw) as { date?: string; tier?: string; name?: string; email?: string; notes?: string }
+    const date = data.date && dates.some((d) => d.id === data.date) ? data.date : null
+    const tier = data.tier && tiers.some((t) => t.id === data.tier) ? data.tier : null
+    return {
+      date,
+      tier,
+      form: {
+        name: typeof data.name === 'string' ? data.name : '',
+        email: typeof data.email === 'string' ? data.email : '',
+        notes: typeof data.notes === 'string' ? data.notes : '',
+      },
+    }
+  } catch {
+    return { date: null, tier: null, form: { name: '', email: '', notes: '' } }
+  }
+}
+
+function savePersisted(date: string | null, tier: string | null, form: { name: string; email: string; notes: string }) {
+  if (typeof window === 'undefined') return
+  try {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ date, tier, ...form }))
+  } catch {
+    /* ignore */
+  }
+}
+
 export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteWizardProps) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [selectedTier, setSelectedTier] = useState<string | null>(null)
@@ -21,11 +57,20 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
   const [deviceType, setDeviceType] = useState<'mobile' | 'tablet' | 'desktop'>('desktop')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
+  const [hydrated, setHydrated] = useState(false)
 
   const dateRef = useRef<HTMLElement>(null)
   const tierRef = useRef<HTMLElement>(null)
   const formRef = useRef<HTMLElement>(null)
   const paymentRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    const persisted = loadPersisted(dates, tiers)
+    setSelectedDate(persisted.date)
+    setSelectedTier(persisted.tier)
+    setFormData(persisted.form)
+    setHydrated(true)
+  }, [dates, tiers])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -35,6 +80,11 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
     else if (hasTouch && w < 1024) setDeviceType('tablet')
     else setDeviceType('desktop')
   }, [])
+
+  useEffect(() => {
+    if (!hydrated) return
+    savePersisted(selectedDate, selectedTier, formData)
+  }, [hydrated, selectedDate, selectedTier, formData])
 
   const selectedTierData = tiers.find((t) => t.id === selectedTier)
 
@@ -232,54 +282,71 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
           <h2 className="font-invite-title text-2xl">
             Complete your reservation
           </h2>
-          <div className="font-invite-body rounded-xl border border-[#f8f6f2]/40 bg-[#f8f6f2]/5 px-6 py-4">
-            <p>
-              {dates.find((d) => d.id === selectedDate)?.label} · {selectedTierData?.label}
-            </p>
-            <p className="mt-2 font-invite-title text-xl">${selectedTierData?.price}</p>
-          </div>
-          {checkoutError && (
-            <p className="font-invite-body text-sm text-red-300" role="alert">
-              {checkoutError}
-            </p>
+          {selectedDate && selectedTier ? (
+            <>
+              <div className="font-invite-body rounded-xl border border-[#f8f6f2]/40 bg-[#f8f6f2]/5 px-6 py-4">
+                <p>
+                  {dates.find((d) => d.id === selectedDate)?.label} · {selectedTierData?.label}
+                </p>
+                <p className="mt-2 font-invite-title text-xl">${selectedTierData?.price}</p>
+              </div>
+              {checkoutError && (
+                <p className="font-invite-body text-sm text-red-300" role="alert">
+                  {checkoutError}
+                </p>
+              )}
+              <button
+                type="button"
+                disabled={isSubmitting}
+                onClick={async () => {
+                  if (!selectedDate || !selectedTier || !formData.name.trim() || !formData.email.trim()) return
+                  setIsSubmitting(true)
+                  setCheckoutError(null)
+                  try {
+                    const res = await fetch('/api/checkout', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        dateId: selectedDate,
+                        tierId: selectedTier,
+                        name: formData.name.trim(),
+                        email: formData.email.trim(),
+                        notes: formData.notes.trim(),
+                        device: deviceType,
+                      }),
+                    })
+                    const data = await res.json()
+                    if (!res.ok) {
+                      setCheckoutError(data.error ?? 'Something went wrong')
+                      return
+                    }
+                    if (data.url) window.location.href = data.url
+                    else setCheckoutError('No checkout URL received')
+                  } catch {
+                    setCheckoutError('Network error. Please try again.')
+                  } finally {
+                    setIsSubmitting(false)
+                  }
+                }}
+                className="invite-reserve rounded-lg bg-[#f8f6f2] px-10 py-4 font-invite-title text-xl text-[#162143] disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? 'Redirecting…' : 'Reserve'}
+              </button>
+            </>
+          ) : (
+            <div className="font-invite-body space-y-4">
+              <p className="opacity-80">
+                Select a date and tier above to complete your reservation.
+              </p>
+              <button
+                type="button"
+                onClick={() => scrollToSection(dateRef)}
+                className="invite-reserve rounded-lg bg-[#f8f6f2]/80 px-8 py-3 font-invite-title text-lg text-[#162143]"
+              >
+                Choose date & tier
+              </button>
+            </div>
           )}
-          <button
-            type="button"
-            disabled={isSubmitting}
-            onClick={async () => {
-              if (!selectedDate || !selectedTier || !formData.name.trim() || !formData.email.trim()) return
-              setIsSubmitting(true)
-              setCheckoutError(null)
-              try {
-                const res = await fetch('/api/checkout', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    dateId: selectedDate,
-                    tierId: selectedTier,
-                    name: formData.name.trim(),
-                    email: formData.email.trim(),
-                    notes: formData.notes.trim(),
-                    device: deviceType,
-                  }),
-                })
-                const data = await res.json()
-                if (!res.ok) {
-                  setCheckoutError(data.error ?? 'Something went wrong')
-                  return
-                }
-                if (data.url) window.location.href = data.url
-                else setCheckoutError('No checkout URL received')
-              } catch {
-                setCheckoutError('Network error. Please try again.')
-              } finally {
-                setIsSubmitting(false)
-              }
-            }}
-            className="invite-reserve rounded-lg bg-[#f8f6f2] px-10 py-4 font-invite-title text-xl text-[#162143] disabled:opacity-70 disabled:cursor-not-allowed"
-          >
-            {isSubmitting ? 'Redirecting…' : 'Reserve'}
-          </button>
         </div>
       </section>
     </div>

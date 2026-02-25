@@ -1,6 +1,14 @@
+'use client'
+
 import Link from 'next/link'
+import { useEffect } from 'react'
+
+const STORAGE_KEY = 'teahouse_reservation'
 
 export default function InviteSuccessPage() {
+  useEffect(() => {
+    sessionStorage.removeItem(STORAGE_KEY)
+  }, [])
   return (
     <div className="invite-success flex min-h-[100dvh] flex-col items-center justify-center px-6 md:min-h-screen">
       <div className="invite-welcome mx-auto flex max-w-md flex-col items-center gap-6 text-center">
