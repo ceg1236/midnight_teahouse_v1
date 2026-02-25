@@ -69,14 +69,33 @@ export async function POST(req: NextRequest) {
     )
   }
 
+  const auth = new google.auth.GoogleAuth({
+    keyFile: credentialsPath,
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+  })
+  const sheets = google.sheets({ version: 'v4', auth })
+
+  // Idempotency: skip if we've already processed this payment
+  try {
+    const existing = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `${sheetName}!H2:H`,
+    })
+    const paymentIds = (existing.data.values ?? []).flat()
+    if (paymentIds.includes(paymentId)) {
+      return NextResponse.json({ received: true })
+    }
+  } catch (err) {
+    console.error('Failed to check existing payments:', err)
+    return NextResponse.json(
+      { error: 'Failed to verify payment' },
+      { status: 500 }
+    )
+  }
+
   // Append to data rows (A2:H) to avoid Table header validation conflicts
   const range = `${sheetName}!A2:H`
   try {
-    const auth = new google.auth.GoogleAuth({
-      keyFile: credentialsPath,
-      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-    })
-    const sheets = google.sheets({ version: 'v4', auth })
     await sheets.spreadsheets.values.append({
       spreadsheetId,
       range,

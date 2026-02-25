@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { eventDates, eventTiers } from '../../../content/event-invite.config'
+import { checkRateLimit } from '../../../lib/rate-limit'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
@@ -19,6 +20,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       { error: 'Stripe is not configured' },
       { status: 500 }
+    )
+  }
+
+  const { ok, retryAfter } = checkRateLimit(req)
+  if (!ok) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      { status: 429, headers: { 'Retry-After': String(retryAfter ?? 60) } }
     )
   }
 

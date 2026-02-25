@@ -11,7 +11,8 @@ Reference this list as we build. Check off items as they're completed.
   - Form data only sent on successful payment (metadata is attached to payment)
 - [ ] **Spreadsheet as data source** – Google Sheets for ticket holder list (see section 7)
 - [x] **Webhook handler** (`checkout.session.completed`)
-  - Append row to spreadsheet (timestamp, name, email, ticket tier, notes, device, stripe_payment_id)
+  - Append row to spreadsheet (timestamp, name, email, ticket date, ticket tier, notes, device, stripe_payment_id)
+  - [x] Idempotency – skip if payment ID already in sheet
   - [ ] Add paid attendees to existing email list (CRM API)
   - [ ] Custom event confirmation email (from our domain, via webhook)
 
@@ -61,7 +62,7 @@ Reference this list as we build. Check off items as they're completed.
 
 - [ ] **Error tracking** – Sentry or similar
 - [ ] **Logging** – log attempts, successes, failures (no sensitive data)
-- [ ] **Rate limiting** – limit reservation attempts per IP or user
+- [x] **Rate limiting** – 5 requests/min per IP on checkout
 
 ---
 
