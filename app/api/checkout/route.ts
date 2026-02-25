@@ -3,8 +3,6 @@ import Stripe from 'stripe'
 import { eventDates, eventTiers } from '../../../content/event-invite.config'
 import { checkRateLimit } from '../../../lib/rate-limit'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
-
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const NAME_MAX_LEN = 200
 const NOTES_MAX_LEN = 1000
@@ -91,6 +89,7 @@ export async function POST(req: NextRequest) {
   const successUrl = `${baseUrl}/invite/success?session_id={CHECKOUT_SESSION_ID}`
   const cancelUrl = `${baseUrl}`
 
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
   try {
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
