@@ -2,6 +2,8 @@
 
 Reference this list as we build. Check off items as they're completed.
 
+**→ Finish remaining payment features (sections 1–6) after UI refactor.**
+
 ---
 
 ## 1. Data & Payment
@@ -91,6 +93,21 @@ Reference this list as we build. Check off items as they're completed.
 - [ ] **Rate limits** – ~100 writes/100 sec (fine for small events)
 - [ ] **Backup** – use version history; periodic export to CSV
 - [ ] **When to graduate** – consider DB if: many concurrent payments, strict capacity, or multiple events
+
+---
+
+## 8. UI Refactor (Event Invite)
+
+- [ ] **Remove vertical images** – Remove flanking flower/plant images from welcome step (desktop and mobile thumbnails)
+- [ ] **Hero video** – Add `midnight_site_vid_hi_res.mov` as top-level looping video
+  - Placement ideas: (A) Full-viewport hero behind title, (B) Large banner above fold, (C) Side panel / split layout with video left, content right, (D) Parallax background with muted overlay
+- [ ] **Typography**
+  - Spring Fling title → Source Sans 3 (available via `next/font/google`)
+  - Paragraph description → Roboto (available via `next/font/google`)
+- [ ] **Scrolling flow** – Replace wizard steps with single-page scroll
+  - Reserve button scrolls smoothly to date/tier options
+  - Selecting date/tier scrolls to form, then payment summary
+  - One continuous page, no step transitions
 
 ---
 
