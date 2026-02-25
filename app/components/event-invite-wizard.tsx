@@ -18,12 +18,18 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [selectedTier, setSelectedTier] = useState<string | null>(null)
   const [formData, setFormData] = useState({ name: '', email: '', notes: '' })
-  const [deviceType, setDeviceType] = useState<'mobile' | 'desktop'>('desktop')
+  const [deviceType, setDeviceType] = useState<'mobile' | 'tablet' | 'desktop'>('desktop')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [checkoutError, setCheckoutError] = useState<string | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const isMobile = typeof window !== 'undefined' && (window.innerWidth < 768 || 'ontouchstart' in window)
-    setDeviceType(isMobile ? 'mobile' : 'desktop')
+    if (typeof window === 'undefined') return
+    const w = window.innerWidth
+    const hasTouch = 'ontouchstart' in window
+    if (w < 768) setDeviceType('mobile')
+    else if (hasTouch && w < 1024) setDeviceType('tablet')
+    else setDeviceType('desktop')
   }, [])
 
   const stepIndex = STEPS.indexOf(step)
@@ -290,7 +296,8 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
             <button
               type="button"
               onClick={handleBack}
-              className="self-start font-invite text-[#f8f6f2] hover:opacity-80"
+              disabled={isSubmitting}
+              className="self-start font-invite text-[#f8f6f2] hover:opacity-80 disabled:opacity-50"
               aria-label="Go back"
             >
               ← Back
@@ -304,15 +311,47 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
               </p>
               <p className="mt-2 text-xl">${selectedTierData?.price}</p>
             </div>
-            <p className="font-invite text-sm opacity-70">
-              Stripe payment will be integrated here. For now, this completes the flow.
-            </p>
+            {checkoutError && (
+              <p className="font-invite text-sm text-red-300" role="alert">
+                {checkoutError}
+              </p>
+            )}
             <button
               type="button"
-              onClick={handleNext}
-              className="invite-reserve rounded-lg bg-[#f8f6f2] px-10 py-4 font-invite text-xl text-[#162143]"
+              disabled={isSubmitting}
+              onClick={async () => {
+                if (!selectedDate || !selectedTier || !formData.name.trim() || !formData.email.trim()) return
+                setIsSubmitting(true)
+                setCheckoutError(null)
+                try {
+                  const res = await fetch('/api/checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      dateId: selectedDate,
+                      tierId: selectedTier,
+                      name: formData.name.trim(),
+                      email: formData.email.trim(),
+                      notes: formData.notes.trim(),
+                      device: deviceType,
+                    }),
+                  })
+                  const data = await res.json()
+                  if (!res.ok) {
+                    setCheckoutError(data.error ?? 'Something went wrong')
+                    return
+                  }
+                  if (data.url) window.location.href = data.url
+                  else setCheckoutError('No checkout URL received')
+                } catch {
+                  setCheckoutError('Network error. Please try again.')
+                } finally {
+                  setIsSubmitting(false)
+                }
+              }}
+              className="invite-reserve rounded-lg bg-[#f8f6f2] px-10 py-4 font-invite text-xl text-[#162143] disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              Reserve (Stripe placeholder)
+              {isSubmitting ? 'Redirecting…' : 'Reserve'}
             </button>
           </div>
         )}

@@ -82,8 +82,9 @@ Reference this list as we build. Check off items as they're completed.
 
 - [x] **Setup**
   - Sheet created, shared with service account (Editor)
-  - Column order: `Timestamp` | `Name` | `Email` | `Ticket tier` | `Notes` | `Stripe Payment ID`
+  - Column order: `Timestamp` | `Name` | `Email` | `Ticket tier` | `Notes` | `Device` | `Stripe Payment ID`
   - Ticket tier = date + tier label (e.g. "Wednesday, March 18 · Community")
+  - Device = mobile | tablet | desktop (from form)
 - [ ] **Write pattern** – append-only from webhook (one row per successful payment)
 - [ ] **Security** – server-only access, never expose sheet ID or credentials to client
 - [ ] **Rate limits** – ~100 writes/100 sec (fine for small events)

@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { eventDates, eventTiers } from '../../../content/event-invite.config'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-04-28.basil',
-})
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const NAME_MAX_LEN = 200
@@ -24,14 +22,27 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  let body: { dateId?: string; tierId?: string; name?: string; email?: string; notes?: string }
+  let body: {
+    dateId?: string
+    tierId?: string
+    name?: string
+    email?: string
+    notes?: string
+    device?: string
+  }
   try {
     body = await req.json()
   } catch {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
   }
 
-  const { dateId, tierId, name, email, notes = '' } = body
+  const { dateId, tierId, name, email, notes = '', device = 'desktop' } = body
+
+  // Validate device (mobile | tablet | desktop)
+  const validDevices = ['mobile', 'tablet', 'desktop'] as const
+  const deviceType = validDevices.includes(device as (typeof validDevices)[number])
+    ? (device as (typeof validDevices)[number])
+    : 'desktop'
 
   // Validate date
   const date = eventDates.find((d) => d.id === dateId)
@@ -93,6 +104,7 @@ export async function POST(req: NextRequest) {
         name: trimmedName,
         email: trimmedEmail,
         notes: notes.slice(0, 500), // Stripe metadata values max 500 chars
+        device: deviceType,
       },
       customer_email: trimmedEmail,
       success_url: successUrl,
