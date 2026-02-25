@@ -13,7 +13,7 @@ Reference this list as we build. Check off items as they're completed.
 - [x] **Webhook handler** (`checkout.session.completed`)
   - Append row to spreadsheet (timestamp, name, email, ticket tier, notes, device, stripe_payment_id)
   - [ ] Add paid attendees to existing email list (CRM API)
-  - [ ] Optional: custom confirmation email (Stripe sends receipt; we send event-specific welcome)
+  - [ ] Custom event confirmation email (from our domain, via webhook)
 
 ---
 
@@ -32,8 +32,8 @@ Reference this list as we build. Check off items as they're completed.
 
 ## 3. Confirmation & Communication
 
-- [ ] **Stripe receipt** – automatic (payment confirmation)
-- [ ] **Custom event confirmation** (optional) – send from webhook via Resend/SendGrid/etc.
+- [x] **Stripe receipt** – automatic (payment confirmation)
+- [ ] **Custom event confirmation email** – send from our own email (Resend/SendGrid/etc.) from webhook after payment; event-specific welcome, not just Stripe receipt
 - [ ] **Email list signup** – add to CRM from webhook after successful payment
 
 ---
@@ -73,7 +73,7 @@ Reference this list as we build. Check off items as they're completed.
 4. Webhook handler → append to spreadsheet + email list signup
 5. Loading states, error handling, double-submit prevention
 6. Capacity limits + sold-out handling
-7. Custom confirmation email (optional)
+7. Custom event confirmation email (from our domain)
 8. Monitoring
 
 ---
