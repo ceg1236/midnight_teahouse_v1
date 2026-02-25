@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=Dancing+Script:wght@400;500;600;700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;1,400&family=Roboto:ital,wght@0,400;0,500;1,400&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Aboreto:wght@400&family=KoHo:ital,wght@0,200;1,200&family=Amiri:ital,wght@0,400;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Aboreto&family=KoHo:ital,wght@0,200;1,200&family=Amiri:ital,wght@0,400;1,400&display=swap');
 
 
 :root {
@@ -656,9 +656,23 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Carrd-style page (Midnight Teahouse) */
 .carrd-page {
-  background: linear-gradient(180deg, #2E0303 65%, #A37F5D 98%);
+  position: relative;
   min-height: 100vh;
   color: #FAEBD4;
+}
+.carrd-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(180deg, #2E0303 65%, #A37F5D 98%);
+  height: 100vh;
+  height: 100dvh;
+  pointer-events: none;
+}
+.carrd-page > * {
+  position: relative;
+  z-index: 1;
 }
 .carrd-font-heading {
   font-family: 'Aboreto', cursive;

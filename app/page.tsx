@@ -2,12 +2,10 @@ import { CarrdStylePage } from './components/carrd-style-page'
 import { getEventInviteContent } from '../content/parse'
 import { eventDates, eventTiers } from '../content/event-invite.config'
 
-/** Unix timestamp for first event at 7pm Pacific */
+/** Unix timestamp for first event at 7pm Pacific (March 18, 2026) */
 function getCountdownTarget(): number {
-  const firstDate = eventDates[0]
-  if (!firstDate) return Math.floor(Date.now() / 1000) + 86400
-  // 7pm Pacific on the event date
-  const d = new Date(`${firstDate.value}T19:00:00-08:00`)
+  // March 18, 2026 7pm PDT (DST starts March 8)
+  const d = new Date('2026-03-18T19:00:00-07:00')
   return Math.floor(d.getTime() / 1000)
 }
 

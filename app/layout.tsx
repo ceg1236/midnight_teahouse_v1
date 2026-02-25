@@ -2,7 +2,6 @@ import './global.css'
 import type { Metadata } from 'next'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
-import { Navbar } from './components/nav'
 import { ThemeProvider } from './context/theme-context'
 import { TitleModalProvider } from './context/title-modal-context'
 import { getTitleModalContent } from '../content/parse'
@@ -52,7 +51,6 @@ export default function RootLayout({
         <div id="root">
           <ThemeProvider>
             <TitleModalProvider titleContent={getTitleModalContent()}>
-              <Navbar />
               {children}
             </TitleModalProvider>
           </ThemeProvider>
