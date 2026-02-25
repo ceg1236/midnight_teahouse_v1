@@ -100,13 +100,8 @@ Reference this list as we build. Check off items as they're completed.
 
 - [x] **Remove vertical images** – Remove flanking flower/plant images from welcome step (desktop and mobile thumbnails)
 - [x] **Hero video** – Add `midnight_site_vid_hi_res.mp4` / `.mov` as full-viewport hero (Option A), mp4 for Chrome/Firefox/Edge, mov fallback for Safari
-- [ ] **Typography**
-  - Spring Fling title → Source Sans 3 (available via `next/font/google`)
-  - Paragraph description → Roboto (available via `next/font/google`)
-- [ ] **Scrolling flow** – Replace wizard steps with single-page scroll
-  - Reserve button scrolls smoothly to date/tier options
-  - Selecting date/tier scrolls to form, then payment summary
-  - One continuous page, no step transitions
+- [x] **Typography** – Spring Fling title → Source Sans 3, paragraph → Roboto
+- [x] **Scrolling flow** – Single-page scroll; Reserve scrolls to date → tier → form → payment
 
 ---
 
