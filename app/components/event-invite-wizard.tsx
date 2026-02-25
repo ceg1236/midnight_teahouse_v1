@@ -66,24 +66,25 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
       {/* Step content - key triggers fade-in on step change */}
       <div key={step} className="invite-step invite-step-enter relative flex flex-1 flex-col items-center justify-center px-6 pb-12 pt-16 md:pt-20">
         {step === 'welcome' && (
-          <div className="invite-welcome invite-welcome-step mx-auto flex max-w-4xl flex-col items-center justify-center gap-4 md:gap-5">
-            <h1 className="font-invite text-center text-3xl text-inherit md:text-3xl lg:text-4xl">
-              Spring Fling at the Teahouse
-            </h1>
-            {/* Text body flanked by images */}
-            <div className="flex w-full items-stretch justify-center gap-4 md:gap-6">
-              <div className="relative hidden w-24 shrink-0 md:block lg:w-28" style={{ minHeight: 320 }}>
-                <Image
-                  src="/images/xf_flowers_tea/xf_white_flowers_2.jpg"
-                  alt=""
-                  fill
-                  className="rounded-lg object-cover"
-                  sizes="112px"
-                  aria-hidden
-                />
-              </div>
+          <>
+            {/* Full-viewport hero video behind title */}
+            <div className="fixed inset-0 z-0" aria-hidden>
+              <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="absolute inset-0 h-full w-full object-cover"
+              >
+                <source src="/images/midnight_site_vid_hi_res.mov" type="video/quicktime" />
+              </video>
+              <div className="absolute inset-0 bg-[#162143]/60" aria-hidden />
+            </div>
+            <div className="invite-welcome invite-welcome-step relative z-10 mx-auto flex max-w-4xl flex-col items-center justify-center gap-4 md:gap-5">
+              <h1 className="font-invite text-center text-3xl text-inherit md:text-3xl lg:text-4xl">
+                Spring Fling at the Teahouse
+              </h1>
               <div className="flex flex-1 flex-col items-center">
-                {/* Invite text - tweak: text-lg/xl on mobile, md:text-lg/xl on desktop */}
                 <div className="font-invite space-y-3 text-center text-lg leading-relaxed md:text-xl">
                   {welcomeContent.split(/\n\n+/).map((para, i) => (
                     <p key={i}>{para}</p>
@@ -97,37 +98,8 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
                   Reserve
                 </button>
               </div>
-              <div className="relative hidden w-24 shrink-0 md:block lg:w-28" style={{ minHeight: 320 }}>
-                <Image
-                  src="/images/xf_flowers_tea/xf_plant_yellow_3.jpg"
-                  alt=""
-                  fill
-                  className="rounded-lg object-cover"
-                  sizes="112px"
-                  aria-hidden
-                />
-              </div>
             </div>
-            {/* Mobile images: Option B - compact thumbnails. Alternatives: remove div (no images), or use opacity-30 for subtle bg */}
-            <div className="flex justify-center gap-3 md:hidden">
-              <Image
-                src="/images/xf_flowers_tea/xf_white_flowers_2.jpg"
-                alt=""
-                width={56}
-                height={56}
-                className="rounded-lg object-cover"
-                aria-hidden
-              />
-              <Image
-                src="/images/xf_flowers_tea/xf_plant_yellow_3.jpg"
-                alt=""
-                width={56}
-                height={56}
-                className="rounded-lg object-cover"
-                aria-hidden
-              />
-            </div>
-          </div>
+          </>
         )}
 
         {step === 'date' && (
