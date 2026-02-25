@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useTheme } from '../context/theme-context'
 import { useTitleModal } from '../context/title-modal-context'
 
@@ -42,22 +43,28 @@ function MoonIcon({ className }: { className?: string }) {
 }
 
 export function Navbar() {
+  const pathname = usePathname()
   const { theme, setTheme } = useTheme()
   const { titleRef, openTitleModal, titleModalOpen } = useTitleModal()
+  const isCarrdHome = pathname === '/'
 
   return (
-    <nav className="site-nav fixed top-0 left-0 right-0 z-50 bg-[#162143] backdrop-blur-sm">
+    <nav
+      className={`site-nav fixed top-0 left-0 right-0 z-50 transition-colors ${
+        isCarrdHome ? 'bg-transparent' : 'bg-[#162143] backdrop-blur-sm'
+      }`}
+    >
       <div className="container mx-auto px-6 py-5 flex items-center justify-center gap-12">
         <Link
           href="/"
-          className="nav-link-hover font-cursive text-lg text-[#f8f6f2]"
+          className={`nav-link-hover font-cursive text-lg ${isCarrdHome ? 'text-[#FAE0B9]' : 'text-[#f8f6f2]'}`}
         >
           {/* home */}
         </Link>
         <button
           type="button"
           onClick={openTitleModal}
-          className="mx-8 cursor-pointer border-none bg-transparent p-0 text-[#f8f6f2]"
+          className={`mx-8 cursor-pointer border-none bg-transparent p-0 ${isCarrdHome ? 'text-[#FAE0B9]' : 'text-[#f8f6f2]'}`}
         >
           <span
             ref={titleRef}
@@ -68,14 +75,14 @@ export function Navbar() {
         </button>
         <Link
           href="/reservations"
-          className="nav-link-hover font-cursive text-lg text-[#f8f6f2]"
+          className={`nav-link-hover font-cursive text-lg ${isCarrdHome ? 'text-[#FAE0B9]' : 'text-[#f8f6f2]'}`}
         >
           {/* reservations */}
         </Link>
         <button
           type="button"
           onClick={() => setTheme(theme === 'night' ? 'day' : 'night')}
-          className="site-nav-toggle absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full hover:opacity-80 transition-opacity text-[#f8f6f2]"
+          className={`site-nav-toggle absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full hover:opacity-80 transition-opacity ${isCarrdHome ? 'text-[#FAE0B9]' : 'text-[#f8f6f2]'}`}
           aria-label={theme === 'night' ? 'Switch to day mode' : 'Switch to night mode'}
         >
           {theme === 'night' ? (
