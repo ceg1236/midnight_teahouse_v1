@@ -76,6 +76,7 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
                 playsInline
                 className="absolute inset-0 h-full w-full object-cover"
               >
+                <source src="/images/midnight_site_vid_hi_res.mp4" type="video/mp4" />
                 <source src="/images/midnight_site_vid_hi_res.mov" type="video/quicktime" />
               </video>
               <div className="absolute inset-0 bg-[#162143]/60" aria-hidden />

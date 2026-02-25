@@ -99,7 +99,7 @@ Reference this list as we build. Check off items as they're completed.
 ## 8. UI Refactor (Event Invite)
 
 - [x] **Remove vertical images** – Remove flanking flower/plant images from welcome step (desktop and mobile thumbnails)
-- [x] **Hero video** – Add `midnight_site_vid_hi_res.mov` as full-viewport hero behind title (Option A), muted, looping, with overlay
+- [x] **Hero video** – Add `midnight_site_vid_hi_res.mp4` / `.mov` as full-viewport hero (Option A), mp4 for Chrome/Firefox/Edge, mov fallback for Safari
 - [ ] **Typography**
   - Spring Fling title → Source Sans 3 (available via `next/font/google`)
   - Paragraph description → Roboto (available via `next/font/google`)
@@ -107,6 +107,19 @@ Reference this list as we build. Check off items as they're completed.
   - Reserve button scrolls smoothly to date/tier options
   - Selecting date/tier scrolls to form, then payment summary
   - One continuous page, no step transitions
+
+---
+
+## 9. Cross-Browser Testing
+
+- [ ] **UI & features** – Test across browsers before launch:
+  - [ ] Chrome (desktop + mobile)
+  - [ ] Safari (desktop + iOS)
+  - [ ] Firefox (desktop)
+  - [ ] Edge (desktop)
+- [ ] **Hero video** – Verify plays in Chrome, Safari, Firefox, Edge
+- [ ] **Reservation flow** – Full flow (date → tier → form → Stripe → success) in each browser
+- [ ] **Stripe Checkout** – Redirect and return work in each browser
 
 ---
 
