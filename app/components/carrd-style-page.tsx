@@ -132,7 +132,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
             7-11pm<br />
             SoMA, SF
           </p>
-          <div className="carrd-font-body text-left space-y-4 max-w-xl">
+          <div className="carrd-font-body text-left space-y-4 w-full max-w-[56rem]">
             {welcomeContent.split(/\n\n+/).map((para, i) => (
               <p key={i} className="leading-relaxed">
                 {para}
@@ -158,7 +158,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           <h2 className="carrd-font-heading text-2xl md:text-3xl">
             Join us
           </h2>
-          <p className="carrd-font-body text-center max-w-xl leading-relaxed">
+          <p className="carrd-font-body text-center w-full max-w-[56rem] leading-relaxed">
             To keep our gatherings intimate, we are open by reservation and have limited seats. Reserve a spot to gift a cozy evening to yourself or someone you love.
           </p>
 
@@ -349,7 +349,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         </section>
 
         {/* Booking notes */}
-        <section className="w-full max-w-xl">
+        <section className="w-full max-w-[56rem]">
           <p className="carrd-font-body font-medium mb-2">A few things to note before booking:</p>
           <ul className="carrd-font-body space-y-2 list-none pl-0">
             {[
@@ -374,7 +374,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           <h2 className="carrd-font-heading text-2xl md:text-3xl">
             our story
           </h2>
-          <div className="carrd-font-body-light space-y-4 max-w-xl text-left leading-relaxed">
+          <div className="carrd-font-body-light space-y-4 w-full max-w-[56rem] text-left leading-relaxed">
             <p>
               Welcome to the Midnight Teahouse — a little world being created in San Francisco, born from our shared love of tea, music, community, and beautiful spaces.
             </p>
