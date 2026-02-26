@@ -55,6 +55,7 @@ function savePersisted(date: string | null, tier: string | null, form: { name: s
 export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }: CarrdStylePageProps) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [selectedTier, setSelectedTier] = useState<string | null>(null)
+  const [showSupportedTier, setShowSupportedTier] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', notes: '' })
   const [deviceType, setDeviceType] = useState<'mobile' | 'tablet' | 'desktop'>('desktop')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -71,6 +72,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
     setSelectedDate(persisted.date)
     setSelectedTier(persisted.tier)
     setFormData(persisted.form)
+    if (persisted.tier === 'supported') setShowSupportedTier(true)
     setHydrated(true)
   }, [dates, tiers])
 
@@ -193,24 +195,62 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               className="w-full flex flex-col items-center gap-6"
             >
               <h2 className="carrd-font-heading text-2xl md:text-3xl">
-                Select your experience
+                Choose Your Ticket
               </h2>
-              <div className="flex flex-wrap justify-center gap-3">
-                {tiers.map((t) => (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => {
-                      setSelectedTier(t.id)
-                      scrollToSection(formRef)
-                    }}
-                    className={`carrd-btn px-6 py-3 whitespace-normal max-w-[10rem] ${
-                      selectedTier === t.id ? 'bg-[#FAE0B9]/20' : ''
-                    }`}
-                  >
-                    {t.label} ${t.price}
-                  </button>
-                ))}
+              <div className="w-full max-w-[56rem] flex flex-wrap justify-evenly gap-6">
+                {tiers
+                  .filter((t) => t.id === 'community' || t.id === 'patron')
+                  .map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedTier(t.id)
+                        scrollToSection(formRef)
+                      }}
+                      className={`carrd-btn px-8 py-4 whitespace-normal min-w-[10rem] flex-1 max-w-[14rem] ${
+                        selectedTier === t.id ? 'bg-[#FAE0B9]/20' : ''
+                      }`}
+                    >
+                      {t.label} ${t.price}
+                    </button>
+                  ))}
+              </div>
+              <p className="carrd-font-body text-center w-full max-w-[56rem] leading-relaxed">
+                Our prices aim to support the sustainability of our project, but we recognize the skewed economic situation of our city. If cost is a barrier, please{' '}
+                <button
+                  type="button"
+                  onClick={() => setShowSupportedTier(true)}
+                  className="underline hover:no-underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline"
+                >
+                  click here
+                </button>
+                {' '}for a supported ticket.
+              </p>
+              <div
+                className={`grid transition-all duration-500 ease-out overflow-hidden w-full max-w-[56rem] ${
+                  showSupportedTier ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                }`}
+              >
+                <div className="min-h-0 flex justify-center">
+                  {tiers
+                    .filter((t) => t.id === 'supported')
+                    .map((t) => (
+                      <button
+                        key={t.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedTier(t.id)
+                          scrollToSection(formRef)
+                        }}
+                        className={`carrd-btn px-8 py-4 whitespace-normal min-w-[10rem] ${
+                          selectedTier === t.id ? 'bg-[#FAE0B9]/20' : ''
+                        }`}
+                      >
+                        {t.label} ${t.price}
+                      </button>
+                    ))}
+                </div>
               </div>
             </section>
             <hr className="carrd-divider border-0 my-2" />
