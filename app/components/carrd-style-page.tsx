@@ -96,7 +96,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         <h1 className="carrd-font-heading text-center text-3xl md:text-4xl">
           Midnight Teahouse
         </h1>
-        <p className="carrd-font-subtitle text-center text-base md:text-lg italic">
+        <p className="carrd-font-subtitle text-center italic">
           an evening teahouse
         </p>
 
@@ -124,7 +124,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           <h2 className="carrd-font-heading text-2xl md:text-3xl">
             March Gatherings
           </h2>
-          <p className="carrd-font-muted text-base leading-relaxed">
+          <p className="carrd-font-muted leading-relaxed">
             {dates[0]?.value && dates[dates.length - 1]?.value
               ? `${new Date(dates[0].value).toLocaleDateString('en-US', { month: 'long' })} ${new Date(dates[0].value).getDate()}-${new Date(dates[dates.length - 1].value).getDate()}, ${new Date(dates[0].value).getFullYear()}`
               : 'March 18-20, 2025'}
@@ -142,7 +142,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           <button
             type="button"
             onClick={() => scrollToSection(joinRef)}
-            className="carrd-btn px-8 py-3 text-base"
+            className="carrd-btn px-8 py-3"
           >
             Reserve your spot
           </button>
@@ -169,7 +169,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 key={d.id}
                 type="button"
                 onClick={() => setSelectedDate(d.id)}
-                className={`carrd-btn px-6 py-3 text-base whitespace-normal max-w-[10rem] ${
+                className={`carrd-btn px-6 py-3 whitespace-normal max-w-[10rem] ${
                   selectedDate === d.id ? 'bg-[#FAE0B9]/20' : ''
                 }`}
               >
@@ -185,7 +185,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 key={t.id}
                 type="button"
                 onClick={() => setSelectedTier(t.id)}
-                className={`carrd-btn px-6 py-3 text-base whitespace-normal max-w-[10rem] ${
+                className={`carrd-btn px-6 py-3 whitespace-normal max-w-[10rem] ${
                   selectedTier === t.id ? 'bg-[#FAE0B9]/20' : ''
                 }`}
               >
@@ -199,7 +199,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
             <button
               type="button"
               onClick={() => scrollToSection(formRef)}
-              className="carrd-btn px-8 py-3 text-base"
+              className="carrd-btn px-8 py-3"
             >
               Continue with details
             </button>
@@ -351,7 +351,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         {/* Booking notes */}
         <section className="w-full max-w-[56rem]">
           <p className="carrd-font-body font-medium mb-2">A few things to note before booking:</p>
-          <ul className="carrd-font-body space-y-2 list-none pl-0">
+          <ul className="carrd-font-body space-y-3 list-none pl-0">
             {[
               'Doors open at 7pm and close at 11pm. Feel free to join us anytime in this window.',
               'Reservation includes unlimited tea and all other amenities.',
@@ -359,9 +359,9 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               'Unfortunately, we aren\'t able to offer refunds or exchanges for future events.',
               'We\'ll share the location once you make the reservation. If you don\'t hear from us within a few days, please send us an email.',
             ].map((item, i) => (
-              <li key={i} className="flex gap-2">
-                <span className="text-[#D9D0BF] mt-1.5 w-2 h-2 rounded-full bg-[#D9D0BF] shrink-0" aria-hidden />
-                <span>{item}</span>
+              <li key={i} className="flex items-start gap-3">
+                <span className="text-[#D9D0BF] mt-[0.45em] w-2 h-2 rounded-full bg-[#D9D0BF] shrink-0 flex-shrink-0" aria-hidden />
+                <span className="flex-1">{item}</span>
               </li>
             ))}
           </ul>
