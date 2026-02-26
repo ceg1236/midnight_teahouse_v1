@@ -62,6 +62,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
   const [hydrated, setHydrated] = useState(false)
 
   const joinRef = useRef<HTMLElement>(null)
+  const tierRef = useRef<HTMLElement>(null)
   const formRef = useRef<HTMLElement>(null)
   const paymentRef = useRef<HTMLElement>(null)
 
@@ -168,7 +169,10 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               <button
                 key={d.id}
                 type="button"
-                onClick={() => setSelectedDate(d.id)}
+                onClick={() => {
+                  setSelectedDate(d.id)
+                  if (!selectedDate) setTimeout(() => scrollToSection(tierRef), 50)
+                }}
                 className={`carrd-btn px-6 py-3 whitespace-pre-line text-center max-w-[10rem] ${
                   selectedDate === d.id ? 'bg-[#FAE0B9]/20' : ''
                 }`}
@@ -177,15 +181,21 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               </button>
             ))}
           </div>
+        </section>
 
-          {/* Tier buttons - shown after date selected, with smooth transition */}
-          <div
-            className={`grid transition-all duration-500 ease-out overflow-hidden ${
-              selectedDate ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
-            }`}
-          >
-            <div className="min-h-0">
-              <div className="flex flex-wrap justify-center gap-3 pt-2">
+        <hr className="carrd-divider border-0 my-2" />
+
+        {/* Tier section - shown after date selected, with smooth transition */}
+        {selectedDate && (
+          <>
+            <section
+              ref={tierRef}
+              className="w-full flex flex-col items-center gap-6"
+            >
+              <h2 className="carrd-font-heading text-2xl md:text-3xl">
+                Select your experience
+              </h2>
+              <div className="flex flex-wrap justify-center gap-3">
                 {tiers.map((t) => (
                   <button
                     key={t.id}
@@ -202,11 +212,10 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   </button>
                 ))}
               </div>
-            </div>
-          </div>
-        </section>
-
-        <hr className="carrd-divider border-0 my-2" />
+            </section>
+            <hr className="carrd-divider border-0 my-2" />
+          </>
+        )}
 
         {/* Form section */}
         <section
@@ -289,6 +298,23 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   ${selectedTierData?.price}
                 </p>
               </div>
+              <div className="w-full max-w-[56rem] text-left">
+                <p className="carrd-font-body font-medium mb-2">A few things to note before booking:</p>
+                <ul className="carrd-font-body space-y-3 list-none pl-0">
+                  {[
+                    'Doors open at 7pm and close at 11pm. Feel free to join us anytime in this window.',
+                    'Reservation includes unlimited tea and all other amenities.',
+                    'We are a phone and laptop-free space.',
+                    'Unfortunately, we aren\'t able to offer refunds or exchanges for future events.',
+                    'We\'ll share the location once you make the reservation. If you don\'t hear from us within a few days, please send us an email.',
+                  ].map((item, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <span className="text-[#D9D0BF] mt-[0.45em] w-2 h-2 rounded-full bg-[#D9D0BF] shrink-0 flex-shrink-0" aria-hidden />
+                      <span className="flex-1">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
               {checkoutError && (
                 <p className="carrd-font-body text-sm text-red-300" role="alert">
                   {checkoutError}
@@ -346,25 +372,6 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               </button>
             </div>
           )}
-        </section>
-
-        {/* Booking notes */}
-        <section className="w-full max-w-[56rem]">
-          <p className="carrd-font-body font-medium mb-2">A few things to note before booking:</p>
-          <ul className="carrd-font-body space-y-3 list-none pl-0">
-            {[
-              'Doors open at 7pm and close at 11pm. Feel free to join us anytime in this window.',
-              'Reservation includes unlimited tea and all other amenities.',
-              'We are a phone and laptop-free space.',
-              'Unfortunately, we aren\'t able to offer refunds or exchanges for future events.',
-              'We\'ll share the location once you make the reservation. If you don\'t hear from us within a few days, please send us an email.',
-            ].map((item, i) => (
-              <li key={i} className="flex items-start gap-3">
-                <span className="text-[#D9D0BF] mt-[0.45em] w-2 h-2 rounded-full bg-[#D9D0BF] shrink-0 flex-shrink-0" aria-hidden />
-                <span className="flex-1">{item}</span>
-              </li>
-            ))}
-          </ul>
         </section>
 
         <hr className="carrd-divider border-0 my-2" />
