@@ -778,3 +778,12 @@ h1, h2, h3, h4, h5, h6 {
   height: 1px;
   background-color: #D9D0BF;
 }
+
+/* Video fade-in on load */
+@keyframes carrd-video-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.carrd-video-fade {
+  animation: carrd-video-fade-in 1.5s ease-out forwards;
+}

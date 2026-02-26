@@ -14,8 +14,29 @@ type CarrdStylePageProps = {
   countdownTarget: number
 }
 
+const SCROLL_DURATION = 1200
+const SCROLL_OFFSET_TOP = 48
+
 function scrollToSection(ref: React.RefObject<HTMLElement | null>) {
-  ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  const el = ref.current
+  if (!el) return
+  const start = window.scrollY
+  const target = el.getBoundingClientRect().top + start - SCROLL_OFFSET_TOP
+  const distance = target - start
+  const startTime = performance.now()
+
+  function easeInOutCubic(t: number) {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+  }
+
+  function step(now: number) {
+    const elapsed = now - startTime
+    const progress = Math.min(elapsed / SCROLL_DURATION, 1)
+    const eased = easeInOutCubic(progress)
+    window.scrollTo(0, start + distance * eased)
+    if (progress < 1) requestAnimationFrame(step)
+  }
+  requestAnimationFrame(step)
 }
 
 function loadPersisted(
@@ -93,7 +114,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
   const selectedTierData = tiers.find((t) => t.id === selectedTier)
 
   return (
-    <div className="carrd-page flex flex-col items-center min-h-screen overflow-x-hidden pt-8">
+    <div className="carrd-page flex flex-col items-center min-h-screen overflow-x-hidden pt-16">
       <div className="w-full max-w-[60rem] flex flex-col items-center px-6 md:px-12 py-8 md:py-12 gap-6">
         {/* Hero: Title + Subtitle */}
         <h1 className="carrd-font-heading text-center text-3xl md:text-4xl">
@@ -104,7 +125,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         </p>
 
         {/* Video */}
-        <div className="w-full -mx-6 md:-mx-12 aspect-video overflow-hidden">
+        <div className="carrd-video-fade w-full -mx-6 md:-mx-12 aspect-video overflow-hidden">
           <video
             autoPlay
             loop
