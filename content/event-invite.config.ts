@@ -3,9 +3,9 @@
  */
 
 export const eventDates = [
-  { id: 'mar-18', label: 'Wednesday, March 18', value: '2026-03-18' },
-  { id: 'mar-19', label: 'Thursday, March 19', value: '2026-03-19' },
-  { id: 'mar-20', label: 'Friday, March 20', value: '2026-03-20' },
+  { id: 'mar-18', label: 'Wednesday,\nMarch 18', value: '2026-03-18' },
+  { id: 'mar-19', label: 'Thursday,\nMarch 19', value: '2026-03-19' },
+  { id: 'mar-20', label: 'Friday,\nMarch 20', value: '2026-03-20' },
 ] as const
 
 export const eventTiers = [

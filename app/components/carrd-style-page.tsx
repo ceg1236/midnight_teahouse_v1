@@ -127,7 +127,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           <p className="carrd-font-muted leading-relaxed">
             {dates[0]?.value && dates[dates.length - 1]?.value
               ? `${new Date(dates[0].value).toLocaleDateString('en-US', { month: 'long' })} ${new Date(dates[0].value).getDate()}-${new Date(dates[dates.length - 1].value).getDate()}, ${new Date(dates[0].value).getFullYear()}`
-              : 'March 18-20, 2025'}
+              : 'March 18-20, 2026'}
             <br />
             7-11pm<br />
             SoMA, SF
@@ -169,7 +169,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 key={d.id}
                 type="button"
                 onClick={() => setSelectedDate(d.id)}
-                className={`carrd-btn px-6 py-3 whitespace-normal max-w-[10rem] ${
+                className={`carrd-btn px-6 py-3 whitespace-pre-line text-center max-w-[10rem] ${
                   selectedDate === d.id ? 'bg-[#FAE0B9]/20' : ''
                 }`}
               >
@@ -178,32 +178,32 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
             ))}
           </div>
 
-          {/* Tier buttons */}
-          <div className="flex flex-wrap justify-center gap-3">
-            {tiers.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => setSelectedTier(t.id)}
-                className={`carrd-btn px-6 py-3 whitespace-normal max-w-[10rem] ${
-                  selectedTier === t.id ? 'bg-[#FAE0B9]/20' : ''
-                }`}
-              >
-                {t.label} ${t.price}
-              </button>
-            ))}
+          {/* Tier buttons - shown after date selected, with smooth transition */}
+          <div
+            className={`grid transition-all duration-500 ease-out overflow-hidden ${
+              selectedDate ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+            }`}
+          >
+            <div className="min-h-0">
+              <div className="flex flex-wrap justify-center gap-3 pt-2">
+                {tiers.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedTier(t.id)
+                      scrollToSection(formRef)
+                    }}
+                    className={`carrd-btn px-6 py-3 whitespace-normal max-w-[10rem] ${
+                      selectedTier === t.id ? 'bg-[#FAE0B9]/20' : ''
+                    }`}
+                  >
+                    {t.label} ${t.price}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
-
-          {/* Form - show when date + tier selected */}
-          {(selectedDate || selectedTier) && (
-            <button
-              type="button"
-              onClick={() => scrollToSection(formRef)}
-              className="carrd-btn px-8 py-3"
-            >
-              Continue with details
-            </button>
-          )}
         </section>
 
         <hr className="carrd-divider border-0 my-2" />
