@@ -32,6 +32,7 @@ export async function POST(req: NextRequest) {
   let body: {
     dateId?: string
     tierId?: string
+    supportedPrice?: number
     name?: string
     email?: string
     notes?: string
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
   }
 
-  const { dateId, tierId, name, email, notes = '', device = 'desktop' } = body
+  const { dateId, tierId, supportedPrice, name, email, notes = '', device = 'desktop' } = body
 
   // Validate device (mobile | tablet | desktop)
   const validDevices = ['mobile', 'tablet', 'desktop'] as const
@@ -62,6 +63,12 @@ export async function POST(req: NextRequest) {
   if (!tier) {
     return NextResponse.json({ error: 'Invalid tier' }, { status: 400 })
   }
+
+  // Supported tier: use sliding scale (20-40) if provided, else default
+  const amount =
+    tierId === 'supported' && typeof supportedPrice === 'number'
+      ? Math.min(40, Math.max(20, Math.round(supportedPrice)))
+      : tier.price
 
   // Validate name
   const trimmedName = typeof name === 'string' ? name.trim() : ''
@@ -101,7 +108,7 @@ export async function POST(req: NextRequest) {
               name: `${date.label} · ${tier.label}`,
               description: `Spring Fling at the Teahouse – ${tier.label} tier`,
             },
-            unit_amount: tier.price * 100, // cents
+            unit_amount: amount * 100, // cents
           },
           quantity: 1,
         },
@@ -113,6 +120,7 @@ export async function POST(req: NextRequest) {
         email: trimmedEmail,
         notes: notes.slice(0, 500), // Stripe metadata values max 500 chars
         device: deviceType,
+        ...(tierId === 'supported' && { supportedPrice: String(amount) }),
       },
       payment_intent_data: {
         metadata: {

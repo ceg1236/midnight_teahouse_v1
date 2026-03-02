@@ -76,6 +76,7 @@ function savePersisted(date: string | null, tier: string | null, form: { name: s
 export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }: CarrdStylePageProps) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [selectedTier, setSelectedTier] = useState<string | null>(null)
+  const [supportedPrice, setSupportedPrice] = useState(20)
   const [showSupportedTier, setShowSupportedTier] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', notes: '' })
   const [deviceType, setDeviceType] = useState<'mobile' | 'tablet' | 'desktop'>('desktop')
@@ -146,7 +147,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         {/* March Gatherings */}
         <section className="w-full flex flex-col items-center gap-4 text-center">
           <h2 className="carrd-font-heading text-2xl md:text-3xl">
-            March Gatherings
+            Crossing into Spring
           </h2>
           <p className="carrd-font-muted leading-relaxed">
             March 18-20, 2026
@@ -178,7 +179,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           className="w-full flex flex-col items-center gap-6"
         >
           <h2 className="carrd-font-heading text-2xl md:text-3xl">
-            Join us
+            Choose Date
           </h2>
           <p className="carrd-font-body text-center w-full max-w-[56rem] leading-relaxed">
             To keep our gatherings intimate, we are open by reservation and have limited seats. Reserve a spot to gift a cozy evening to yourself or someone you love.
@@ -214,25 +215,26 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               className="w-full flex flex-col items-center gap-6"
             >
               <h2 className="carrd-font-heading text-2xl md:text-3xl">
-                Choose Your Ticket
+                Choose Ticket
               </h2>
               <div className="w-full max-w-[56rem] flex flex-wrap justify-evenly gap-6">
                 {tiers
                   .filter((t) => t.id === 'community' || t.id === 'patron')
                   .map((t) => (
-                    <button
-                      key={t.id}
-                      type="button"
-                      onClick={() => {
-                        setSelectedTier(t.id)
-                        scrollToSection(formRef)
-                      }}
-                      className={`carrd-btn px-8 py-4 whitespace-normal min-w-[10rem] flex-1 max-w-[14rem] ${
-                        selectedTier === t.id ? 'bg-[#FAE0B9]/20' : ''
-                      }`}
-                    >
-                      {t.label} ${t.price}
-                    </button>
+                    <div key={t.id} className="flex flex-col items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedTier(t.id)
+                          scrollToSection(formRef)
+                        }}
+                        className={`carrd-btn px-8 py-4 whitespace-normal min-w-[10rem] flex-1 max-w-[14rem] ${
+                          selectedTier === t.id ? 'bg-[#FAE0B9]/20' : ''
+                        }`}
+                      >
+                        {t.label} ${t.price}
+                      </button>
+                    </div>
                   ))}
               </div>
               <p className="carrd-font-body text-center w-full max-w-[56rem] leading-relaxed">
@@ -251,23 +253,42 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   showSupportedTier ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
                 }`}
               >
-                <div className="min-h-0 flex justify-center">
+                <div className="min-h-0 flex flex-col items-center gap-2">
                   {tiers
                     .filter((t) => t.id === 'supported')
                     .map((t) => (
-                      <button
-                        key={t.id}
-                        type="button"
-                        onClick={() => {
-                          setSelectedTier(t.id)
-                          scrollToSection(formRef)
-                        }}
-                        className={`carrd-btn px-8 py-4 whitespace-normal min-w-[10rem] ${
-                          selectedTier === t.id ? 'bg-[#FAE0B9]/20' : ''
-                        }`}
-                      >
-                        {t.label} ${t.price}
-                      </button>
+                      <div key={t.id} className="flex flex-col items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedTier(t.id)
+                            scrollToSection(formRef)
+                          }}
+                          className={`carrd-btn px-8 py-4 whitespace-normal min-w-[10rem] ${
+                            selectedTier === t.id ? 'bg-[#FAE0B9]/20' : ''
+                          }`}
+                        >
+                          {t.label}
+                        </button>
+                        {selectedTier === 'supported' && (
+                          <div className="flex flex-col items-center gap-1 w-full max-w-[32rem]">
+                            <input
+                              type="number"
+                              min={20}
+                              max={40}
+                              value={supportedPrice}
+                              onChange={(e) => {
+                                const v = parseInt(e.target.value, 10)
+                                if (!isNaN(v)) setSupportedPrice(Math.min(40, Math.max(20, v)))
+                              }}
+                              className="w-20 text-center rounded-md border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-2 py-1 text-[#FAEBD4] text-lg focus:border-[#FAE0B9] focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            />
+                            <p className="carrd-font-body text-xs text-center opacity-90 w-full px-2">
+                              Sliding scale: choose an amount between $20 and $40 that works for you.
+                            </p>
+                          </div>
+                        )}
+                      </div>
                     ))}
                 </div>
               </div>
@@ -282,7 +303,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           className="w-full flex flex-col items-center gap-6"
         >
           <h2 className="carrd-font-heading text-2xl md:text-3xl">
-            A few details
+            A Few Details
           </h2>
           <form
             id="carrd-form"
@@ -356,7 +377,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   {dates.find((d) => d.id === selectedDate)?.label} · {selectedTierData?.label}
                 </p>
                 <p className="mt-2 carrd-font-heading text-xl">
-                  ${selectedTierData?.price}
+                  ${selectedTier === 'supported' ? supportedPrice : selectedTierData?.price}
                 </p>
               </div>
               <div className="w-full max-w-[56rem] text-left">
@@ -395,6 +416,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       body: JSON.stringify({
                         dateId: selectedDate,
                         tierId: selectedTier,
+                        supportedPrice: selectedTier === 'supported' ? supportedPrice : undefined,
                         name: formData.name.trim(),
                         email: formData.email.trim(),
                         notes: formData.notes.trim(),
@@ -429,7 +451,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 onClick={() => scrollToSection(joinRef)}
                 className="carrd-btn px-8 py-3"
               >
-                Choose date & tier
+                Choose date & ticket
               </button>
             </div>
           )}
@@ -440,7 +462,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         {/* Our story */}
         <section className="w-full flex flex-col items-center gap-4">
           <h2 className="carrd-font-heading text-2xl md:text-3xl">
-            our story
+            Our Story
           </h2>
           <div className="carrd-font-body-light space-y-4 w-full max-w-[56rem] text-left leading-relaxed">
             <p>

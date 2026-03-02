@@ -15,6 +15,8 @@ Reference this list as we build. Check off items as they're completed.
 - [x] **Webhook handler** (`checkout.session.completed`)
   - Append row to spreadsheet (timestamp, name, email, ticket date, ticket tier, notes, device, stripe_payment_id)
   - [x] Idempotency – skip if payment ID already in sheet
+  - [x] **G Sheet credentials on Vercel** – Use `GOOGLE_CREDENTIALS_JSON` env var (full service account JSON) for serverless; `GOOGLE_APPLICATION_CREDENTIALS` for local
+  - [x] **Error logging** – Structured JSON logs on sheet write failure (`webhook_sheet_write_failed`, `webhook_sheet_check_failed`) with sessionId, paymentId; return 500 so Stripe retries
   - [ ] Add paid attendees to existing email list (CRM API)
   - [ ] Custom event confirmation email (from our domain, via webhook)
 
@@ -22,11 +24,11 @@ Reference this list as we build. Check off items as they're completed.
 
 ## 2. Server-Side Validation
 
-- [ ] **API route** (e.g. `POST /api/checkout`) that creates Stripe session
-- [ ] Validate before creating session:
-  - [ ] Date ID exists in config
-  - [ ] Tier ID exists in config
-  - [ ] Tier price matches config (prevent tampering)
+- [x] **API route** (`POST /api/checkout`) that creates Stripe session
+- [x] Validate before creating session:
+  - [x] Date ID exists in config
+  - [x] Tier ID exists in config
+  - [x] Tier price matches config (Supported: sliding scale 20–40; Community/Patron: fixed)
   - [ ] Name: non-empty, reasonable length
   - [ ] Email: valid format
   - [ ] Capacity check (if implemented)
@@ -86,7 +88,7 @@ Reference this list as we build. Check off items as they're completed.
 - [x] **Setup**
   - Sheet created, shared with service account (Editor)
   - Column order: `Timestamp` | `Name` | `Email` | `Ticket date` | `Ticket tier` | `Notes` | `Device` | `Stripe Payment ID`
-  - Ticket date = date label (e.g. "Wednesday, March 18"); Ticket tier = tier label (e.g. "Community")
+  - Ticket date = date label (e.g. "Wednesday, March 18"); Ticket tier = tier label (e.g. "Supported" or "Supported $25" for sliding scale)
   - Device = mobile | tablet | desktop (from form)
 - [x] **Write pattern** – append-only from webhook (one row per successful payment)
 - [ ] **Security** – server-only access, never expose sheet ID or credentials to client
@@ -96,7 +98,13 @@ Reference this list as we build. Check off items as they're completed.
 
 ---
 
-## 8. UI Refactor (Event Invite)
+## 8. Supported Sliding Scale
+
+- [x] **Supported ticket 20–40** – Number input under Supported button when selected; note: "Sliding scale: choose an amount between $20 and $40 that works for you"; validated in API; stored in Stripe metadata and sheet as "Supported $X"
+
+---
+
+## 9. UI Refactor (Event Invite)
 
 - [x] **Remove vertical images** – Remove flanking flower/plant images from welcome step (desktop and mobile thumbnails)
 - [x] **Hero video** – Add `midnight_site_vid_hi_res.mp4` / `.mov` as full-viewport hero (Option A), mp4 for Chrome/Firefox/Edge, mov fallback for Safari
@@ -105,7 +113,7 @@ Reference this list as we build. Check off items as they're completed.
 
 ---
 
-## 9. Cross-Browser Testing
+## 10. Cross-Browser Testing
 
 - [ ] **UI & features** – Test across browsers before launch:
   - [ ] Chrome (desktop + mobile)

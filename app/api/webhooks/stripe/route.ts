@@ -40,8 +40,11 @@ export async function POST(req: NextRequest) {
 
   const date = eventDates.find((d) => d.id === metadata.dateId)
   const tier = eventTiers.find((t) => t.id === metadata.tierId)
-  const ticketDate = date?.label ?? metadata.dateId
-  const ticketTier = tier?.label ?? metadata.tierId
+  const ticketDate = (date?.label ?? metadata.dateId).replace(/\n/g, ' ')
+  const ticketTier =
+    metadata.tierId === 'supported' && metadata.supportedPrice
+      ? `Supported $${metadata.supportedPrice}`
+      : (tier?.label ?? metadata.tierId)
   const paymentId =
     typeof session.payment_intent === 'string'
       ? session.payment_intent
@@ -59,20 +62,36 @@ export async function POST(req: NextRequest) {
   ]
 
   const spreadsheetId = process.env.SPREADSHEET_ID
+  const credentialsJson = process.env.GOOGLE_CREDENTIALS_JSON
   const credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS
   const sheetName = process.env.SPREADSHEET_SHEET_NAME || 'Sheet1'
-  if (!spreadsheetId || !credentialsPath) {
-    console.error('SPREADSHEET_ID or GOOGLE_APPLICATION_CREDENTIALS not set')
+  if (!spreadsheetId) {
+    console.error('SPREADSHEET_ID not set')
     return NextResponse.json(
       { error: 'Sheets not configured' },
       { status: 500 }
     )
   }
 
-  const auth = new google.auth.GoogleAuth({
-    keyFile: credentialsPath,
-    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-  })
+  // Support both: GOOGLE_CREDENTIALS_JSON (Vercel) and GOOGLE_APPLICATION_CREDENTIALS (local file)
+  if (!credentialsJson && !credentialsPath) {
+    console.error('Neither GOOGLE_CREDENTIALS_JSON nor GOOGLE_APPLICATION_CREDENTIALS set')
+    return NextResponse.json(
+      { error: 'Sheets credentials not configured' },
+      { status: 500 }
+    )
+  }
+  const auth = new google.auth.GoogleAuth(
+    credentialsJson
+      ? {
+          credentials: JSON.parse(credentialsJson) as object,
+          scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+        }
+      : {
+          keyFile: credentialsPath,
+          scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+        }
+  )
   const sheets = google.sheets({ version: 'v4', auth })
 
   // Idempotency: skip if we've already processed this payment
@@ -86,7 +105,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ received: true })
     }
   } catch (err) {
-    console.error('Failed to check existing payments:', err)
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error(
+      JSON.stringify({
+        event: 'webhook_sheet_check_failed',
+        sessionId: session.id,
+        paymentId,
+        error: msg,
+      })
+    )
     return NextResponse.json(
       { error: 'Failed to verify payment' },
       { status: 500 }
@@ -108,7 +135,17 @@ export async function POST(req: NextRequest) {
     const details = err && typeof err === 'object' && 'response' in err
       ? JSON.stringify((err as { response?: unknown }).response)
       : ''
-    console.error('Failed to append to Google Sheet:', msg, details)
+    console.error(
+      JSON.stringify({
+        event: 'webhook_sheet_write_failed',
+        sessionId: session.id,
+        paymentId,
+        name: metadata.name,
+        email: metadata.email,
+        error: msg,
+        details,
+      })
+    )
     return NextResponse.json(
       { error: 'Failed to write to sheet' },
       { status: 500 }
