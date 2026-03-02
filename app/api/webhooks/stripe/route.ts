@@ -41,29 +41,19 @@ export async function POST(req: NextRequest) {
   const date = eventDates.find((d) => d.id === metadata.dateId)
   const ticketDate = (date?.label ?? metadata.dateId).replace(/\n/g, ' ')
 
-  // Parse order: "community:2,patron:1" or legacy tierId+quantity
-  let ticketTier: string
+  const amountPaid =
+    session.amount_total != null ? `$${Math.round(session.amount_total / 100)}` : ''
+
   let totalQty: number
   if (metadata.order && typeof metadata.order === 'string') {
-    const parts: string[] = []
     totalQty = 0
     for (const pair of metadata.order.split(',')) {
-      const [tierId, qStr] = pair.split(':')
+      const [, qStr] = pair.split(':')
       const q = parseInt(qStr ?? '1', 10)
-      if (!tierId || isNaN(q) || q < 1) continue
-      const tier = eventTiers.find((t) => t.id === tierId)
-      const price = tierId === 'supported' && metadata.supportedPrice
-        ? Number(metadata.supportedPrice)
-        : (tier?.price ?? 0)
-      parts.push(`${tier?.label ?? tierId} $${price} × ${q}`)
-      totalQty += q
+      if (!isNaN(q) && q >= 1) totalQty += q
     }
-    ticketTier = parts.length > 0 ? parts.join(', ') : String(metadata.order)
+    if (totalQty === 0) totalQty = 1
   } else {
-    const tier = eventTiers.find((t) => t.id === metadata.tierId)
-    const amountDollars = session.amount_total != null ? Math.round(session.amount_total / 100) : null
-    const tierLabel = tier?.label ?? metadata.tierId ?? 'Unknown'
-    ticketTier = amountDollars != null ? `${tierLabel} $${amountDollars}` : tierLabel
     totalQty = metadata.quantity ? parseInt(String(metadata.quantity), 10) || 1 : 1
   }
 
@@ -78,7 +68,7 @@ export async function POST(req: NextRequest) {
     String(metadata.name),
     String(metadata.email),
     String(ticketDate),
-    String(ticketTier),
+    String(amountPaid),
     String(qty),
     String(metadata.notes ?? ''),
     String(metadata.device ?? 'desktop'),
@@ -144,7 +134,7 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // Append to data rows (A2:I) - Timestamp|Name|Email|Ticket date|Ticket tier|Quantity|Notes|Device|Payment ID
+  // Append to data rows (A2:I) - Timestamp|Name|Email|Ticket date|Amount paid|Quantity|Notes|Device|Payment ID
   const range = `${sheetName}!A2:I`
   try {
     await sheets.spreadsheets.values.append({
