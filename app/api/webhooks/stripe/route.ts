@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { google } from 'googleapis'
-import { eventDates, eventTiers } from '../../../../content/event-invite.config'
+import { eventDates } from '../../../../content/event-invite.config'
+import { sendConfirmationEmail } from '../../../../lib/confirmation-email'
 
 export async function POST(req: NextRequest) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
@@ -186,6 +187,19 @@ export async function POST(req: NextRequest) {
       quantity: qty,
     })
   )
+
+  // Send confirmation email (non-blocking; don't fail webhook if email fails)
+  const emailResult = await sendConfirmationEmail(metadata as Record<string, string | undefined>, amountPaid, qty)
+  if (!emailResult.ok) {
+    console.error(
+      JSON.stringify({
+        event: 'webhook_confirmation_email_failed',
+        sessionId: session.id,
+        paymentId,
+        error: emailResult.error,
+      })
+    )
+  }
 
   return NextResponse.json({ received: true })
 }

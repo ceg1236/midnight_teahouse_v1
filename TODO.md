@@ -38,7 +38,7 @@ Reference this list as we build. Check off items as they're completed.
 ## 3. Confirmation & Communication
 
 - [x] **Stripe receipt** – automatic (payment confirmation)
-- [ ] **Custom event confirmation email** – send from our own email (Resend/SendGrid/etc.) from webhook after payment; event-specific welcome, not just Stripe receipt
+- [x] **Custom event confirmation email** – Resend; sent from webhook after sheet write; event-specific (date, order summary, amount)
 - [ ] **Email list signup** – add to CRM from webhook after successful payment
 
 ---
