@@ -276,13 +276,13 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               <h2 className="carrd-font-heading text-2xl md:text-3xl">
                 Choose Ticket
               </h2>
-              <div className="w-full max-w-[56rem] flex flex-wrap justify-evenly gap-6">
+              <div className="w-full max-w-[56rem] flex flex-wrap justify-evenly gap-6 items-center">
                 {tiers
                   .filter((t) => t.id === 'community' || t.id === 'patron')
                   .map((t) => {
                     const qty = selections[t.id] ?? 0
                     return (
-                      <div key={t.id} className="flex flex-col items-center gap-2">
+                      <div key={t.id} className="flex items-center gap-2">
                         <button
                           type="button"
                           onClick={() => handleTierClick(t.id)}
@@ -293,7 +293,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                           {t.label} ${t.price}
                         </button>
                         {qty > 0 && (
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 shrink-0">
                             <button
                               type="button"
                               onClick={() => handleQuantityChange(t.id, -1)}
@@ -339,48 +339,18 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     .filter((t) => t.id === 'supported')
                     .map((t) => (
                       <div key={t.id} className="flex flex-col items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => handleTierClick(t.id)}
-                          className={`carrd-btn px-8 py-4 whitespace-normal min-w-[10rem] ${
-                            (selections['supported'] ?? 0) > 0 ? 'bg-[#FAE0B9]/20' : ''
-                          }`}
-                        >
-                          {t.label}
-                        </button>
-                        {(selections['supported'] ?? 0) > 0 && (
-                          <>
-                            <div className="flex flex-col items-center gap-1 w-full max-w-[40rem]">
-                              <p className="carrd-font-body text-xs text-center opacity-90 w-full px-2">
-                                Sliding scale: choose an amount between $20 and $39 that works for you.
-                              </p>
-                              <div className="flex items-center justify-center gap-1">
-                                <span className="carrd-font-body text-lg text-[#FAEBD4]">$</span>
-                                <input
-                                  type="number"
-                                  min={20}
-                                  max={39}
-                                  value={supportedPriceInput}
-                                  onChange={(e) => {
-                                    const raw = e.target.value
-                                    setSupportedPriceInput(raw)
-                                    const v = parseInt(raw, 10)
-                                    if (!isNaN(v) && v >= 20 && v <= 39) setSupportedPrice(v)
-                                  }}
-                                  onBlur={() => {
-                                    const v = parseInt(supportedPriceInput, 10)
-                                    if (!isNaN(v) && v >= 20 && v <= 39) {
-                                      setSupportedPrice(v)
-                                      setSupportedPriceInput(String(v))
-                                    } else {
-                                      setSupportedPriceInput(String(supportedPrice))
-                                    }
-                                  }}
-                                  className="w-20 text-center rounded-md border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-2 py-1 text-[#FAEBD4] text-lg focus:border-[#FAE0B9] focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                />
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleTierClick(t.id)}
+                            className={`carrd-btn px-8 py-4 whitespace-normal min-w-[10rem] ${
+                              (selections['supported'] ?? 0) > 0 ? 'bg-[#FAE0B9]/20' : ''
+                            }`}
+                          >
+                            {t.label}
+                          </button>
+                          {(selections['supported'] ?? 0) > 0 && (
+                            <div className="flex items-center gap-2 shrink-0">
                               <button
                                 type="button"
                                 onClick={() => handleQuantityChange('supported', -1)}
@@ -400,7 +370,39 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                                 +
                               </button>
                             </div>
-                          </>
+                          )}
+                        </div>
+                        {(selections['supported'] ?? 0) > 0 && (
+                          <div className="flex flex-col items-center gap-1 w-full max-w-[40rem]">
+                            <p className="carrd-font-body text-xs text-center opacity-90 w-full px-2">
+                              Sliding scale: choose an amount between $20 and $39 that works for you.
+                            </p>
+                            <div className="flex items-center justify-center gap-1">
+                              <span className="carrd-font-body text-lg text-[#FAEBD4]">$</span>
+                              <input
+                                type="number"
+                                min={20}
+                                max={39}
+                                value={supportedPriceInput}
+                                onChange={(e) => {
+                                  const raw = e.target.value
+                                  setSupportedPriceInput(raw)
+                                  const v = parseInt(raw, 10)
+                                  if (!isNaN(v) && v >= 20 && v <= 39) setSupportedPrice(v)
+                                }}
+                                onBlur={() => {
+                                  const v = parseInt(supportedPriceInput, 10)
+                                  if (!isNaN(v) && v >= 20 && v <= 39) {
+                                    setSupportedPrice(v)
+                                    setSupportedPriceInput(String(v))
+                                  } else {
+                                    setSupportedPriceInput(String(supportedPrice))
+                                  }
+                                }}
+                                className="w-20 text-center rounded-md border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-2 py-1 text-[#FAEBD4] text-lg focus:border-[#FAE0B9] focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              />
+                            </div>
+                          </div>
                         )}
                       </div>
                     ))}
