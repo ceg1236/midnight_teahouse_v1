@@ -65,12 +65,16 @@ export async function POST(req: NextRequest) {
     if (!tier || !item.quantity || item.quantity < 1 || item.quantity > 4) continue
     const unitAmount =
       item.tierId === 'supported' && typeof (item.supportedPrice ?? supportedPrice) === 'number'
-        ? Math.min(40, Math.max(20, Math.round(item.supportedPrice ?? supportedPrice ?? 20)))
+        ? Math.min(39, Math.max(20, Math.round(item.supportedPrice ?? supportedPrice ?? 20)))
         : tier.price
     lineItems.push({ tier, quantity: Math.min(4, Math.max(1, Math.round(item.quantity))), unitAmount })
   }
   if (lineItems.length === 0) {
     return NextResponse.json({ error: 'Select at least one ticket' }, { status: 400 })
+  }
+  const totalQty = lineItems.reduce((s, li) => s + li.quantity, 0)
+  if (totalQty > 4) {
+    return NextResponse.json({ error: 'Maximum 4 tickets per order' }, { status: 400 })
   }
 
   // Validate name

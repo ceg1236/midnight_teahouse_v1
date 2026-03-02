@@ -101,6 +101,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [selections, setSelections] = useState<TierSelections>({})
   const [supportedPrice, setSupportedPrice] = useState(20)
+  const [supportedPriceInput, setSupportedPriceInput] = useState('20')
   const [showSupportedTier, setShowSupportedTier] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', notes: '' })
   const [deviceType, setDeviceType] = useState<'mobile' | 'tablet' | 'desktop'>('desktop')
@@ -137,6 +138,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
   }, [hydrated, selectedDate, selections, formData])
 
   const hasSelection = Object.values(selections).some((q) => q > 0)
+  const totalQuantity = Object.values(selections).reduce((s, q) => s + q, 0)
   const totalPrice = Object.entries(selections).reduce((sum, [tierId, qty]) => {
     if (qty <= 0) return sum
     const tier = tiers.find((t) => t.id === tierId)
@@ -146,11 +148,13 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
   const handleTierClick = (tierId: string) => {
     setSelections((prev) => {
       const q = prev[tierId] ?? 0
+      const othersTotal = Object.entries(prev).reduce((s, [id, n]) => (id === tierId ? s : s + n), 0)
       if (q > 0) {
         const next = { ...prev }
         delete next[tierId]
         return next
       }
+      if (othersTotal >= 4) return prev
       return { ...prev, [tierId]: 1 }
     })
   }
@@ -158,12 +162,13 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
   const handleQuantityChange = (tierId: string, delta: number) => {
     setSelections((prev) => {
       const q = prev[tierId] ?? 0
+      const othersTotal = Object.entries(prev).reduce((s, [id, n]) => (id === tierId ? s : s + n), 0)
       if (delta === -1 && q <= 1) {
         const next = { ...prev }
         delete next[tierId]
         return next
       }
-      if (delta === 1 && q >= 4) return prev
+      if (delta === 1 && othersTotal + q >= 4) return prev
       return { ...prev, [tierId]: q + delta }
     })
   }
@@ -277,7 +282,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   .map((t) => {
                     const qty = selections[t.id] ?? 0
                     return (
-                      <div key={t.id} className="flex flex-col items-center gap-2 min-h-[7.5rem]">
+                      <div key={t.id} className="flex flex-col items-center gap-2">
                         <button
                           type="button"
                           onClick={() => handleTierClick(t.id)}
@@ -287,32 +292,28 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         >
                           {t.label} ${t.price}
                         </button>
-                        <div className="flex items-center gap-2 h-9">
-                          {qty > 0 ? (
-                            <>
-                              <button
-                                type="button"
-                                onClick={() => handleQuantityChange(t.id, -1)}
-                                className="carrd-btn w-9 h-9 flex items-center justify-center p-0 text-lg leading-none"
-                                aria-label={`Decrease ${t.label} quantity`}
-                              >
-                                −
-                              </button>
-                              <span className="carrd-font-body w-8 text-center tabular-nums">{qty}</span>
-                              <button
-                                type="button"
-                                onClick={() => handleQuantityChange(t.id, 1)}
-                                className="carrd-btn w-9 h-9 flex items-center justify-center p-0 text-lg leading-none disabled:opacity-50 disabled:cursor-not-allowed"
-                                disabled={qty >= 4}
-                                aria-label={`Increase ${t.label} quantity`}
-                              >
-                                +
-                              </button>
-                            </>
-                          ) : (
-                            <span className="w-[5.5rem]" aria-hidden />
-                          )}
-                        </div>
+                        {qty > 0 && (
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleQuantityChange(t.id, -1)}
+                              className="carrd-btn w-9 h-9 flex items-center justify-center p-0 text-lg leading-none"
+                              aria-label={`Decrease ${t.label} quantity`}
+                            >
+                              −
+                            </button>
+                            <span className="carrd-font-body w-8 text-center tabular-nums">{qty}</span>
+                            <button
+                              type="button"
+                              onClick={() => handleQuantityChange(t.id, 1)}
+                              className="carrd-btn w-9 h-9 flex items-center justify-center p-0 text-lg leading-none disabled:opacity-50 disabled:cursor-not-allowed"
+                              disabled={totalQuantity >= 4}
+                              aria-label={`Increase ${t.label} quantity`}
+                            >
+                              +
+                            </button>
+                          </div>
+                        )}
                       </div>
                     )
                   })}
@@ -337,7 +338,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   {tiers
                     .filter((t) => t.id === 'supported')
                     .map((t) => (
-                      <div key={t.id} className="flex flex-col items-center gap-2 min-h-[7.5rem]">
+                      <div key={t.id} className="flex flex-col items-center gap-2">
                         <button
                           type="button"
                           onClick={() => handleTierClick(t.id)}
@@ -347,28 +348,39 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         >
                           {t.label}
                         </button>
-                        {(selections['supported'] ?? 0) > 0 ? (
+                        {(selections['supported'] ?? 0) > 0 && (
                           <>
                             <div className="flex flex-col items-center gap-1 w-full max-w-[40rem]">
                               <p className="carrd-font-body text-xs text-center opacity-90 w-full px-2">
-                                Sliding scale: choose an amount between $20 and $40 that works for you.
+                                Sliding scale: choose an amount between $20 and $39 that works for you.
                               </p>
                               <div className="flex items-center justify-center gap-1">
                                 <span className="carrd-font-body text-lg text-[#FAEBD4]">$</span>
                                 <input
                                   type="number"
                                   min={20}
-                                  max={40}
-                                  value={supportedPrice}
+                                  max={39}
+                                  value={supportedPriceInput}
                                   onChange={(e) => {
-                                    const v = parseInt(e.target.value, 10)
-                                    if (!isNaN(v)) setSupportedPrice(Math.min(40, Math.max(20, v)))
+                                    const raw = e.target.value
+                                    setSupportedPriceInput(raw)
+                                    const v = parseInt(raw, 10)
+                                    if (!isNaN(v) && v >= 20 && v <= 39) setSupportedPrice(v)
+                                  }}
+                                  onBlur={() => {
+                                    const v = parseInt(supportedPriceInput, 10)
+                                    if (!isNaN(v) && v >= 20 && v <= 39) {
+                                      setSupportedPrice(v)
+                                      setSupportedPriceInput(String(v))
+                                    } else {
+                                      setSupportedPriceInput(String(supportedPrice))
+                                    }
                                   }}
                                   className="w-20 text-center rounded-md border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-2 py-1 text-[#FAEBD4] text-lg focus:border-[#FAE0B9] focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 />
                               </div>
                             </div>
-                            <div className="flex items-center gap-2 h-9">
+                            <div className="flex items-center gap-2">
                               <button
                                 type="button"
                                 onClick={() => handleQuantityChange('supported', -1)}
@@ -382,15 +394,13 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                                 type="button"
                                 onClick={() => handleQuantityChange('supported', 1)}
                                 className="carrd-btn w-9 h-9 flex items-center justify-center p-0 text-lg leading-none disabled:opacity-50 disabled:cursor-not-allowed"
-                                disabled={(selections['supported'] ?? 0) >= 4}
+                                disabled={totalQuantity >= 4}
                                 aria-label="Increase Supported quantity"
                               >
                                 +
                               </button>
                             </div>
                           </>
-                        ) : (
-                          <div className="h-9" aria-hidden />
                         )}
                       </div>
                     ))}
