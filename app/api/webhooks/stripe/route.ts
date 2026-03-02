@@ -49,12 +49,14 @@ export async function POST(req: NextRequest) {
       ? session.payment_intent
       : session.payment_intent?.id ?? session.id
 
+  const qty = metadata.quantity ? String(metadata.quantity) : '1'
   const row = [
     new Date().toISOString(),
     String(metadata.name),
     String(metadata.email),
     String(ticketDate),
     String(ticketTier),
+    String(qty),
     String(metadata.notes ?? ''),
     String(metadata.device ?? 'desktop'),
     String(paymentId),
@@ -93,11 +95,11 @@ export async function POST(req: NextRequest) {
   )
   const sheets = google.sheets({ version: 'v4', auth })
 
-  // Idempotency: skip if we've already processed this payment
+  // Idempotency: skip if we've already processed this payment (payment ID in column I)
   try {
     const existing = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!H2:H`,
+      range: `${sheetName}!I2:I`,
     })
     const paymentIds = (existing.data.values ?? []).flat()
     if (paymentIds.includes(paymentId)) {
@@ -119,8 +121,8 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // Append to data rows (A2:H) to avoid Table header validation conflicts
-  const range = `${sheetName}!A2:H`
+  // Append to data rows (A2:I) - Timestamp|Name|Email|Ticket date|Ticket tier|Quantity|Notes|Device|Payment ID
+  const range = `${sheetName}!A2:I`
   try {
     await sheets.spreadsheets.values.append({
       spreadsheetId,

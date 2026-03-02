@@ -87,7 +87,7 @@ Reference this list as we build. Check off items as they're completed.
 
 - [x] **Setup**
   - Sheet created, shared with service account (Editor)
-  - Column order: `Timestamp` | `Name` | `Email` | `Ticket date` | `Ticket tier` | `Notes` | `Device` | `Stripe Payment ID`
+  - Column order: `Timestamp` | `Name` | `Email` | `Ticket date` | `Ticket tier` | `Quantity` | `Notes` | `Device` | `Stripe Payment ID`
   - Ticket date = date label (e.g. "Wednesday, March 18"); Ticket tier = tier label (e.g. "Supported" or "Supported $25" for sliding scale)
   - Device = mobile | tablet | desktop (from form)
 - [x] **Write pattern** – append-only from webhook (one row per successful payment)

@@ -42,17 +42,19 @@ function scrollToSection(ref: React.RefObject<HTMLElement | null>) {
 function loadPersisted(
   dates: readonly { id: string }[],
   tiers: readonly { id: string }[]
-): { date: string | null; tier: string | null; form: { name: string; email: string; notes: string } } {
-  if (typeof window === 'undefined') return { date: null, tier: null, form: { name: '', email: '', notes: '' } }
+): { date: string | null; tier: string | null; quantity: number; form: { name: string; email: string; notes: string } } {
+  if (typeof window === 'undefined') return { date: null, tier: null, quantity: 1, form: { name: '', email: '', notes: '' } }
   try {
     const raw = sessionStorage.getItem(STORAGE_KEY)
-    if (!raw) return { date: null, tier: null, form: { name: '', email: '', notes: '' } }
-    const data = JSON.parse(raw) as { date?: string; tier?: string; name?: string; email?: string; notes?: string }
+    if (!raw) return { date: null, tier: null, quantity: 1, form: { name: '', email: '', notes: '' } }
+    const data = JSON.parse(raw) as { date?: string; tier?: string; quantity?: number; name?: string; email?: string; notes?: string }
     const date = data.date && dates.some((d) => d.id === data.date) ? data.date : null
     const tier = data.tier && tiers.some((t) => t.id === data.tier) ? data.tier : null
+    const quantity = typeof data.quantity === 'number' ? Math.min(4, Math.max(1, data.quantity)) : 1
     return {
       date,
       tier,
+      quantity,
       form: {
         name: typeof data.name === 'string' ? data.name : '',
         email: typeof data.email === 'string' ? data.email : '',
@@ -60,14 +62,19 @@ function loadPersisted(
       },
     }
   } catch {
-    return { date: null, tier: null, form: { name: '', email: '', notes: '' } }
+    return { date: null, tier: null, quantity: 1, form: { name: '', email: '', notes: '' } }
   }
 }
 
-function savePersisted(date: string | null, tier: string | null, form: { name: string; email: string; notes: string }) {
+function savePersisted(
+  date: string | null,
+  tier: string | null,
+  quantity: number,
+  form: { name: string; email: string; notes: string }
+) {
   if (typeof window === 'undefined') return
   try {
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ date, tier, ...form }))
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ date, tier, quantity, ...form }))
   } catch {
     /* ignore */
   }
@@ -76,6 +83,7 @@ function savePersisted(date: string | null, tier: string | null, form: { name: s
 export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }: CarrdStylePageProps) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [selectedTier, setSelectedTier] = useState<string | null>(null)
+  const [quantity, setQuantity] = useState(1)
   const [supportedPrice, setSupportedPrice] = useState(20)
   const [showSupportedTier, setShowSupportedTier] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', notes: '' })
@@ -93,6 +101,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
     const persisted = loadPersisted(dates, tiers)
     setSelectedDate(persisted.date)
     setSelectedTier(persisted.tier)
+    setQuantity(persisted.quantity)
     setFormData(persisted.form)
     if (persisted.tier === 'supported') setShowSupportedTier(true)
     setHydrated(true)
@@ -109,10 +118,33 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
 
   useEffect(() => {
     if (!hydrated) return
-    savePersisted(selectedDate, selectedTier, formData)
-  }, [hydrated, selectedDate, selectedTier, formData])
+    savePersisted(selectedDate, selectedTier, quantity, formData)
+  }, [hydrated, selectedDate, selectedTier, quantity, formData])
 
   const selectedTierData = tiers.find((t) => t.id === selectedTier)
+  const unitPrice = selectedTier === 'supported' ? supportedPrice : (selectedTierData?.price ?? 0)
+  const totalPrice = unitPrice * quantity
+
+  const handleTierClick = (tierId: string) => {
+    if (selectedTier === tierId) {
+      setSelectedTier(null)
+      setQuantity(1)
+    } else {
+      setSelectedTier(tierId)
+      setQuantity(1)
+    }
+  }
+
+  const handleQuantityChange = (delta: number) => {
+    if (delta === -1 && quantity <= 1) {
+      setSelectedTier(null)
+      setQuantity(1)
+    } else if (delta === 1 && quantity < 4) {
+      setQuantity((q) => q + 1)
+    } else if (delta === -1 && quantity > 1) {
+      setQuantity((q) => q - 1)
+    }
+  }
 
   return (
     <div className="carrd-page flex flex-col items-center min-h-screen overflow-x-hidden pt-8">
@@ -224,16 +256,35 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     <div key={t.id} className="flex flex-col items-center gap-2">
                       <button
                         type="button"
-                        onClick={() => {
-                          setSelectedTier(t.id)
-                          scrollToSection(formRef)
-                        }}
+                        onClick={() => handleTierClick(t.id)}
                         className={`carrd-btn px-8 py-4 whitespace-normal min-w-[10rem] flex-1 max-w-[14rem] ${
                           selectedTier === t.id ? 'bg-[#FAE0B9]/20' : ''
                         }`}
                       >
                         {t.label} ${t.price}
                       </button>
+                      {selectedTier === t.id && (
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleQuantityChange(-1)}
+                            className="carrd-btn w-9 h-9 flex items-center justify-center p-0 text-lg leading-none"
+                            aria-label="Decrease quantity"
+                          >
+                            −
+                          </button>
+                          <span className="carrd-font-body w-8 text-center tabular-nums">{quantity}</span>
+                          <button
+                            type="button"
+                            onClick={() => handleQuantityChange(1)}
+                            className="carrd-btn w-9 h-9 flex items-center justify-center p-0 text-lg leading-none disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={quantity >= 4}
+                            aria-label="Increase quantity"
+                          >
+                            +
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ))}
               </div>
@@ -260,10 +311,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       <div key={t.id} className="flex flex-col items-center gap-2">
                         <button
                           type="button"
-                          onClick={() => {
-                            setSelectedTier(t.id)
-                            scrollToSection(formRef)
-                          }}
+                          onClick={() => handleTierClick(t.id)}
                           className={`carrd-btn px-8 py-4 whitespace-normal min-w-[10rem] ${
                             selectedTier === t.id ? 'bg-[#FAE0B9]/20' : ''
                           }`}
@@ -271,22 +319,44 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                           {t.label}
                         </button>
                         {selectedTier === 'supported' && (
-                          <div className="flex flex-col items-center gap-1 w-full max-w-[32rem]">
-                            <input
-                              type="number"
-                              min={20}
-                              max={40}
-                              value={supportedPrice}
-                              onChange={(e) => {
-                                const v = parseInt(e.target.value, 10)
-                                if (!isNaN(v)) setSupportedPrice(Math.min(40, Math.max(20, v)))
-                              }}
-                              className="w-20 text-center rounded-md border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-2 py-1 text-[#FAEBD4] text-lg focus:border-[#FAE0B9] focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                            />
-                            <p className="carrd-font-body text-xs text-center opacity-90 w-full px-2">
-                              Sliding scale: choose an amount between $20 and $40 that works for you.
-                            </p>
-                          </div>
+                          <>
+                            <div className="flex flex-col items-center gap-1 w-full max-w-[40rem]">
+                              <input
+                                type="number"
+                                min={20}
+                                max={40}
+                                value={supportedPrice}
+                                onChange={(e) => {
+                                  const v = parseInt(e.target.value, 10)
+                                  if (!isNaN(v)) setSupportedPrice(Math.min(40, Math.max(20, v)))
+                                }}
+                                className="w-20 text-center rounded-md border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-2 py-1 text-[#FAEBD4] text-lg focus:border-[#FAE0B9] focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              />
+                              <p className="carrd-font-body text-xs text-center opacity-90 w-full px-2">
+                                Sliding scale: choose an amount between $20 and $40 that works for you.
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => handleQuantityChange(-1)}
+                                className="carrd-btn w-9 h-9 flex items-center justify-center p-0 text-lg leading-none"
+                                aria-label="Decrease quantity"
+                              >
+                                −
+                              </button>
+                              <span className="carrd-font-body w-8 text-center tabular-nums">{quantity}</span>
+                              <button
+                                type="button"
+                                onClick={() => handleQuantityChange(1)}
+                                className="carrd-btn w-9 h-9 flex items-center justify-center p-0 text-lg leading-none disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={quantity >= 4}
+                                aria-label="Increase quantity"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </>
                         )}
                       </div>
                     ))}
@@ -377,7 +447,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   {dates.find((d) => d.id === selectedDate)?.label} · {selectedTierData?.label}
                 </p>
                 <p className="mt-2 carrd-font-heading text-xl">
-                  ${selectedTier === 'supported' ? supportedPrice : selectedTierData?.price}
+                  {quantity} × ${unitPrice} = ${totalPrice}
                 </p>
               </div>
               <div className="w-full max-w-[56rem] text-left">
@@ -416,6 +486,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       body: JSON.stringify({
                         dateId: selectedDate,
                         tierId: selectedTier,
+                        quantity,
                         supportedPrice: selectedTier === 'supported' ? supportedPrice : undefined,
                         name: formData.name.trim(),
                         email: formData.email.trim(),
