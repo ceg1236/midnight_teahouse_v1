@@ -116,6 +116,14 @@ export async function POST(req: NextRequest) {
     })
     const paymentIds = (existing.data.values ?? []).flat()
     if (paymentIds.includes(paymentId)) {
+      console.log(
+        JSON.stringify({
+          event: 'webhook_sheet_duplicate',
+          sessionId: session.id,
+          paymentId,
+          message: 'Payment already in sheet, skipped',
+        })
+      )
       return NextResponse.json({ received: true })
     }
   } catch (err) {
@@ -165,6 +173,19 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     )
   }
+
+  console.log(
+    JSON.stringify({
+      event: 'webhook_sheet_success',
+      sessionId: session.id,
+      paymentId,
+      name: metadata.name,
+      email: metadata.email,
+      ticketDate,
+      amountPaid,
+      quantity: qty,
+    })
+  )
 
   return NextResponse.json({ received: true })
 }
