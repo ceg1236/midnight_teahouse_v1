@@ -41,10 +41,9 @@ export async function POST(req: NextRequest) {
   const date = eventDates.find((d) => d.id === metadata.dateId)
   const tier = eventTiers.find((t) => t.id === metadata.tierId)
   const ticketDate = (date?.label ?? metadata.dateId).replace(/\n/g, ' ')
-  const ticketTier =
-    metadata.tierId === 'supported' && metadata.supportedPrice
-      ? `Supported $${metadata.supportedPrice}`
-      : (tier?.label ?? metadata.tierId)
+  const amountDollars = session.amount_total != null ? Math.round(session.amount_total / 100) : null
+  const tierLabel = tier?.label ?? metadata.tierId
+  const ticketTier = amountDollars != null ? `${tierLabel} $${amountDollars}` : tierLabel
   const paymentId =
     typeof session.payment_intent === 'string'
       ? session.payment_intent
