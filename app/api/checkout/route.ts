@@ -31,8 +31,7 @@ export async function POST(req: NextRequest) {
 
   let body: {
     dateId?: string
-    tierId?: string
-    quantity?: number
+    items?: Array<{ tierId: string; quantity: number; supportedPrice?: number }>
     supportedPrice?: number
     name?: string
     email?: string
@@ -45,7 +44,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
   }
 
-  const { dateId, tierId, quantity = 1, supportedPrice, name, email, notes = '', device = 'desktop' } = body
+  const { dateId, items = [], supportedPrice, name, email, notes = '', device = 'desktop' } = body
 
   // Validate device (mobile | tablet | desktop)
   const validDevices = ['mobile', 'tablet', 'desktop'] as const
@@ -59,19 +58,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid date' }, { status: 400 })
   }
 
-  // Validate tier
-  const tier = eventTiers.find((t) => t.id === tierId)
-  if (!tier) {
-    return NextResponse.json({ error: 'Invalid tier' }, { status: 400 })
+  // Validate items
+  const lineItems: Array<{ tier: (typeof eventTiers)[number]; quantity: number; unitAmount: number }> = []
+  for (const item of items) {
+    const tier = eventTiers.find((t) => t.id === item.tierId)
+    if (!tier || !item.quantity || item.quantity < 1 || item.quantity > 4) continue
+    const unitAmount =
+      item.tierId === 'supported' && typeof (item.supportedPrice ?? supportedPrice) === 'number'
+        ? Math.min(40, Math.max(20, Math.round(item.supportedPrice ?? supportedPrice ?? 20)))
+        : tier.price
+    lineItems.push({ tier, quantity: Math.min(4, Math.max(1, Math.round(item.quantity))), unitAmount })
   }
-
-  // Supported tier: use sliding scale (20-40) if provided, else default
-  const amount =
-    tierId === 'supported' && typeof supportedPrice === 'number'
-      ? Math.min(40, Math.max(20, Math.round(supportedPrice)))
-      : tier.price
-
-  const qty = Math.min(4, Math.max(1, Math.round(quantity)))
+  if (lineItems.length === 0) {
+    return NextResponse.json({ error: 'Select at least one ticket' }, { status: 400 })
+  }
 
   // Validate name
   const trimmedName = typeof name === 'string' ? name.trim() : ''
@@ -99,37 +99,35 @@ export async function POST(req: NextRequest) {
   const successUrl = `${baseUrl}/invite/success?session_id={CHECKOUT_SESSION_ID}`
   const cancelUrl = `${baseUrl}`
 
+  const orderStr = lineItems.map((li) => `${li.tier.id}:${li.quantity}`).join(',')
+  const supportedInOrder = lineItems.find((li) => li.tier.id === 'supported')
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
   try {
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
-      line_items: [
-        {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: `${date.label} · ${tier.label}`,
-              description: `Spring Fling at the Teahouse – ${tier.label} tier`,
-            },
-            unit_amount: amount * 100, // cents
+      line_items: lineItems.map((li) => ({
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: `${date.label} · ${li.tier.label}`,
+            description: `Spring Fling at the Teahouse – ${li.tier.label} tier`,
           },
-          quantity: qty,
+          unit_amount: li.unitAmount * 100, // cents
         },
-      ],
+        quantity: li.quantity,
+      })),
       metadata: {
         dateId: date.id,
-        tierId: tier.id,
+        order: orderStr,
         name: trimmedName,
         email: trimmedEmail,
         notes: notes.slice(0, 500), // Stripe metadata values max 500 chars
         device: deviceType,
-        ...(tierId === 'supported' && { supportedPrice: String(amount) }),
-        quantity: String(qty),
+        ...(supportedInOrder && { supportedPrice: String(supportedInOrder.unitAmount) }),
       },
       payment_intent_data: {
         metadata: {
           dateId: date.id,
-          tierId: tier.id,
           name: trimmedName,
           email: trimmedEmail,
           device: deviceType,

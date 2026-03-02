@@ -33,23 +33,46 @@ export async function POST(req: NextRequest) {
 
   const session = event.data.object as Stripe.Checkout.Session
   const metadata = session.metadata
-  if (!metadata?.dateId || !metadata?.tierId || !metadata?.name || !metadata?.email) {
+  if (!metadata?.dateId || !metadata?.name || !metadata?.email) {
     console.error('Missing metadata in checkout session:', session.id)
     return NextResponse.json({ error: 'Invalid session metadata' }, { status: 400 })
   }
 
   const date = eventDates.find((d) => d.id === metadata.dateId)
-  const tier = eventTiers.find((t) => t.id === metadata.tierId)
   const ticketDate = (date?.label ?? metadata.dateId).replace(/\n/g, ' ')
-  const amountDollars = session.amount_total != null ? Math.round(session.amount_total / 100) : null
-  const tierLabel = tier?.label ?? metadata.tierId
-  const ticketTier = amountDollars != null ? `${tierLabel} $${amountDollars}` : tierLabel
+
+  // Parse order: "community:2,patron:1" or legacy tierId+quantity
+  let ticketTier: string
+  let totalQty: number
+  if (metadata.order && typeof metadata.order === 'string') {
+    const parts: string[] = []
+    totalQty = 0
+    for (const pair of metadata.order.split(',')) {
+      const [tierId, qStr] = pair.split(':')
+      const q = parseInt(qStr ?? '1', 10)
+      if (!tierId || isNaN(q) || q < 1) continue
+      const tier = eventTiers.find((t) => t.id === tierId)
+      const price = tierId === 'supported' && metadata.supportedPrice
+        ? Number(metadata.supportedPrice)
+        : (tier?.price ?? 0)
+      parts.push(`${tier?.label ?? tierId} $${price} × ${q}`)
+      totalQty += q
+    }
+    ticketTier = parts.length > 0 ? parts.join(', ') : String(metadata.order)
+  } else {
+    const tier = eventTiers.find((t) => t.id === metadata.tierId)
+    const amountDollars = session.amount_total != null ? Math.round(session.amount_total / 100) : null
+    const tierLabel = tier?.label ?? metadata.tierId ?? 'Unknown'
+    ticketTier = amountDollars != null ? `${tierLabel} $${amountDollars}` : tierLabel
+    totalQty = metadata.quantity ? parseInt(String(metadata.quantity), 10) || 1 : 1
+  }
+
   const paymentId =
     typeof session.payment_intent === 'string'
       ? session.payment_intent
       : session.payment_intent?.id ?? session.id
 
-  const qty = metadata.quantity ? String(metadata.quantity) : '1'
+  const qty = String(totalQty)
   const row = [
     new Date().toISOString(),
     String(metadata.name),
