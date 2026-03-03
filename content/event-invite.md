@@ -6,5 +6,5 @@ This is an invitation to step away from the everyday rhythm of the city and ente
 
 Join us for an evening of rest, play and discovery. We can't wait to see you.
 
-With love,
+With love,  
 Your Tea Keepers
