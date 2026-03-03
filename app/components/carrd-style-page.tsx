@@ -204,40 +204,44 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         </div>
 
         {/* March Gatherings */}
-        <section className="w-full flex flex-col items-center gap-4 text-center">
+        <section className="w-full flex flex-col items-center gap-6 text-center">
           <h2 className="carrd-font-heading text-2xl md:text-3xl">
             Crossing into Spring
           </h2>
-          <div className="w-full max-w-[56rem] flex flex-col md:flex-row justify-between gap-8 text-left">
-            <div className="space-y-1">
-              <p className="carrd-font-muted text-xs tracking-[0.2em] uppercase">
-                Date
-              </p>
-              <p className="carrd-font-body">
-                March 18-20, 2026
-                <br />
-                7-11pm
-              </p>
-            </div>
-            <div className="space-y-1">
-              <p className="carrd-font-muted text-xs tracking-[0.2em] uppercase">
-                Location
-              </p>
-              <p className="carrd-font-body">
-                Private home in SoMA, SF
-                <br />
-                <span className="carrd-font-muted text-xs">
-                  (Exact location shared after RSVP)
-                </span>
-              </p>
-            </div>
-          </div>
           <div className="carrd-font-body text-left space-y-4 w-full max-w-[56rem]">
             {welcomeContent.split(/\n\n+/).map((para, i) => (
               <p key={i} className="leading-relaxed">
                 {para}
               </p>
             ))}
+          </div>
+          <div className="w-full max-w-[56rem] flex flex-col md:flex-row items-center justify-center gap-10 md:gap-16 text-center pt-2">
+            <div className="space-y-2">
+              <p className="carrd-font-muted text-xs tracking-[0.2em] uppercase">
+                Date
+              </p>
+              <div className="space-y-1">
+                <p className="carrd-font-body inline-block border-b border-[#2f4381] pb-0.5">
+                  March 18-20, 2026
+                </p>
+                <p className="carrd-font-body inline-block border-b border-[#2f4381] pb-0.5">
+                  7-11pm
+                </p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <p className="carrd-font-muted text-xs tracking-[0.2em] uppercase">
+                Location
+              </p>
+              <div className="space-y-1">
+                <p className="carrd-font-body">
+                  Private home in SoMA, SF
+                </p>
+                <p className="carrd-font-muted text-xs">
+                  (Exact location shared after RSVP)
+                </p>
+              </div>
+            </div>
           </div>
           <button
             type="button"
