@@ -182,7 +182,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           Midnight Teahouse
         </h1>
         <p className="carrd-font-subtitle text-center italic">
-          an evening teahouse
+          welcome to our evening world
         </p>
 
         {/* Video */}
