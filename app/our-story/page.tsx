@@ -67,7 +67,7 @@ export default function OurStoryPage() {
             <p>
               Thank you for being part of our unfolding. We are grateful to be building it with you.
             </p>
-            <div className="text-right">
+            <div className="text-right mt-8">
               <p>
                 With love,
               </p>
