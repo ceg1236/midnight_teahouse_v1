@@ -213,7 +213,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               Midnight Teahouse
             </h1>
             <p className="carrd-font-subtitle text-center italic">
-              welcome to our enchanted world
+              an enchanted world hidden in San Francisco
             </p>
           </div>
           <Link
