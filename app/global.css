@@ -795,7 +795,7 @@ html::-webkit-scrollbar {
   font-variant: normal;
 }
 .carrd-font-subtitle {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Amiri', serif;
   font-weight: 400;
   font-size: 1.25rem;
   line-height: 1.6;
