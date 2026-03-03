@@ -84,7 +84,7 @@ export default function OurStoryPage() {
             href="/"
             className="carrd-btn px-8 py-3 mt-4 inline-block"
           >
-            RSVP
+            Join our upcoming pop-up
           </Link>
         </div>
       <SiteFooter />
