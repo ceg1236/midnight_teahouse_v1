@@ -216,7 +216,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               </p>
             ))}
           </div>
-          <div className="w-full max-w-[56rem] flex flex-col md:flex-row items-center justify-center gap-10 md:gap-16 text-center pt-2">
+          <div className="w-full max-w-[56rem] flex flex-col md:flex-row items-center md:items-start justify-center gap-10 md:gap-16 text-center pt-2">
             <div className="space-y-2">
               <p className="carrd-font-muted text-xs tracking-[0.2em] uppercase">
                 Date
