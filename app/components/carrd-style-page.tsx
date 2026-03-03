@@ -600,22 +600,35 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               {selectedDate && hasSelection ? (
                 <>
                   {/* Summary box: date/time + choices, directly under heading */}
-                  <div className="carrd-font-body rounded-lg bg-[#FAEBD4]/20 px-4 py-3 text-center w-full max-w-[28rem]">
-                    <p className="text-base text-[#FAEBD4]">{selectedDateDisplay}</p>
-                    <div className="mt-2 space-y-1">
-                      {Object.entries(selections)
-                        .filter(([, q]) => q > 0)
-                        .map(([tierId, qty]) => {
-                          const tier = tiers.find((t) => t.id === tierId)
-                          const price = tierId === 'supported' ? supportedPrice : (tier?.price ?? 0)
-                          return (
-                            <p key={tierId} className="text-base text-[#FAEBD4]">
-                              {tier?.label} (${price}) x {qty} = ${price * qty}
-                            </p>
-                          )
-                        })}
+                  <div className="carrd-font-body rounded-lg bg-[#FAEBD4]/20 px-4 py-4 text-left w-full max-w-[28rem]">
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-xs text-[#D9D0BF]/80 uppercase tracking-wider">Date</p>
+                        <p className="text-base text-[#FAEBD4]">{selectedDateDisplay}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-[#D9D0BF]/80 uppercase tracking-wider mb-1.5">Tickets</p>
+                        <div className="space-y-1">
+                          {(['supported', 'community', 'patron'] as const)
+                            .filter((tierId) => (selections[tierId] ?? 0) > 0)
+                            .map((tierId) => {
+                              const qty = selections[tierId] ?? 0
+                              const tier = tiers.find((t) => t.id === tierId)
+                              const price = tierId === 'supported' ? supportedPrice : (tier?.price ?? 0)
+                              const label = tier?.label ?? (tierId === 'supported' ? 'Supported' : tierId)
+                              return (
+                                <p key={tierId} className="text-base text-[#FAEBD4]">
+                                  {label} — ${price} × {qty} = ${price * qty}
+                                </p>
+                              )
+                            })}
+                        </div>
+                      </div>
+                      <div className="pt-2 border-t border-[#D9D0BF]/30">
+                        <p className="text-xs text-[#D9D0BF]/80 uppercase tracking-wider">Total</p>
+                        <p className="text-lg font-medium text-[#FAEBD4]">${totalPrice}</p>
+                      </div>
                     </div>
-                    <p className="mt-2 text-base font-medium text-[#FAEBD4]">Total: ${totalPrice}</p>
                   </div>
                 </>
               ) : (
