@@ -260,7 +260,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           <h2 className="carrd-font-heading text-2xl md:text-3xl">
             Choose Date
           </h2>
-          <p className="carrd-font-body text-center w-full max-w-[56rem] leading-relaxed">
+          <p className="carrd-font-body text-left w-full max-w-[56rem] leading-relaxed">
             To keep our gatherings intimate, we are open by reservation and have limited seats. Reserve a spot to gift a cozy evening to yourself or someone you love.
           </p>
 
@@ -338,7 +338,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     )
                   })}
               </div>
-              <p className="carrd-font-body text-center w-full max-w-[56rem] leading-relaxed">
+              <p className="carrd-font-body text-left w-full max-w-[56rem] leading-relaxed">
                 Our prices aim to support the sustainability of our project, but we recognize the skewed economic situation of our city. If cost is a barrier, please{' '}
                 <button
                   type="button"
