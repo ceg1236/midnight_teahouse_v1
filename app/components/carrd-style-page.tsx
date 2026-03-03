@@ -410,34 +410,34 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         <div className="carrd-font-body flex-shrink-0 min-w-[10rem]">
                           <p className="font-medium text-[#FAEBD4]">{t.label} ${t.price}</p>
                         </div>
-                        <div className="carrd-font-body flex-1 min-w-0 mr-4 sm:mr-6">
-                          <div className="text-[#D9D0BF] text-sm">
-                            {expandedTierBlurbId === t.id ? (
-                              <>
-                                <p className="font-medium italic text-[#FAEBD4] leading-tight">{t.mainLine}</p>
-                                <p className="leading-tight mt-1 text-[#D9D0BF]">{t.blurb}</p>
+                        <div className="carrd-font-body flex-1 min-w-0 space-y-1 text-[#FAEBD4] mr-4 sm:mr-6">
+                          {expandedTierBlurbId === t.id ? (
+                            <>
+                              <p className="font-medium italic">{t.mainLine}</p>
+                              <div className="text-[#D9D0BF] text-sm">
+                                <p className="leading-tight">{t.blurb}</p>
                                 <button
                                   type="button"
                                   onClick={() => setExpandedTierBlurbId(null)}
-                                  className="mt-1 italic text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
+                                  className="mt-1 block italic text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
                                 >
                                   ...less
                                 </button>
-                              </>
-                            ) : (
-                              <p className="leading-tight flex items-baseline gap-1 min-w-0">
-                                <span className="font-medium italic text-[#FAEBD4]">{t.mainLine}</span>
-                                {' '}
-                                <button
-                                  type="button"
-                                  onClick={() => setExpandedTierBlurbId(t.id)}
-                                  className="italic flex-shrink-0 text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
-                                >
-                                  ...more
-                                </button>
-                              </p>
-                            )}
-                          </div>
+                              </div>
+                            </>
+                          ) : (
+                            <p className="leading-tight flex items-baseline gap-1 min-w-0">
+                              <span className="font-medium italic">{t.mainLine}</span>
+                              {' '}
+                              <button
+                                type="button"
+                                onClick={() => setExpandedTierBlurbId(t.id)}
+                                className="italic flex-shrink-0 text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer text-sm"
+                              >
+                                ...more
+                              </button>
+                            </p>
+                          )}
                         </div>
                         <div className="flex flex-col items-start gap-2 flex-shrink-0">
                           {qty > 0 ? (
@@ -484,8 +484,8 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       <div className="carrd-font-body flex-shrink-0 min-w-[10rem]">
                         <p className="font-medium text-[#FAEBD4]">{t.mainLine}</p>
                       </div>
-                      <div className="carrd-font-body flex-1 min-w-0 mr-4 sm:mr-6">
-                        <p className="font-medium italic text-[#FAEBD4] leading-tight">{t.blurb}</p>
+                      <div className="carrd-font-body flex-1 min-w-0 space-y-1 text-[#FAEBD4] mr-4 sm:mr-6">
+                        <p className="font-medium italic leading-tight">{t.blurb}</p>
                       </div>
                       <div className="flex flex-col items-start gap-2 flex-shrink-0">
                         {qty > 0 ? (
