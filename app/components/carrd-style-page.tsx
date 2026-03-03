@@ -481,7 +481,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           className="w-full flex flex-col items-center gap-6"
         >
           <h2 className="carrd-font-heading text-2xl md:text-3xl">
-            Complete your reservation
+            Complete Your Reservation
           </h2>
           {selectedDate && hasSelection ? (
             <>

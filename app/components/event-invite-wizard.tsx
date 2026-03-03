@@ -279,8 +279,8 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
         className="flex min-h-[100dvh] flex-col items-center justify-center px-6 py-16 md:min-h-screen md:py-20"
       >
         <div className="invite-payment mx-auto flex max-w-md flex-col items-center gap-6 text-center">
-          <h2 className="font-invite-title text-2xl">
-            Complete your reservation
+          <h2 className="font-invite-title text-2xl [font-variant:small-caps]">
+            Complete Your Reservation
           </h2>
           {selectedDate && selectedTier ? (
             <>
