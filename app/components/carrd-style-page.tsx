@@ -261,7 +261,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           ref={joinRef}
           className="w-full flex flex-col items-center gap-6"
         >
-          <h2 className="carrd-font-heading text-2xl md:text-3xl">
+          <h2 className="carrd-font-heading carrd-font-h2">
             1. Choose Your Date
           </h2>
           <p className="carrd-font-body text-left w-full max-w-[56rem] leading-relaxed">
@@ -297,7 +297,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               ref={tierRef}
               className="w-full flex flex-col items-center gap-6"
             >
-              <h2 className="carrd-font-heading text-2xl md:text-3xl">
+              <h2 className="carrd-font-heading carrd-font-h2">
                 2. Choose Your Ticket
               </h2>
               <div className="w-full max-w-[56rem] flex flex-wrap justify-evenly gap-6">
@@ -440,7 +440,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           ref={formRef}
           className="w-full flex flex-col items-center gap-6"
         >
-          <h2 className="carrd-font-heading text-2xl md:text-3xl">
+          <h2 className="carrd-font-heading carrd-font-h2">
             3. Complete Your Reservation
           </h2>
           <form

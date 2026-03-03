@@ -733,6 +733,15 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.2;
   color: #C4AF86;
 }
+
+.carrd-font-h2 {
+  font-family: 'Playfair Display', 'Times New Roman', serif;
+  font-size: 1.75rem; /* ~0.7x of 2.5rem heading */
+  line-height: 1.3;
+  font-variant: normal;
+  text-transform: none;
+  color: #E4D6B8; /* lighter than #C4AF86, between that and white */
+}
 .carrd-font-title {
   font-family: 'Tangerine', 'Playfair Display', 'Times New Roman', serif;
   font-size: 3.75rem;
