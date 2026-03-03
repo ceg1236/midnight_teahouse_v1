@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Tangerine:wght@400;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=Dancing+Script:wght@400;500;600;700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;1,400&family=Roboto:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Allison&family=Great+Vibes&family=Tangerine:wght@400;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=Dancing+Script:wght@400;500;600;700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;1,400&family=Roboto:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap');
 /* KoHo no longer used - Amiri used for all body text */
 
 /* Amiri - local for reliable loading */
@@ -761,7 +761,7 @@ html::-webkit-scrollbar {
   color: #E4D6B8;
 }
 .carrd-font-title {
-  font-family: 'Great Vibes', 'Dancing Script', cursive;
+  font-family: 'Allison', 'Great Vibes', cursive;
   font-size: clamp(2.5rem, 6vw, 4rem);
   line-height: 1.1;
 }
@@ -829,8 +829,6 @@ html::-webkit-scrollbar {
 }
 .our-story-frame {
   border-radius: 42% 58% 61% 39% / 55% 41% 59% 45%;
-  padding: 0.5rem;
-  background: rgba(250, 235, 212, 0.08);
   overflow: hidden;
   box-shadow: 0 0 0 1px rgba(217, 208, 191, 0.2);
 }
