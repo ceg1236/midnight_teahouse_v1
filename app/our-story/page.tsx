@@ -54,7 +54,7 @@ export default function OurStoryPage() {
 
           <Link
             href="/"
-            className="carrd-font-body text-xs md:text-sm tracking-[0.18em] uppercase text-[#D9D0BF] hover:text-[#FAE0B9] transition-colors mt-2"
+            className="carrd-btn px-8 py-3 mt-4 inline-block"
           >
             RSVP
           </Link>

@@ -195,7 +195,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
 
   return (
     <div className="carrd-page flex flex-col items-center min-h-screen overflow-x-hidden pt-8">
-      <div className="w-full max-w-[60rem] flex flex-col items-center px-6 md:px-12 py-8 md:py-12 gap-6">
+      <div className="w-full max-w-[60rem] flex flex-col items-center px-6 md:px-12 py-8 md:py-12 gap-8">
         {/* Hero: Title + Subtitle */}
         <h1 className="carrd-font-heading carrd-font-title text-center">
           Midnight Teahouse
@@ -224,20 +224,20 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         </div>
 
         {/* March Gatherings */}
-        <section className="w-full flex flex-col items-center gap-6 text-center">
+        <section className="w-full flex flex-col items-center gap-8 text-center">
           <h2 className="carrd-font-heading text-2xl md:text-3xl">
             Crossing into Spring
           </h2>
           <div className="carrd-font-body text-left space-y-4 w-full max-w-[56rem]">
             {welcomeContent.split(/\n\n+/).map((para, i) => (
-              <p key={i} className="leading-relaxed">
+              <p key={i}>
                 {para}
               </p>
             ))}
           </div>
           <div className="w-full max-w-[56rem] flex flex-col md:flex-row items-center md:items-start justify-center gap-10 md:gap-16 text-center pt-2">
             <div className="space-y-2">
-              <p className="text-[#D9D0BF]/80 text-sm">
+              <p className="carrd-font-label">
                 Date
               </p>
               <div className="space-y-1">
@@ -250,7 +250,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               </div>
             </div>
             <div className="space-y-2">
-              <p className="text-[#D9D0BF]/80 text-sm">
+              <p className="carrd-font-label">
                 Location
               </p>
               <div className="space-y-1">
@@ -269,7 +269,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           </button>
         </section>
 
-        <hr className="carrd-divider-solid border-0 my-2" />
+        <hr className="carrd-divider-solid border-0 my-4" />
 
         <div className="flex items-center justify-between w-full">
           <div className="flex-1 flex justify-start min-w-0">
@@ -283,7 +283,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               </button>
             )}
           </div>
-          <h2 className="carrd-font-heading text-2xl md:text-3xl flex-1 text-center">
+          <h2 className="carrd-font-heading carrd-font-heading-sm flex-1 text-center">
             Reservation
           </h2>
           <div className="flex-1 min-w-0" aria-hidden />
@@ -292,10 +292,10 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         {/* Reservation: three sliding panels (evening → ticket → form) */}
         <section
           ref={joinRef}
-          className="w-full overflow-x-hidden"
+          className="w-full overflow-x-hidden mt-4"
         >
           {/* Step indicator */}
-          <div className="flex justify-center gap-2 mb-4" aria-hidden>
+          <div className="flex justify-center gap-2 mb-6" aria-hidden>
             {([1, 2, 3] as const).map((step) => (
               <span
                 key={step}
@@ -313,8 +313,8 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
             }}
           >
             {/* Panel 1: Choose your evening */}
-            <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-6 px-1">
-              <p className="carrd-font-body text-left w-full max-w-[56rem] leading-relaxed">
+            <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-6 px-3">
+              <p className="carrd-font-intro text-left w-full max-w-[56rem]">
                 To keep our gatherings intimate, we are open by reservation and have limited seats. Reserve a seat to gift a cozy evening to yourself or someone you love.
               </p>
               <h2 className="carrd-font-heading carrd-font-h2">
@@ -382,7 +382,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
             </div>
 
             {/* Panel 2: Choose your ticket */}
-            <div ref={tierRef} className="flex-shrink-0 w-1/3 flex flex-col items-center gap-6 px-1">
+            <div ref={tierRef} className="flex-shrink-0 w-1/3 flex flex-col items-center gap-6 px-3">
               <h2 className="carrd-font-heading carrd-font-h2">
                 2. Choose Your Ticket
               </h2>
@@ -532,7 +532,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
             </div>
 
             {/* Panel 3: Complete your reservation (summary + form + reserve) */}
-            <div ref={formRef} className="flex-shrink-0 w-1/3 flex flex-col items-center gap-6 px-1">
+            <div ref={formRef} className="flex-shrink-0 w-1/3 flex flex-col items-center gap-6 px-3">
               <h2 className="carrd-font-heading carrd-font-h2">
                 3. Complete Your Reservation
               </h2>
@@ -540,21 +540,21 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 <>
                   {/* Summary box: date/time + choices, directly under heading */}
                   <div className="carrd-font-body rounded-lg bg-[#FAEBD4]/20 px-4 py-3 text-center w-full max-w-[28rem]">
-                    <p className="text-sm italic text-[#FAEBD4]">{selectedDateDisplay}</p>
-                    <div className="mt-1.5 space-y-0.5">
+                    <p className="text-base text-[#FAEBD4]">{selectedDateDisplay}</p>
+                    <div className="mt-2 space-y-1">
                       {Object.entries(selections)
                         .filter(([, q]) => q > 0)
                         .map(([tierId, qty]) => {
                           const tier = tiers.find((t) => t.id === tierId)
                           const price = tierId === 'supported' ? supportedPrice : (tier?.price ?? 0)
                           return (
-                            <p key={tierId} className="text-sm italic text-[#FAEBD4]">
+                            <p key={tierId} className="text-base text-[#FAEBD4]">
                               {tier?.label} (${price}) x {qty} = ${price * qty}
                             </p>
                           )
                         })}
                     </div>
-                    <p className="mt-1.5 text-sm italic text-[#FAEBD4]">Total: ${totalPrice}</p>
+                    <p className="mt-2 text-base font-medium text-[#FAEBD4]">Total: ${totalPrice}</p>
                   </div>
                 </>
               ) : (
@@ -580,7 +580,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               >
                 <input type="hidden" name="device_type" value={deviceType} />
                 <input type="hidden" name="date" value={selectedDate ?? ''} />
-                <label className="flex flex-col gap-1">
+                <label className="flex flex-col gap-1.5">
                   Name *
                   <input
                     type="text"
@@ -592,7 +592,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     placeholder="Your name"
                   />
                 </label>
-                <label className="flex flex-col gap-1">
+                <label className="flex flex-col gap-1.5">
                   Email *
                   <input
                     type="email"
@@ -604,7 +604,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     placeholder="you@example.com"
                   />
                 </label>
-                <label className="flex flex-col gap-1">
+                <label className="flex flex-col gap-1.5">
                   Notes
                   <textarea
                     name="notes"
@@ -622,7 +622,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 </p>
               )}
               <div className="w-full max-w-md text-left mt-6">
-                <p className="carrd-font-body text-[0.74375rem] font-medium mb-1.5">A few things to note before booking:</p>
+                <p className="carrd-font-body text-sm font-medium mb-1.5">A few things to note before booking:</p>
                 <ul className="carrd-font-body text-[0.74375rem] space-y-1 list-none pl-0 leading-tight">
                   {BOOKING_NOTES.map((item, i) => (
                     <li key={i} className="flex items-start gap-2">
@@ -674,7 +674,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       setIsSubmitting(false)
                     }
                   }}
-                  className="carrd-btn px-10 py-3 disabled:opacity-70 disabled:cursor-not-allowed mt-6"
+                    className="carrd-btn px-10 py-3 disabled:opacity-70 disabled:cursor-not-allowed mt-8"
                 >
                   {isSubmitting ? 'Redirecting…' : 'Finish Booking'}
                 </button>

@@ -9,7 +9,7 @@ export function SiteFooter({ variant = 'default' }: SiteFooterProps) {
 
   return (
     <footer className="w-full flex justify-center">
-      <div className="w-full max-w-[60rem] px-6 md:px-12 py-5 flex items-center justify-center gap-10">
+      <div className="w-full max-w-[60rem] px-6 md:px-12 py-6 flex items-center justify-center gap-10">
         <div className="flex items-center justify-center gap-8">
           <a
             href="mailto:hello@midnightteahouse.com"
@@ -51,7 +51,7 @@ export function SiteFooter({ variant = 'default' }: SiteFooterProps) {
           <div className="ml-2">
             <Link
               href="/our-story"
-              className="carrd-font-body text-xs md:text-sm tracking-[0.18em] uppercase text-[#D9D0BF] hover:text-[#FAE0B9] transition-colors whitespace-nowrap"
+              className="carrd-link text-sm whitespace-nowrap"
             >
               Our Story
             </Link>
