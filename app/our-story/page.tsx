@@ -8,7 +8,7 @@ export default function OurStoryPage() {
       <div className="w-full max-w-[60rem] flex flex-col items-center px-6 md:px-12 py-8 md:py-12 gap-8 flex-1">
           {/* Hero photo with wiggly crop */}
           <div className="w-full flex justify-center">
-            <div className="our-story-frame relative w-full max-w-[56rem]">
+            <div className="our-story-frame relative w-full max-w-[39.2rem]">
               <Image
                 src="/images/teahouse-team.png"
                 alt="The Midnight Teahouse team gathered around a low tea table"
