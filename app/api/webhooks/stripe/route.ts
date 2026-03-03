@@ -190,12 +190,22 @@ export async function POST(req: NextRequest) {
 
   // Send confirmation email (non-blocking; don't fail webhook if email fails)
   const emailResult = await sendConfirmationEmail(metadata as Record<string, string | undefined>, amountPaid, qty)
-  if (!emailResult.ok) {
+  if (emailResult.ok) {
+    console.log(
+      JSON.stringify({
+        event: 'webhook_confirmation_email_sent',
+        sessionId: session.id,
+        paymentId,
+        to: metadata.email,
+      })
+    )
+  } else {
     console.error(
       JSON.stringify({
         event: 'webhook_confirmation_email_failed',
         sessionId: session.id,
         paymentId,
+        to: metadata.email,
         error: emailResult.error,
       })
     )
