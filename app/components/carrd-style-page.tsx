@@ -110,11 +110,12 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
   const [hydrated, setHydrated] = useState(false)
   const [expandedBlurbId, setExpandedBlurbId] = useState<string | null>(null)
+  /** 1 = Choose evening, 2 = Choose ticket, 3 = Complete reservation */
+  const [reservationStep, setReservationStep] = useState<1 | 2 | 3>(1)
 
   const joinRef = useRef<HTMLElement>(null)
-  const tierRef = useRef<HTMLElement>(null)
-  const formRef = useRef<HTMLElement>(null)
-  const paymentRef = useRef<HTMLElement>(null)
+  const tierRef = useRef<HTMLDivElement>(null)
+  const formRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const persisted = loadPersisted(dates, tiers)
@@ -123,6 +124,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
     setFormData(persisted.form)
     if (Object.keys(persisted.selections).some((id) => id === 'supported')) setShowSupportedTier(true)
     setHydrated(true)
+    if (persisted.date) setReservationStep(2)
   }, [dates, tiers])
 
   useEffect(() => {
@@ -147,6 +149,14 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
     const price = tierId === 'supported' ? supportedPrice : (tier?.price ?? 0)
     return sum + price * qty
   }, 0)
+  const selectedDateData = dates.find((d) => d.id === selectedDate)
+  const selectedDateDisplay = selectedDateData
+    ? (() => {
+        const parts = selectedDateData.dateTime.split(', ')
+        const timePart = parts.length > 1 ? parts.slice(1).join(', ') : ''
+        return timePart ? `${selectedDateData.label} ${timePart}` : selectedDateData.label
+      })()
+    : ''
   const handleTierClick = (tierId: string) => {
     setSelections((prev) => {
       const q = prev[tierId] ?? 0
@@ -257,89 +267,89 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           Reserve Your Spot
         </h2>
 
-        {/* Join us - Dates + Tiers */}
+        {/* Reservation: three sliding panels (evening → ticket → form) */}
         <section
           ref={joinRef}
-          className="w-full flex flex-col items-center gap-6"
+          className="w-full overflow-x-hidden"
         >
-          <p className="carrd-font-body text-left w-full max-w-[56rem] leading-relaxed">
-            To keep our gatherings intimate, we are open by reservation and have limited seats. Reserve a spot to gift a cozy evening to yourself or someone you love.
-          </p>
-          <h2 className="carrd-font-heading carrd-font-h2">
-            1. Choose Your Evening
-          </h2>
-
-          {/* Date rows: date/time left, musicians + subtitle center, Select right — top-aligned */}
-          <div className="w-full max-w-[56rem] space-y-4">
-            {dates.map((d) => (
-              <div
-                key={d.id}
-                className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-6 py-3 border-b border-[#D9D0BF]/30 last:border-b-0"
-              >
-                <div className="carrd-font-body flex-shrink-0 min-w-[10rem]">
-                  <p className="font-medium text-[#FAEBD4]">{d.day}</p>
-                  <p className="text-[#D9D0BF] text-sm">{d.dateTime}</p>
-                </div>
-                <div className="carrd-font-body flex-1 min-w-0 space-y-1 text-[#FAEBD4]">
-                  {d.musicians.map((line, i) => (
-                    <p key={i} className="font-medium italic">
-                      {line}
-                    </p>
-                  ))}
-                  {d.blurb ? (
-                    <div className="text-[#D9D0BF] text-sm">
-                      {expandedBlurbId === d.id ? (
-                        <>
-                          <p className="leading-relaxed">{d.blurb}</p>
-                          <button
-                            type="button"
-                            onClick={() => setExpandedBlurbId(null)}
-                            className="mt-1 italic text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
-                          >
-                            ...less
-                          </button>
-                        </>
-                      ) : (
-                        <p className="leading-relaxed flex items-baseline gap-1 min-w-0">
-                          <span className="truncate min-w-0">{d.blurb}</span>
-                          <button
-                            type="button"
-                            onClick={() => setExpandedBlurbId(d.id)}
-                            className="italic flex-shrink-0 text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
-                          >
-                            ...more
-                          </button>
-                        </p>
-                      )}
+          <div
+            className="flex transition-transform duration-300 ease-out"
+            style={{
+              width: '300%',
+              transform: `translateX(-${(reservationStep - 1) * (100 / 3)}%)`,
+            }}
+          >
+            {/* Panel 1: Choose your evening */}
+            <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-6 px-1">
+              <p className="carrd-font-body text-left w-full max-w-[56rem] leading-relaxed">
+                To keep our gatherings intimate, we are open by reservation and have limited seats. Reserve a spot to gift a cozy evening to yourself or someone you love.
+              </p>
+              <h2 className="carrd-font-heading carrd-font-h2">
+                1. Choose Your Evening
+              </h2>
+              <div className="w-full max-w-[56rem] space-y-4">
+                {dates.map((d) => (
+                  <div
+                    key={d.id}
+                    className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-6 py-3 border-b border-[#D9D0BF]/30 last:border-b-0"
+                  >
+                    <div className="carrd-font-body flex-shrink-0 min-w-[10rem]">
+                      <p className="font-medium text-[#FAEBD4]">{d.day}</p>
+                      <p className="text-[#D9D0BF] text-sm">{d.dateTime}</p>
                     </div>
-                  ) : null}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedDate(d.id)
-                    if (!selectedDate) setTimeout(() => scrollToSection(tierRef), 50)
-                  }}
-                  className={`carrd-btn px-6 py-3 flex-shrink-0 self-start ${
-                    selectedDate === d.id ? 'bg-[#FAE0B9]/20' : ''
-                  }`}
-                >
-                  Select
-                </button>
+                    <div className="carrd-font-body flex-1 min-w-0 space-y-1 text-[#FAEBD4]">
+                      {d.musicians.map((line, i) => (
+                        <p key={i} className="font-medium italic">
+                          {line}
+                        </p>
+                      ))}
+                      {d.blurb ? (
+                        <div className="text-[#D9D0BF] text-sm">
+                          {expandedBlurbId === d.id ? (
+                            <>
+                              <p className="leading-relaxed">{d.blurb}</p>
+                              <button
+                                type="button"
+                                onClick={() => setExpandedBlurbId(null)}
+                                className="mt-1 italic text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
+                              >
+                                ...less
+                              </button>
+                            </>
+                          ) : (
+                            <p className="leading-relaxed flex items-baseline gap-1 min-w-0">
+                              <span className="truncate min-w-0">{d.blurb}</span>
+                              <button
+                                type="button"
+                                onClick={() => setExpandedBlurbId(d.id)}
+                                className="italic flex-shrink-0 text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
+                              >
+                                ...more
+                              </button>
+                            </p>
+                          )}
+                        </div>
+                      ) : null}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedDate(d.id)
+                        setReservationStep(2)
+                      }}
+                      className={`carrd-btn px-6 py-3 flex-shrink-0 self-start ${
+                        selectedDate === d.id ? 'bg-[#FAE0B9]/20' : ''
+                      }`}
+                    >
+                      Select
+                    </button>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </section>
+            </div>
 
-        <hr className="carrd-divider border-0 my-2" />
-
-        {/* Tier section - shown after date selected, with smooth transition */}
-        {selectedDate && (
-          <>
-            <section
-              ref={tierRef}
-              className="w-full flex flex-col items-center gap-6"
-            >
+            {/* Panel 2: Choose your ticket */}
+            <div ref={tierRef} className="flex-shrink-0 w-1/3 flex flex-col items-center gap-6 px-1">
               <h2 className="carrd-font-heading carrd-font-h2">
                 2. Choose Your Ticket
               </h2>
@@ -392,10 +402,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 If cost is a barrier please consider our{' '}
                 <button
                   type="button"
-                  onClick={() => {
-                    setShowSupportedTier(true)
-                    setTimeout(() => scrollToSection(tierRef), 50)
-                  }}
+                  onClick={() => setShowSupportedTier(true)}
                   className="underline hover:no-underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline"
                 >
                   supported ticket option
@@ -479,185 +486,195 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     ))}
                 </div>
               </div>
-            </section>
-            <hr className="carrd-divider border-0 my-2" />
-          </>
-        )}
+              <div className="flex flex-wrap items-center justify-center gap-4 w-full max-w-[56rem]">
+                <button
+                  type="button"
+                  onClick={() => setReservationStep(1)}
+                  className="carrd-font-body text-[#D9D0BF] hover:text-[#FAEBD4] underline focus:outline-none cursor-pointer"
+                >
+                  ← Change evening
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setReservationStep(3)}
+                  disabled={!hasSelection}
+                  className="carrd-btn px-6 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Continue
+                </button>
+              </div>
+            </div>
 
-        {/* Form section */}
-        <section
-          ref={formRef}
-          className="w-full flex flex-col items-center gap-6"
-        >
-          <h2 className="carrd-font-heading carrd-font-h2">
-            3. Complete Your Reservation
-          </h2>
-          <form
-            id="carrd-form"
-            onSubmit={(e) => {
-              e.preventDefault()
-              scrollToSection(paymentRef)
-            }}
-            className="w-full max-w-md flex flex-col gap-4 carrd-font-body"
-          >
-            <input type="hidden" name="device_type" value={deviceType} />
-            <input type="hidden" name="date" value={selectedDate ?? ''} />
-            <label className="flex flex-col gap-1">
-              Name *
-              <input
-                type="text"
-                name="name"
-                required
-                value={formData.name}
-                onChange={(e) => setFormData((d) => ({ ...d, name: e.target.value }))}
-                className="mt-1 w-full rounded-md border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] placeholder:text-[#D9D0BF]/60 focus:border-[#FAE0B9] focus:outline-none"
-                placeholder="Your name"
-              />
-            </label>
-            <label className="flex flex-col gap-1">
-              Email *
-              <input
-                type="email"
-                name="email"
-                required
-                value={formData.email}
-                onChange={(e) => setFormData((d) => ({ ...d, email: e.target.value }))}
-                className="mt-1 w-full rounded-md border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] placeholder:text-[#D9D0BF]/60 focus:border-[#FAE0B9] focus:outline-none"
-                placeholder="you@example.com"
-              />
-            </label>
-            <label className="flex flex-col gap-1">
-              Notes
-              <textarea
-                name="notes"
-                value={formData.notes}
-                onChange={(e) => setFormData((d) => ({ ...d, notes: e.target.value }))}
-                rows={2}
-                className="mt-1 w-full resize-none rounded-md border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] placeholder:text-[#D9D0BF]/60 focus:border-[#FAE0B9] focus:outline-none"
-                placeholder="Anything else we should know?"
-              />
-            </label>
-            <button
-              type="submit"
-              className="carrd-btn w-full py-3 mt-2"
-            >
-              Continue to payment
-            </button>
-          </form>
+            {/* Panel 3: Complete your reservation (summary + form + reserve) */}
+            <div ref={formRef} className="flex-shrink-0 w-1/3 flex flex-col items-center gap-6 px-1">
+              <h2 className="carrd-font-heading carrd-font-h2">
+                3. Complete Your Reservation
+              </h2>
+              {selectedDate && hasSelection ? (
+                <>
+                  {/* Summary box: date/time + choices, directly under heading */}
+                  <div className="carrd-font-body rounded-lg border border-[#D9D0BF]/40 bg-[#2E0303]/30 px-6 py-4 text-center w-full max-w-[40rem]">
+                    <p>{selectedDateDisplay}</p>
+                    <div className="mt-2 space-y-1">
+                      {Object.entries(selections)
+                        .filter(([, q]) => q > 0)
+                        .map(([tierId, qty]) => {
+                          const tier = tiers.find((t) => t.id === tierId)
+                          const price = tierId === 'supported' ? supportedPrice : (tier?.price ?? 0)
+                          return (
+                            <p key={tierId} className="carrd-font-heading text-lg">
+                              {tier?.label} (${price}) x {qty} = ${price * qty}
+                            </p>
+                          )
+                        })}
+                    </div>
+                    <p className="mt-2 carrd-font-heading text-xl">Total: ${totalPrice}</p>
+                  </div>
+                </>
+              ) : (
+                <div className="carrd-font-body space-y-3 text-center">
+                  <p className="opacity-80">
+                    Select an evening and ticket above to see your reservation summary.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setReservationStep(1)}
+                    className="carrd-btn px-8 py-3"
+                  >
+                    Choose evening & ticket
+                  </button>
+                </div>
+              )}
+              <form
+                id="carrd-form"
+                onSubmit={(e) => {
+                  e.preventDefault()
+                }}
+                className="w-full max-w-md flex flex-col gap-4 carrd-font-body"
+              >
+                <input type="hidden" name="device_type" value={deviceType} />
+                <input type="hidden" name="date" value={selectedDate ?? ''} />
+                <label className="flex flex-col gap-1">
+                  Name *
+                  <input
+                    type="text"
+                    name="name"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData((d) => ({ ...d, name: e.target.value }))}
+                    className="mt-1 w-full rounded-md border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] placeholder:text-[#D9D0BF]/60 focus:border-[#FAE0B9] focus:outline-none"
+                    placeholder="Your name"
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  Email *
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData((d) => ({ ...d, email: e.target.value }))}
+                    className="mt-1 w-full rounded-md border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] placeholder:text-[#D9D0BF]/60 focus:border-[#FAE0B9] focus:outline-none"
+                    placeholder="you@example.com"
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  Notes
+                  <textarea
+                    name="notes"
+                    value={formData.notes}
+                    onChange={(e) => setFormData((d) => ({ ...d, notes: e.target.value }))}
+                    rows={2}
+                    className="mt-1 w-full resize-none rounded-md border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] placeholder:text-[#D9D0BF]/60 focus:border-[#FAE0B9] focus:outline-none"
+                    placeholder="Anything else we should know?"
+                  />
+                </label>
+                <div className="flex flex-wrap items-center gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setReservationStep(2)}
+                    className="carrd-font-body text-[#D9D0BF] hover:text-[#FAEBD4] underline focus:outline-none cursor-pointer"
+                  >
+                    ← Change ticket
+                  </button>
+                </div>
+              </form>
+              {selectedDate && hasSelection && (
+                <>
+                  <div className="w-full max-w-[56rem] text-left mt-4">
+                    <p className="carrd-font-body font-medium mb-2">A few things to note before booking:</p>
+                    <ul className="carrd-font-body space-y-3 list-none pl-0">
+                      {[
+                        'Doors open at 7pm and close at 11pm. Feel free to join us anytime in this window.',
+                        'Reservation includes unlimited tea and all other amenities.',
+                        'We are a phone and laptop-free space.',
+                        "Unfortunately, we aren't able to offer refunds or exchanges for future events.",
+                        "We'll share the location once you make the reservation. If you don't hear from us within a few days, please send us an email.",
+                      ].map((item, i) => (
+                        <li key={i} className="flex items-start gap-3">
+                          <span className="text-[#D9D0BF] mt-[0.45em] w-2 h-2 rounded-full bg-[#D9D0BF] shrink-0 flex-shrink-0" aria-hidden />
+                          <span className="flex-1">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  {checkoutError && (
+                    <p className="carrd-font-body text-sm text-red-300" role="alert">
+                      {checkoutError}
+                    </p>
+                  )}
+                  <button
+                    type="button"
+                    disabled={isSubmitting}
+                    onClick={async () => {
+                      if (!selectedDate || !hasSelection || !formData.name.trim() || !formData.email.trim()) return
+                      setIsSubmitting(true)
+                      setCheckoutError(null)
+                      try {
+                        const items = Object.entries(selections)
+                          .filter(([, q]) => q > 0)
+                          .map(([tierId, qty]) => ({
+                            tierId,
+                            quantity: qty,
+                            ...(tierId === 'supported' && { supportedPrice }),
+                          }))
+                        const res = await fetch('/api/checkout', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            dateId: selectedDate,
+                            items,
+                            supportedPrice: (selections['supported'] ?? 0) > 0 ? supportedPrice : undefined,
+                            name: formData.name.trim(),
+                            email: formData.email.trim(),
+                            notes: formData.notes.trim(),
+                            device: deviceType,
+                          }),
+                        })
+                        const data = await res.json()
+                        if (!res.ok) {
+                          setCheckoutError(data.error ?? 'Something went wrong')
+                          return
+                        }
+                        if (data.url) window.location.href = data.url
+                        else setCheckoutError('No checkout URL received')
+                      } catch {
+                        setCheckoutError('Network error. Please try again.')
+                      } finally {
+                        setIsSubmitting(false)
+                      }
+                    }}
+                    className="carrd-btn px-10 py-3 disabled:opacity-70 disabled:cursor-not-allowed mt-4"
+                  >
+                    {isSubmitting ? 'Redirecting…' : 'Reserve'}
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
         </section>
 
         <hr className="carrd-divider border-0 my-2" />
-
-        {/* Payment section */}
-        <section
-          ref={paymentRef}
-          className="w-full flex flex-col items-center gap-6"
-        >
-          <h2 className="carrd-font-heading text-2xl md:text-3xl">
-            Complete Your Reservation
-          </h2>
-          {selectedDate && hasSelection ? (
-            <>
-              <div className="carrd-font-body rounded-lg border border-[#D9D0BF]/40 bg-[#2E0303]/30 px-6 py-4 text-center">
-                <p>{dates.find((d) => d.id === selectedDate)?.label}</p>
-                <div className="mt-2 space-y-1">
-                  {Object.entries(selections)
-                    .filter(([, q]) => q > 0)
-                    .map(([tierId, qty]) => {
-                      const tier = tiers.find((t) => t.id === tierId)
-                      const price = tierId === 'supported' ? supportedPrice : (tier?.price ?? 0)
-                      return (
-                        <p key={tierId} className="carrd-font-heading text-lg">
-                          {qty} × {tier?.label} ${price} = ${price * qty}
-                        </p>
-                      )
-                    })}
-                </div>
-                <p className="mt-2 carrd-font-heading text-xl">Total: ${totalPrice}</p>
-              </div>
-              <div className="w-full max-w-[56rem] text-left">
-                <p className="carrd-font-body font-medium mb-2">A few things to note before booking:</p>
-                <ul className="carrd-font-body space-y-3 list-none pl-0">
-                  {[
-                    'Doors open at 7pm and close at 11pm. Feel free to join us anytime in this window.',
-                    'Reservation includes unlimited tea and all other amenities.',
-                    'We are a phone and laptop-free space.',
-                    'Unfortunately, we aren\'t able to offer refunds or exchanges for future events.',
-                    'We\'ll share the location once you make the reservation. If you don\'t hear from us within a few days, please send us an email.',
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <span className="text-[#D9D0BF] mt-[0.45em] w-2 h-2 rounded-full bg-[#D9D0BF] shrink-0 flex-shrink-0" aria-hidden />
-                      <span className="flex-1">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              {checkoutError && (
-                <p className="carrd-font-body text-sm text-red-300" role="alert">
-                  {checkoutError}
-                </p>
-              )}
-              <button
-                type="button"
-                disabled={isSubmitting}
-                onClick={async () => {
-                  if (!selectedDate || !hasSelection || !formData.name.trim() || !formData.email.trim()) return
-                  setIsSubmitting(true)
-                  setCheckoutError(null)
-                  try {
-                    const items = Object.entries(selections)
-                      .filter(([, q]) => q > 0)
-                      .map(([tierId, qty]) => ({
-                        tierId,
-                        quantity: qty,
-                        ...(tierId === 'supported' && { supportedPrice }),
-                      }))
-                    const res = await fetch('/api/checkout', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        dateId: selectedDate,
-                        items,
-                        supportedPrice: (selections['supported'] ?? 0) > 0 ? supportedPrice : undefined,
-                        name: formData.name.trim(),
-                        email: formData.email.trim(),
-                        notes: formData.notes.trim(),
-                        device: deviceType,
-                      }),
-                    })
-                    const data = await res.json()
-                    if (!res.ok) {
-                      setCheckoutError(data.error ?? 'Something went wrong')
-                      return
-                    }
-                    if (data.url) window.location.href = data.url
-                    else setCheckoutError('No checkout URL received')
-                  } catch {
-                    setCheckoutError('Network error. Please try again.')
-                  } finally {
-                    setIsSubmitting(false)
-                  }
-                }}
-                className="carrd-btn px-10 py-3 disabled:opacity-70 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? 'Redirecting…' : 'Reserve'}
-              </button>
-            </>
-          ) : (
-            <div className="carrd-font-body space-y-4 text-center">
-              <p className="opacity-80">
-                Select a date and tier above to complete your reservation.
-              </p>
-              <button
-                type="button"
-                onClick={() => scrollToSection(joinRef)}
-                className="carrd-btn px-8 py-3"
-              >
-                Choose date & ticket
-              </button>
-            </div>
-          )}
-        </section>
       </div>
       <SiteFooter variant="main" />
     </div>
