@@ -374,7 +374,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 onClick={() => setReservationStep(1)}
                 className="carrd-font-body text-[#D9D0BF] hover:text-[#FAEBD4] underline focus:outline-none cursor-pointer self-start -mt-1"
               >
-                ← Change evening
+                ← Back
               </button>
               <h2 className="carrd-font-heading carrd-font-h2">
                 2. Choose Your Ticket
@@ -531,7 +531,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 onClick={() => setReservationStep(2)}
                 className="carrd-font-body text-[#D9D0BF] hover:text-[#FAEBD4] underline focus:outline-none cursor-pointer self-start -mt-1"
               >
-                ← Change ticket
+                ← Back
               </button>
               <h2 className="carrd-font-heading carrd-font-h2">
                 3. Complete Your Reservation
