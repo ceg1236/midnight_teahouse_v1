@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { SiteFooter } from '../components/site-footer'
 
 export default function OurStoryPage() {
@@ -22,6 +23,20 @@ export default function OurStoryPage() {
               Eventually, we hope to find a permanent home. We&apos;d love to become a place where artists and musicians gather to play, where friends stop by after a long day or wander in on a quiet Friday looking for adventure.
             </p>
           </div>
+
+          <div className="w-full max-w-[40rem] mt-4">
+            <div className="relative w-full overflow-hidden rounded-lg border border-[#D9D0BF]/40">
+              <Image
+                src="/images/teahouse-team.png"
+                alt="The Midnight Teahouse team gathered around a low tea table"
+                width={1024}
+                height={682}
+                className="w-full h-auto object-cover"
+                priority
+              />
+            </div>
+          </div>
+
           <Link
             href="/"
             className="carrd-font-body text-xs md:text-sm tracking-[0.18em] uppercase text-[#D9D0BF] hover:text-[#FAE0B9] transition-colors mt-4"
