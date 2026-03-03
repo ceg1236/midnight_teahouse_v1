@@ -283,20 +283,20 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
             </button>
           )}
           <div className="flex flex-col items-center gap-1">
+            {/* Step indicator */}
+            <div className="flex justify-center gap-2" aria-hidden>
+              {([1, 2, 3] as const).map((step) => (
+                <span
+                  key={step}
+                  className={`w-2 h-2 rounded-full transition-colors duration-300 ${
+                    reservationStep === step ? 'bg-[#FAE0B9]' : 'bg-[#D9D0BF]/40'
+                  }`}
+                />
+              ))}
+            </div>
             <h2 className="carrd-font-heading carrd-font-heading-sm text-center">
               Reservation
             </h2>
-            {/* Step indicator */}
-            <div className="flex justify-center gap-2" aria-hidden>
-            {([1, 2, 3] as const).map((step) => (
-              <span
-                key={step}
-                className={`w-2 h-2 rounded-full transition-colors duration-300 ${
-                  reservationStep === step ? 'bg-[#FAE0B9]' : 'bg-[#D9D0BF]/40'
-                }`}
-              />
-            ))}
-            </div>
           </div>
         </div>
 
