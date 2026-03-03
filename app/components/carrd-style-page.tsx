@@ -607,59 +607,10 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   </button>
                 </div>
               </form>
-              {selectedDate && hasSelection && (
-                <>
-                  {checkoutError && (
-                    <p className="carrd-font-body text-sm text-red-300" role="alert">
-                      {checkoutError}
-                    </p>
-                  )}
-                  <button
-                    type="button"
-                    disabled={isSubmitting}
-                    onClick={async () => {
-                      if (!selectedDate || !hasSelection || !formData.name.trim() || !formData.email.trim()) return
-                      setIsSubmitting(true)
-                      setCheckoutError(null)
-                      try {
-                        const items = Object.entries(selections)
-                          .filter(([, q]) => q > 0)
-                          .map(([tierId, qty]) => ({
-                            tierId,
-                            quantity: qty,
-                            ...(tierId === 'supported' && { supportedPrice }),
-                          }))
-                        const res = await fetch('/api/checkout', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({
-                            dateId: selectedDate,
-                            items,
-                            supportedPrice: (selections['supported'] ?? 0) > 0 ? supportedPrice : undefined,
-                            name: formData.name.trim(),
-                            email: formData.email.trim(),
-                            notes: formData.notes.trim(),
-                            device: deviceType,
-                          }),
-                        })
-                        const data = await res.json()
-                        if (!res.ok) {
-                          setCheckoutError(data.error ?? 'Something went wrong')
-                          return
-                        }
-                        if (data.url) window.location.href = data.url
-                        else setCheckoutError('No checkout URL received')
-                      } catch {
-                        setCheckoutError('Network error. Please try again.')
-                      } finally {
-                        setIsSubmitting(false)
-                      }
-                    }}
-                    className="carrd-btn px-10 py-3 disabled:opacity-70 disabled:cursor-not-allowed mt-4"
-                  >
-                    {isSubmitting ? 'Redirecting…' : 'Reserve'}
-                  </button>
-                </>
+              {selectedDate && hasSelection && checkoutError && (
+                <p className="carrd-font-body text-sm text-red-300" role="alert">
+                  {checkoutError}
+                </p>
               )}
               <div className="w-full max-w-[56rem] text-left mt-6">
                 <p className="carrd-font-body font-medium mb-2">A few things to note before booking:</p>
@@ -672,6 +623,53 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   ))}
                 </ul>
               </div>
+              {selectedDate && hasSelection && (
+                <button
+                  type="button"
+                  disabled={isSubmitting}
+                  onClick={async () => {
+                    if (!selectedDate || !hasSelection || !formData.name.trim() || !formData.email.trim()) return
+                    setIsSubmitting(true)
+                    setCheckoutError(null)
+                    try {
+                      const items = Object.entries(selections)
+                        .filter(([, q]) => q > 0)
+                        .map(([tierId, qty]) => ({
+                          tierId,
+                          quantity: qty,
+                          ...(tierId === 'supported' && { supportedPrice }),
+                        }))
+                      const res = await fetch('/api/checkout', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          dateId: selectedDate,
+                          items,
+                          supportedPrice: (selections['supported'] ?? 0) > 0 ? supportedPrice : undefined,
+                          name: formData.name.trim(),
+                          email: formData.email.trim(),
+                          notes: formData.notes.trim(),
+                          device: deviceType,
+                        }),
+                      })
+                      const data = await res.json()
+                      if (!res.ok) {
+                        setCheckoutError(data.error ?? 'Something went wrong')
+                        return
+                      }
+                      if (data.url) window.location.href = data.url
+                      else setCheckoutError('No checkout URL received')
+                    } catch {
+                      setCheckoutError('Network error. Please try again.')
+                    } finally {
+                      setIsSubmitting(false)
+                    }
+                  }}
+                  className="carrd-btn px-10 py-3 disabled:opacity-70 disabled:cursor-not-allowed mt-6"
+                >
+                  {isSubmitting ? 'Redirecting…' : 'Confirm'}
+                </button>
+              )}
             </div>
           </div>
         </section>
