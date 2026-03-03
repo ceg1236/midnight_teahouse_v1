@@ -407,11 +407,10 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-6 py-3 border-b border-[#D9D0BF]/30 last:border-b-0"
                       >
                         <div className="carrd-font-body flex-shrink-0 min-w-[10rem]">
-                          <p className="font-medium text-[#FAEBD4]">{t.label}</p>
-                          <p className="text-[#D9D0BF] text-sm">${t.price}</p>
+                          <p className="font-medium text-[#FAEBD4]">{t.label} ${t.price}</p>
                         </div>
-                        <div className="carrd-font-body flex-1 min-w-0 text-[#FAE9D8] mr-4 sm:mr-6">
-                          <p className="leading-relaxed">{t.description}</p>
+                        <div className="carrd-font-body flex-1 min-w-0 mr-4 sm:mr-6">
+                          <p className="font-medium italic text-[#FAEBD4] leading-tight">{t.description}</p>
                         </div>
                         <div className="flex flex-col items-start gap-2 flex-shrink-0">
                           {qty > 0 ? (
