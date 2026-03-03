@@ -84,7 +84,6 @@ export default function OurStoryPage() {
             RSVP
           </Link>
         </div>
-      </div>
       <SiteFooter />
     </div>
   )
