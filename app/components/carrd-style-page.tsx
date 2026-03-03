@@ -258,7 +258,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           className="w-full flex flex-col items-center gap-6"
         >
           <h2 className="carrd-font-heading text-2xl md:text-3xl">
-            Choose Date
+            1. Choose Your Date
           </h2>
           <p className="carrd-font-body text-left w-full max-w-[56rem] leading-relaxed">
             To keep our gatherings intimate, we are open by reservation and have limited seats. Reserve a spot to gift a cozy evening to yourself or someone you love.
@@ -294,7 +294,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               className="w-full flex flex-col items-center gap-6"
             >
               <h2 className="carrd-font-heading text-2xl md:text-3xl">
-                Choose Ticket
+                2. Choose Your Ticket
               </h2>
               <div className="w-full max-w-[56rem] flex flex-wrap justify-evenly gap-6">
                 {tiers
@@ -437,7 +437,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           className="w-full flex flex-col items-center gap-6"
         >
           <h2 className="carrd-font-heading text-2xl md:text-3xl">
-            A Few Details
+            3. Complete Reservation
           </h2>
           <form
             id="carrd-form"
