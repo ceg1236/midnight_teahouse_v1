@@ -3,9 +3,9 @@
  */
 
 export const eventDates = [
-  { id: 'mar-18', day: 'Wednesday', dateTime: 'March 18, 7-11PM', label: 'Wednesday, March 18', value: '2026-03-18', musicians: ['Daniel Burkeman, Kora', 'Sasha Bayan, Sitar', 'TBD'] },
-  { id: 'mar-19', day: 'Thursday', dateTime: 'March 19, 7-11PM', label: 'Thursday, March 19', value: '2026-03-19', musicians: ['Daniel Burkeman, Kora', 'Sasha Bayan, Sitar', 'TBD'] },
-  { id: 'mar-20', day: 'Friday', dateTime: 'March 20, 7-11PM', label: 'Friday, March 20', value: '2026-03-20', musicians: ['Daniel Burkeman, Kora', 'Sasha Bayan, Sitar', 'TBD'] },
+  { id: 'mar-18', day: 'Wednesday', dateTime: 'March 18, 7-11PM', label: 'Wednesday, March 18', value: '2026-03-18', musicians: ['Daniel Burkeman, Kora'] },
+  { id: 'mar-19', day: 'Thursday', dateTime: 'March 19, 7-11PM', label: 'Thursday, March 19', value: '2026-03-19', musicians: ['Sasha Bayan, Sitar'] },
+  { id: 'mar-20', day: 'Friday', dateTime: 'March 20, 7-11PM', label: 'Friday, March 20', value: '2026-03-20', musicians: ['TBD'] },
 ] as const
 
 export const eventTiers = [
