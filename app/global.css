@@ -748,7 +748,7 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.1;
 }
 .carrd-page h2 {
-  font-variant: small-caps;
+  font-variant: normal;
 }
 .carrd-font-subtitle {
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
