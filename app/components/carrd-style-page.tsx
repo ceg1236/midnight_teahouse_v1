@@ -396,44 +396,55 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               <h2 className="carrd-font-heading carrd-font-h2">
                 2. Choose Your Ticket
               </h2>
-              <div className="w-full max-w-[56rem] flex flex-wrap justify-evenly gap-6">
+              <div className="w-full max-w-[56rem] space-y-4">
                 {tiers
                   .filter((t) => t.id === 'community' || t.id === 'patron')
                   .map((t) => {
                     const qty = selections[t.id] ?? 0
                     return (
-                      <div key={t.id} className="flex flex-col items-center gap-2 min-h-[6.5rem]">
-                        <button
-                          type="button"
-                          onClick={() => handleTierClick(t.id)}
-                          className={`carrd-btn px-8 py-4 whitespace-normal min-w-[10rem] flex-1 max-w-[14rem] shrink-0 max-h-[3.5rem] ${
-                            qty > 0 ? 'bg-[#FAE0B9]/20' : ''
-                          }`}
-                        >
-                          {t.label} ${t.price}
-                        </button>
-                        {qty > 0 ? (
-                          <div className="flex items-center gap-2">
+                      <div
+                        key={t.id}
+                        className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-6 py-3 border-b border-[#D9D0BF]/30 last:border-b-0"
+                      >
+                        <div className="carrd-font-body flex-shrink-0 min-w-[10rem]">
+                          <p className="font-medium text-[#FAEBD4]">{t.label}</p>
+                          <p className="text-[#D9D0BF] text-sm">${t.price}</p>
+                        </div>
+                        <div className="carrd-font-body flex-1 min-w-0 text-[#FAE9D8] mr-4 sm:mr-6">
+                          <p className="leading-relaxed">{t.description}</p>
+                        </div>
+                        <div className="flex flex-col items-start gap-2 flex-shrink-0">
+                          {qty > 0 ? (
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => handleQuantityChange(t.id, -1)}
+                                className="carrd-btn w-9 h-9 flex items-center justify-center p-0 text-lg leading-none"
+                                aria-label={`Decrease ${t.label} quantity`}
+                              >
+                                −
+                              </button>
+                              <span className="carrd-font-body w-8 text-center tabular-nums">{qty}</span>
+                              <button
+                                type="button"
+                                onClick={() => handleQuantityChange(t.id, 1)}
+                                className="carrd-btn w-9 h-9 flex items-center justify-center p-0 text-lg leading-none disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={totalQuantity >= 4}
+                                aria-label={`Increase ${t.label} quantity`}
+                              >
+                                +
+                              </button>
+                            </div>
+                          ) : (
                             <button
                               type="button"
-                              onClick={() => handleQuantityChange(t.id, -1)}
-                              className="carrd-btn w-9 h-9 flex items-center justify-center p-0 text-lg leading-none"
-                              aria-label={`Decrease ${t.label} quantity`}
+                              onClick={() => handleTierClick(t.id)}
+                              className="carrd-btn px-6 py-3 self-start"
                             >
-                              −
+                              Select
                             </button>
-                            <span className="carrd-font-body w-8 text-center tabular-nums">{qty}</span>
-                            <button
-                              type="button"
-                              onClick={() => handleQuantityChange(t.id, 1)}
-                              className="carrd-btn w-9 h-9 flex items-center justify-center p-0 text-lg leading-none disabled:opacity-50 disabled:cursor-not-allowed"
-                              disabled={totalQuantity >= 4}
-                              aria-label={`Increase ${t.label} quantity`}
-                            >
-                              +
-                            </button>
-                          </div>
-                        ) : null}
+                          )}
+                        </div>
                       </div>
                     )
                   })}

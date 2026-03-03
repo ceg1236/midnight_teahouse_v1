@@ -10,6 +10,6 @@ export const eventDates = [
 
 export const eventTiers = [
   { id: 'supported', label: 'Supported', description: 'An accessible option, we don\'t want price to keep people out.', price: 20 },
-  { id: 'community', label: 'Community', description: 'The heart of our gathering, your support sustains the experience.', price: 40 },
-  { id: 'patron', label: 'Patron', description: 'Your generosity helps us grow and supports others to attend.', price: 60 },
+  { id: 'community', label: 'Community', description: 'This is our standard price to keep the teahouse sustainable.', price: 40 },
+  { id: 'patron', label: 'Patron', description: 'If you have excess capacity, please consider supporting our guests who would like supported tickets.', price: 60 },
 ] as const
