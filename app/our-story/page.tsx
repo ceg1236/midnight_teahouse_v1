@@ -28,15 +28,26 @@ export default function OurStoryPage() {
                 Our Story
               </h1>
               <p>
-                Welcome to the Midnight Teahouse — a little world being created in San Francisco, born from our shared love of tea, music, community, and beautiful spaces.
+                Welcome to the Midnight Teahouse — a dreamy little world created by friends for friends, with support from our talented and loving community.
               </p>
-              <p className="font-medium carrd-font-body">What is Midnight Teahouse?</p>
+              <p className="font-medium carrd-font-body">What is the Midnight Teahouse?</p>
               <p>
-                Our vision is to cultivate a place that becomes both a beloved gathering spot and an inviting home for creative exploration — for ourselves, our community, and the beautiful strangers we meet along the way. We imagine a space to savor: where our body and mind can be softened, our senses delighted. For now, that takes the shape of a curated evening by reservation, with gongfu-style tea service, live music, and quiet corners.
+                We are cultivating a beloved gathering spot for ourselves, our community, and the beautiful strangers we meet along the way. This is a space to savor: where body and mind can be softened, senses delighted, imaginations set loose.
+              </p>
+              <p>
+                For now, our teahouse is offered as a monthly pop-up: a curated evening of gongfu tea service, live music and cozy corners. It is a time and space carved out for rest, unfurling and gentle play.
               </p>
               <p className="font-medium carrd-font-body">What&apos;s next?</p>
               <p>
-                Eventually, we hope to find a permanent home. We&apos;d love to become a place where artists and musicians gather to play, where friends stop by after a long day or wander in on a quiet Friday looking for adventure.
+                Soon we hope to find a permanent home. A place where artists and musicians gather to play, where regulars come to unwind and new friends are always wandering in, hoping to be surprised.
+              </p>
+              <p>
+                Thank you for being part of our unfolding. We are grateful to be building it with you.
+              </p>
+              <p>
+                With love,
+                <br />
+                Your Tea Keepers
               </p>
             </div>
           </div>
