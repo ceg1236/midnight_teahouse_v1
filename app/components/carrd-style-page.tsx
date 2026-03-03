@@ -222,10 +222,10 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 Date
               </p>
               <div className="space-y-1">
-                <p className="carrd-font-body inline-block border-b border-[#2f4381] pb-0.5">
+                <p className="carrd-font-body">
                   March 18-20, 2026
                 </p>
-                <p className="carrd-font-body inline-block border-b border-[#2f4381] pb-0.5">
+                <p className="carrd-font-body">
                   7-11pm
                 </p>
               </div>
@@ -236,10 +236,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               </p>
               <div className="space-y-1">
                 <p className="carrd-font-body">
-                  Private home in SoMA, SF
-                </p>
-                <p className="carrd-font-muted text-xs">
-                  (Exact location shared after RSVP)
+                  SoMA, SF
                 </p>
               </div>
             </div>
