@@ -272,7 +272,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         <hr className="carrd-divider-solid border-0 my-2" />
 
         <h2 className="carrd-font-heading text-2xl md:text-3xl">
-          Reserve
+          Reservation
         </h2>
 
         {/* Reservation: three sliding panels (evening → ticket → form) */}
