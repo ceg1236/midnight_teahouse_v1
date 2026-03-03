@@ -1,5 +1,6 @@
 @import 'tailwindcss';
-@import url('https://fonts.googleapis.com/css2?family=Allison&family=Great+Vibes&family=Tangerine:wght@400;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=Dancing+Script:wght@400;500;600;700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;1,400&family=Roboto:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Allison&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Tangerine:wght@400;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Spectral:ital,wght@0,300;0,400;1,300;1,400&family=Dancing+Script:wght@400;500;600;700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;1,400&family=Roboto:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap');
 /* KoHo no longer used - Amiri used for all body text */
 
 /* Amiri - local for reliable loading */
