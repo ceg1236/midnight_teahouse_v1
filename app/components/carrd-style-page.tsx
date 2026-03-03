@@ -211,14 +211,6 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           <div className="w-full max-w-[56rem] flex flex-col md:flex-row justify-between gap-8 text-left">
             <div className="space-y-1">
               <p className="carrd-font-muted text-xs tracking-[0.2em] uppercase">
-                Hosted by
-              </p>
-              <p className="carrd-font-body">
-                Midnight Teahouse
-              </p>
-            </div>
-            <div className="space-y-1">
-              <p className="carrd-font-muted text-xs tracking-[0.2em] uppercase">
                 Date
               </p>
               <p className="carrd-font-body">
