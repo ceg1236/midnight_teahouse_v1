@@ -131,7 +131,10 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
     setSelectedDate(persisted.date)
     setSelections(persisted.selections)
     setFormData(persisted.form)
-    if (Object.keys(persisted.selections).some((id) => id === 'supported')) setShowSupportedTier(true)
+    if (Object.keys(persisted.selections).some((id) => id === 'supported')) {
+      setShowSupportedTier(true)
+      setSupportedPriceInput('20')
+    }
     setHydrated(true)
     if (persisted.date) setReservationStep(2)
   }, [dates, tiers])
@@ -152,6 +155,10 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
 
   const hasSelection = Object.values(selections).some((q) => q > 0)
   const totalQuantity = Object.values(selections).reduce((s, q) => s + q, 0)
+  const hasValidSupportedPrice = (() => {
+    const v = parseInt(supportedPriceInput, 10)
+    return !isNaN(v) && v >= 20 && v <= 40
+  })()
   const totalPrice = Object.entries(selections).reduce((sum, [tierId, qty]) => {
     if (qty <= 0) return sum
     const tier = tiers.find((t) => t.id === tierId)
@@ -410,46 +417,68 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       <p className="font-medium italic leading-tight">{t.blurb}</p>
                     </div>
                     <div className="flex flex-col items-start gap-2 flex-shrink-0">
-                      <div className="flex items-center gap-1">
-                        <span className="carrd-font-body text-lg text-[#FAEBD4]">$</span>
-                        <input
-                          type="number"
-                          min={20}
-                          max={40}
-                          value={supportedPriceInput}
-                          onChange={(e) => {
-                            const raw = e.target.value
-                            setSupportedPriceInput(raw)
-                            const v = parseInt(raw, 10)
-                            if (!isNaN(v) && v >= 20 && v <= 40) {
-                              setSupportedPrice(v)
-                              setSelections((prev) => ({ ...prev, supported: 1 }))
-                            } else if (raw === '') {
-                              setSelections((prev) => {
-                                const next = { ...prev }
-                                delete next.supported
-                                return next
-                              })
-                            }
-                          }}
-                          onBlur={() => {
-                            const v = parseInt(supportedPriceInput, 10)
-                            if (!isNaN(v) && v >= 20 && v <= 40) {
-                              setSupportedPrice(v)
-                              setSupportedPriceInput(String(v))
-                              setSelections((prev) => ({ ...prev, supported: 1 }))
-                            } else if (supportedPriceInput === '') {
-                              setSelections((prev) => {
-                                const next = { ...prev }
-                                delete next.supported
-                                return next
-                              })
-                            } else {
-                              setSupportedPriceInput(String(supportedPrice))
-                            }
-                          }}
-                          className="w-20 text-center rounded-md border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-2 py-1 text-[#FAEBD4] text-lg focus:border-[#FAE0B9] focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                        />
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <div className="flex items-center gap-1">
+                          <span className="carrd-font-body text-lg text-[#FAEBD4]">$</span>
+                          <input
+                            type="number"
+                            min={20}
+                            max={40}
+                            value={supportedPriceInput}
+                            onChange={(e) => {
+                              const raw = e.target.value
+                              setSupportedPriceInput(raw)
+                              const v = parseInt(raw, 10)
+                              if (!isNaN(v) && v >= 20 && v <= 40) {
+                                setSupportedPrice(v)
+                              } else if (raw === '') {
+                                setSelections((prev) => {
+                                  const next = { ...prev }
+                                  delete next.supported
+                                  return next
+                                })
+                              }
+                            }}
+                            onBlur={() => {
+                              const v = parseInt(supportedPriceInput, 10)
+                              if (!isNaN(v) && v >= 20 && v <= 40) {
+                                setSupportedPrice(v)
+                                setSupportedPriceInput(String(v))
+                              } else if (supportedPriceInput === '') {
+                                setSelections((prev) => {
+                                  const next = { ...prev }
+                                  delete next.supported
+                                  return next
+                                })
+                              } else {
+                                setSupportedPriceInput(String(supportedPrice))
+                              }
+                            }}
+                            className="w-20 text-center rounded-md border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-2 py-1 text-[#FAEBD4] text-lg focus:border-[#FAE0B9] focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          />
+                        </div>
+                        {hasValidSupportedPrice && (
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleQuantityChange('supported', -1)}
+                              className="carrd-btn w-9 h-9 flex items-center justify-center p-0 text-lg leading-none"
+                              aria-label="Decrease Supported quantity"
+                            >
+                              −
+                            </button>
+                            <span className="carrd-font-body w-8 text-center tabular-nums">{selections['supported'] ?? 0}</span>
+                            <button
+                              type="button"
+                              onClick={() => handleQuantityChange('supported', 1)}
+                              className="carrd-btn w-9 h-9 flex items-center justify-center p-0 text-lg leading-none disabled:opacity-50 disabled:cursor-not-allowed"
+                              disabled={totalQuantity >= 4}
+                              aria-label="Increase Supported quantity"
+                            >
+                              +
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
