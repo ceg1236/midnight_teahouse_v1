@@ -354,17 +354,6 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   </div>
                 ))}
               </div>
-              <div className="w-full max-w-[56rem] text-left mt-6">
-                <p className="carrd-font-body font-medium mb-2">A few things to note before booking:</p>
-                <ul className="carrd-font-body space-y-3 list-none pl-0">
-                  {BOOKING_NOTES.map((item, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <span className="text-[#D9D0BF] mt-[0.45em] w-2 h-2 rounded-full bg-[#D9D0BF] shrink-0 flex-shrink-0" aria-hidden />
-                      <span className="flex-1">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
             </div>
 
             {/* Panel 2: Choose your ticket */}
@@ -521,17 +510,6 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 >
                   Continue
                 </button>
-              </div>
-              <div className="w-full max-w-[56rem] text-left mt-6">
-                <p className="carrd-font-body font-medium mb-2">A few things to note before booking:</p>
-                <ul className="carrd-font-body space-y-3 list-none pl-0">
-                  {BOOKING_NOTES.map((item, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <span className="text-[#D9D0BF] mt-[0.45em] w-2 h-2 rounded-full bg-[#D9D0BF] shrink-0 flex-shrink-0" aria-hidden />
-                      <span className="flex-1">{item}</span>
-                    </li>
-                  ))}
-                </ul>
               </div>
             </div>
 
