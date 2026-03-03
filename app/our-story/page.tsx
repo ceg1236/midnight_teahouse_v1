@@ -12,9 +12,9 @@ export default function OurStoryPage() {
           </h1>
 
           <div className="w-full flex flex-col gap-6 md:grid md:grid-cols-2 md:items-start md:gap-10">
-            {/* Photo: full-bleed on small screens, left column on larger screens */}
-            <div className="w-full -mx-6 md:mx-0">
-              <div className="relative w-full">
+            {/* Photo: centered with equal side margins on all screens */}
+            <div className="w-full flex justify-center">
+              <div className="relative w-full max-w-[56rem]">
                 <Image
                   src="/images/teahouse-team.png"
                   alt="The Midnight Teahouse team gathered around a low tea table"
