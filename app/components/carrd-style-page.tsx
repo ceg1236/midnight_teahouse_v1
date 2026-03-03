@@ -419,7 +419,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     <div className="carrd-font-body min-w-0 space-y-1 text-[#FAEBD4]">
                       <p className="font-medium italic leading-tight">{t.blurb}</p>
                     </div>
-                    <div className="flex items-center justify-end gap-2">
+                    <div className="flex items-start justify-end gap-2">
                       <div className="flex items-center gap-1 rounded-lg bg-[#FAEBD4]/5 px-2 py-1">
                         <span className="carrd-font-body text-[#D9D0BF] text-sm">$</span>
                         <input
@@ -531,7 +531,7 @@ className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D9D0BF]/25
                             )}
                           </div>
                         </div>
-                        <div className="flex items-center justify-end min-w-[4.5rem]">
+                        <div className="flex items-start justify-end min-w-[4.5rem]">
                           {qty > 0 ? (
                             <div className="flex items-center gap-1">
                               <button
