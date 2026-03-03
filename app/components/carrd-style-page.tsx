@@ -621,12 +621,12 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   {checkoutError}
                 </p>
               )}
-              <div className="w-full max-w-[56rem] text-left mt-6">
-                <p className="carrd-font-body font-medium mb-2">A few things to note before booking:</p>
-                <ul className="carrd-font-body space-y-2.5 list-none pl-0">
+              <div className="w-full max-w-md text-left mt-6">
+                <p className="carrd-font-body text-sm font-medium mb-1.5">A few things to note before booking:</p>
+                <ul className="carrd-font-body text-sm space-y-1.5 list-none pl-0 leading-snug">
                   {BOOKING_NOTES.map((item, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <span className="text-[#D9D0BF] mt-[0.45em] w-2 h-2 rounded-full bg-[#D9D0BF] shrink-0 flex-shrink-0" aria-hidden />
+                    <li key={i} className="flex items-start gap-2">
+                      <span className="text-[#D9D0BF] mt-[0.35em] w-1.5 h-1.5 rounded-full bg-[#D9D0BF] shrink-0 flex-shrink-0" aria-hidden />
                       <span className="flex-1 text-[#D9D0BF]/95">{item}</span>
                     </li>
                   ))}
