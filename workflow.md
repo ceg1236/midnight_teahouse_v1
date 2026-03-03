@@ -2,7 +2,8 @@
 
 ## Branching
 
-- **main** = Production (Vercel deploys from here). Develop new designs on main.
+- **main** = Production (Vercel deploys from here). Nothing merges to main without a PR.
+- **carl-n-team** = Carl's working branch. Work here, push, open PR to merge into main.
 - **design-v1** = Preserved branch with the icon-animation design. Use as reference or fallback.
 - To spin off a new design branch: `git checkout -b design-<name>` from main, push with `git push -u origin design-<name>`.
 

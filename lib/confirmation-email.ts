@@ -78,11 +78,21 @@ export async function sendConfirmationEmail(
   const orderSummary = buildOrderSummary(metadata)
 
   const from = process.env.RESEND_FROM ?? 'Midnight Teahouse <onboarding@resend.dev>'
+  const replyTo = process.env.RESEND_REPLY_TO // e.g. midnight.teahouse.sf@gmail.com
   const resend = new Resend(apiKey)
+
+  console.log(
+    JSON.stringify({
+      event: 'confirmation_email_attempt',
+      to,
+      from,
+    })
+  )
 
   const { data, error } = await resend.emails.send({
     from,
     to: [to],
+    ...(replyTo && { replyTo }),
     subject: 'Your Midnight Teahouse reservation is confirmed',
     html: buildHtml({
       to,
