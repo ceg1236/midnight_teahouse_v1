@@ -467,7 +467,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                             <button
                               type="button"
                               onClick={() => handleQuantityChange('supported', -1)}
-                              className="flex h-6 w-6 items-center justify-center rounded-full border border-[#D9D0BF]/40 text-[#FAEBD4] text-sm transition-colors hover:bg-[#FAE0B9]/10 hover:border-[#FAE0B9]/50"
+                              className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-xs transition-colors hover:bg-[#FAE0B9]/30"
                               aria-label="Decrease Supported quantity"
                             >
                               −
@@ -478,9 +478,9 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                             <button
                               type="button"
                               onClick={() => handleQuantityChange('supported', 1)}
-                              className="flex h-6 w-6 items-center justify-center rounded-full border border-[#D9D0BF]/40 text-[#FAEBD4] text-sm transition-colors hover:bg-[#FAE0B9]/10 hover:border-[#FAE0B9]/50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-xs transition-colors hover:bg-[#FAE0B9]/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                               disabled={totalQuantity >= 4}
-                              aria-label="Increase Supported quantity"
+                                aria-label="Increase Supported quantity"
                             >
                               +
                             </button>
@@ -537,7 +537,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                               <button
                                 type="button"
                                 onClick={() => handleQuantityChange(t.id, -1)}
-                                className="flex h-6 w-6 items-center justify-center rounded-full border border-[#D9D0BF]/40 text-[#FAEBD4] text-sm transition-colors hover:bg-[#FAE0B9]/10 hover:border-[#FAE0B9]/50"
+                                className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-xs transition-colors hover:bg-[#FAE0B9]/30"
                                 aria-label={`Decrease ${t.label} quantity`}
                               >
                                 −
@@ -546,7 +546,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                               <button
                                 type="button"
                                 onClick={() => handleQuantityChange(t.id, 1)}
-                                className="flex h-6 w-6 items-center justify-center rounded-full border border-[#D9D0BF]/40 text-[#FAEBD4] text-sm transition-colors hover:bg-[#FAE0B9]/10 hover:border-[#FAE0B9]/50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                                className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-xs transition-colors hover:bg-[#FAE0B9]/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                                 disabled={totalQuantity >= 4}
                                 aria-label={`Increase ${t.label} quantity`}
                               >
