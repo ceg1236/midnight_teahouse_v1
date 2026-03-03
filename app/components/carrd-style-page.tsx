@@ -206,7 +206,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
     <div className="carrd-page flex flex-col items-center min-h-screen overflow-x-hidden pt-8">
       <Link
         href="/our-story"
-        className="fixed top-6 right-6 z-50 carrd-link text-sm whitespace-nowrap"
+        className="fixed top-16 right-6 z-50 carrd-link text-sm whitespace-nowrap md:top-20"
       >
         Our Story
       </Link>
