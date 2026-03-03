@@ -265,14 +265,14 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
             onClick={() => scrollToSection(joinRef)}
             className="carrd-btn px-8 py-3"
           >
-            Reserve your spot
+            Reserve Your Seat
           </button>
         </section>
 
         <hr className="carrd-divider-solid border-0 my-2" />
 
         <h2 className="carrd-font-heading text-2xl md:text-3xl">
-          Reserve Your Spot
+          Reserve Your Seat
         </h2>
 
         {/* Reservation: three sliding panels (evening → ticket → form) */}
@@ -290,7 +290,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
             {/* Panel 1: Choose your evening */}
             <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-6 px-1">
               <p className="carrd-font-body text-left w-full max-w-[56rem] leading-relaxed">
-                To keep our gatherings intimate, we are open by reservation and have limited seats. Reserve a spot to gift a cozy evening to yourself or someone you love.
+                To keep our gatherings intimate, we are open by reservation and have limited seats. Reserve a seat to gift a cozy evening to yourself or someone you love.
               </p>
               <h2 className="carrd-font-heading carrd-font-h2">
                 1. Choose Your Evening
@@ -543,22 +543,22 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               {selectedDate && hasSelection ? (
                 <>
                   {/* Summary box: date/time + choices, directly under heading */}
-                  <div className="carrd-font-body rounded-lg border border-[#D9D0BF]/40 bg-[#2E0303]/30 px-6 py-4 text-center w-full max-w-[40rem]">
-                    <p>{selectedDateDisplay}</p>
-                    <div className="mt-2 space-y-1">
+                  <div className="carrd-font-body rounded-lg bg-[#FAEBD4]/15 px-4 py-3 text-center w-full max-w-[28rem]">
+                    <p className="text-sm italic text-[#FAEBD4]">{selectedDateDisplay}</p>
+                    <div className="mt-1.5 space-y-0.5">
                       {Object.entries(selections)
                         .filter(([, q]) => q > 0)
                         .map(([tierId, qty]) => {
                           const tier = tiers.find((t) => t.id === tierId)
                           const price = tierId === 'supported' ? supportedPrice : (tier?.price ?? 0)
                           return (
-                            <p key={tierId} className="carrd-font-heading text-lg">
+                            <p key={tierId} className="text-sm italic text-[#FAEBD4]">
                               {tier?.label} (${price}) x {qty} = ${price * qty}
                             </p>
                           )
                         })}
                     </div>
-                    <p className="mt-2 carrd-font-heading text-xl">Total: ${totalPrice}</p>
+                    <p className="mt-1.5 text-sm italic text-[#FAEBD4]">Total: ${totalPrice}</p>
                   </div>
                 </>
               ) : (
