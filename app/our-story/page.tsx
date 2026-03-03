@@ -4,9 +4,8 @@ import { SiteFooter } from '../components/site-footer'
 
 export default function OurStoryPage() {
   return (
-    <>
-      <div className="carrd-page flex flex-col items-center min-h-screen overflow-x-hidden pt-8">
-        <div className="w-full max-w-[60rem] flex flex-col items-center px-6 md:px-12 py-8 md:py-12 gap-8">
+    <div className="carrd-page flex flex-col items-center min-h-screen overflow-x-hidden pt-8">
+      <div className="w-full max-w-[60rem] flex flex-col items-center px-6 md:px-12 py-8 md:py-12 gap-8 flex-1">
           {/* Hero photo */}
           <div className="w-full flex justify-center">
             <div className="relative w-full max-w-[56rem]">
@@ -87,6 +86,6 @@ export default function OurStoryPage() {
         </div>
       </div>
       <SiteFooter />
-    </>
+    </div>
   )
 }
