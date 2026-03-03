@@ -816,10 +816,12 @@ html::-webkit-scrollbar {
   border: 1px solid #FAE0B9;
   border-radius: 0.375rem;
   padding: 0.5rem 1rem;
-  transition: color 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+  transition: color 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
-.carrd-btn:hover {
-  background-color: rgba(250, 224, 185, 0.15);
+.carrd-btn:hover:not(:disabled) {
+  background-color: rgba(250, 224, 185, 0.2);
+  transform: scale(1.02);
+  box-shadow: 0 0 12px rgba(250, 224, 185, 0.25);
 }
 .carrd-divider-solid {
   width: 100%;
@@ -837,11 +839,20 @@ html::-webkit-scrollbar {
   background-repeat: repeat-x;
 }
 
-/* Video fade-in on load */
+/* Video fade-in on load + subtle vignette overlay */
 @keyframes carrd-video-fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 .carrd-video-fade {
+  position: relative;
   animation: carrd-video-fade-in 1.5s ease-out forwards;
+}
+.carrd-video-fade::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(ellipse 80% 70% at 50% 50%, transparent 40%, rgba(46, 3, 3, 0.35) 100%);
 }

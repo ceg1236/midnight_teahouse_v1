@@ -219,7 +219,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         </div>
 
         {/* Countdown */}
-        <div className="flex justify-center py-2">
+        <div className="flex justify-center py-6">
           <CountdownTimer targetTimestamp={countdownTarget} length={3} />
         </div>
 
@@ -237,7 +237,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           </div>
           <div className="w-full max-w-[56rem] flex flex-col md:flex-row items-center md:items-start justify-center gap-10 md:gap-16 text-center pt-2">
             <div className="space-y-2">
-              <p className="carrd-font-muted text-xs tracking-[0.2em] uppercase">
+              <p className="text-[#D9D0BF]/80 text-sm">
                 Date
               </p>
               <div className="space-y-1">
@@ -250,7 +250,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               </div>
             </div>
             <div className="space-y-2">
-              <p className="carrd-font-muted text-xs tracking-[0.2em] uppercase">
+              <p className="text-[#D9D0BF]/80 text-sm">
                 Location
               </p>
               <div className="space-y-1">
@@ -272,7 +272,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         <hr className="carrd-divider-solid border-0 my-2" />
 
         <h2 className="carrd-font-heading text-2xl md:text-3xl">
-          Reserve Your Seat
+          Reserve
         </h2>
 
         {/* Reservation: three sliding panels (evening → ticket → form) */}
@@ -280,8 +280,19 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           ref={joinRef}
           className="w-full overflow-x-hidden"
         >
+          {/* Step indicator */}
+          <div className="flex justify-center gap-2 mb-4" aria-hidden>
+            {([1, 2, 3] as const).map((step) => (
+              <span
+                key={step}
+                className={`w-2 h-2 rounded-full transition-colors duration-300 ${
+                  reservationStep === step ? 'bg-[#FAE0B9]' : 'bg-[#D9D0BF]/40'
+                }`}
+              />
+            ))}
+          </div>
           <div
-            className="flex transition-transform duration-300 ease-out"
+            className="flex transition-transform duration-500 ease-in-out"
             style={{
               width: '300%',
               transform: `translateX(-${(reservationStep - 1) * (100 / 3)}%)`,
@@ -358,6 +369,13 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
 
             {/* Panel 2: Choose your ticket */}
             <div ref={tierRef} className="flex-shrink-0 w-1/3 flex flex-col items-center gap-6 px-1">
+              <button
+                type="button"
+                onClick={() => setReservationStep(1)}
+                className="carrd-font-body text-[#D9D0BF] hover:text-[#FAEBD4] underline focus:outline-none cursor-pointer self-start -mt-1"
+              >
+                ← Change evening
+              </button>
               <h2 className="carrd-font-heading carrd-font-h2">
                 2. Choose Your Ticket
               </h2>
@@ -497,13 +515,6 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               <div className="flex flex-wrap items-center justify-center gap-4 w-full max-w-[56rem]">
                 <button
                   type="button"
-                  onClick={() => setReservationStep(1)}
-                  className="carrd-font-body text-[#D9D0BF] hover:text-[#FAEBD4] underline focus:outline-none cursor-pointer"
-                >
-                  ← Change evening
-                </button>
-                <button
-                  type="button"
                   onClick={() => setReservationStep(3)}
                   disabled={!hasSelection}
                   className="carrd-btn px-6 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -515,13 +526,20 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
 
             {/* Panel 3: Complete your reservation (summary + form + reserve) */}
             <div ref={formRef} className="flex-shrink-0 w-1/3 flex flex-col items-center gap-6 px-1">
+              <button
+                type="button"
+                onClick={() => setReservationStep(2)}
+                className="carrd-font-body text-[#D9D0BF] hover:text-[#FAEBD4] underline focus:outline-none cursor-pointer self-start -mt-1"
+              >
+                ← Change ticket
+              </button>
               <h2 className="carrd-font-heading carrd-font-h2">
                 3. Complete Your Reservation
               </h2>
               {selectedDate && hasSelection ? (
                 <>
                   {/* Summary box: date/time + choices, directly under heading */}
-                  <div className="carrd-font-body rounded-lg bg-[#FAEBD4]/15 px-4 py-3 text-center w-full max-w-[28rem]">
+                  <div className="carrd-font-body rounded-lg bg-[#FAEBD4]/20 px-4 py-3 text-center w-full max-w-[28rem]">
                     <p className="text-sm italic text-[#FAEBD4]">{selectedDateDisplay}</p>
                     <div className="mt-1.5 space-y-0.5">
                       {Object.entries(selections)
@@ -570,7 +588,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     required
                     value={formData.name}
                     onChange={(e) => setFormData((d) => ({ ...d, name: e.target.value }))}
-                    className="mt-1 w-full rounded-md border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] placeholder:text-[#D9D0BF]/60 focus:border-[#FAE0B9] focus:outline-none"
+                    className="mt-1 w-full rounded-lg border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] placeholder:text-[#D9D0BF]/60 focus:border-[#FAE0B9] focus:outline-none focus:ring-2 focus:ring-[#FAE0B9]/30"
                     placeholder="Your name"
                   />
                 </label>
@@ -582,7 +600,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     required
                     value={formData.email}
                     onChange={(e) => setFormData((d) => ({ ...d, email: e.target.value }))}
-                    className="mt-1 w-full rounded-md border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] placeholder:text-[#D9D0BF]/60 focus:border-[#FAE0B9] focus:outline-none"
+                    className="mt-1 w-full rounded-lg border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] placeholder:text-[#D9D0BF]/60 focus:border-[#FAE0B9] focus:outline-none focus:ring-2 focus:ring-[#FAE0B9]/30"
                     placeholder="you@example.com"
                   />
                 </label>
@@ -593,19 +611,10 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     value={formData.notes}
                     onChange={(e) => setFormData((d) => ({ ...d, notes: e.target.value }))}
                     rows={2}
-                    className="mt-1 w-full resize-none rounded-md border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] placeholder:text-[#D9D0BF]/60 focus:border-[#FAE0B9] focus:outline-none"
+                    className="mt-1 w-full resize-none rounded-lg border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] placeholder:text-[#D9D0BF]/60 focus:border-[#FAE0B9] focus:outline-none focus:ring-2 focus:ring-[#FAE0B9]/30"
                     placeholder="Anything else we should know?"
                   />
                 </label>
-                <div className="flex flex-wrap items-center gap-4">
-                  <button
-                    type="button"
-                    onClick={() => setReservationStep(2)}
-                    className="carrd-font-body text-[#D9D0BF] hover:text-[#FAEBD4] underline focus:outline-none cursor-pointer"
-                  >
-                    ← Change ticket
-                  </button>
-                </div>
               </form>
               {selectedDate && hasSelection && checkoutError && (
                 <p className="carrd-font-body text-sm text-red-300" role="alert">
@@ -614,11 +623,11 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               )}
               <div className="w-full max-w-[56rem] text-left mt-6">
                 <p className="carrd-font-body font-medium mb-2">A few things to note before booking:</p>
-                <ul className="carrd-font-body space-y-3 list-none pl-0">
+                <ul className="carrd-font-body space-y-2.5 list-none pl-0">
                   {BOOKING_NOTES.map((item, i) => (
                     <li key={i} className="flex items-start gap-3">
                       <span className="text-[#D9D0BF] mt-[0.45em] w-2 h-2 rounded-full bg-[#D9D0BF] shrink-0 flex-shrink-0" aria-hidden />
-                      <span className="flex-1">{item}</span>
+                      <span className="flex-1 text-[#D9D0BF]/95">{item}</span>
                     </li>
                   ))}
                 </ul>
