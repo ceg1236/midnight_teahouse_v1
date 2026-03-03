@@ -415,12 +415,12 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     key={t.id}
                     className="grid grid-cols-1 sm:grid-cols-[minmax(10rem,auto)_1fr_auto] gap-3 sm:gap-6 py-3 border-b border-[#D9D0BF]/30 items-start"
                   >
-                    <div className="carrd-font-body flex-shrink-0">
+                    <div className="carrd-font-body flex-shrink-0 min-w-[10rem]">
                       <p className="font-medium text-[#FAEBD4]">Supported</p>
                       <p className="text-[#D9D0BF] text-sm">$20+</p>
                     </div>
-                    <div className="carrd-font-body min-w-0 space-y-1 text-[#FAEBD4]">
-                      <p className="font-medium italic leading-tight">{t.blurb}</p>
+                    <div className="carrd-font-body min-w-0 space-y-1 text-[#FAEBD4] mr-4 sm:mr-6">
+                      <p className="font-medium italic">{t.blurb}</p>
                     </div>
                     <div className="flex items-start justify-end gap-2">
                       <div className="flex items-center gap-1 rounded-lg bg-[#FAEBD4]/5 px-2 py-1">
@@ -502,11 +502,11 @@ className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D9D0BF]/25
                         key={t.id}
                         className="grid grid-cols-[minmax(10rem,auto)_1fr_auto] sm:grid-cols-[minmax(10rem,auto)_1fr_auto] gap-3 sm:gap-6 py-3 border-b border-[#D9D0BF]/30 last:border-b-0 items-start"
                       >
-                        <div className="carrd-font-body flex-shrink-0">
+                        <div className="carrd-font-body flex-shrink-0 min-w-[10rem]">
                           <p className="font-medium text-[#FAEBD4]">{t.label}</p>
                           <p className="text-[#D9D0BF] text-sm">${t.price}</p>
                         </div>
-                        <div className="carrd-font-body min-w-0 space-y-1 text-[#FAEBD4]">
+                        <div className="carrd-font-body min-w-0 space-y-1 text-[#FAEBD4] mr-4 sm:mr-6">
                           <p className="font-medium italic">{t.mainLine}</p>
                           <div className="text-[#D9D0BF] text-sm">
                             {expandedTierBlurbId === t.id ? (
