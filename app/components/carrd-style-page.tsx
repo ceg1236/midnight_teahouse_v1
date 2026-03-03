@@ -261,12 +261,12 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           ref={joinRef}
           className="w-full flex flex-col items-center gap-6"
         >
-          <h2 className="carrd-font-heading carrd-font-h2">
-            1. Choose Your Date
-          </h2>
           <p className="carrd-font-body text-left w-full max-w-[56rem] leading-relaxed">
             To keep our gatherings intimate, we are open by reservation and have limited seats. Reserve a spot to gift a cozy evening to yourself or someone you love.
           </p>
+          <h2 className="carrd-font-heading carrd-font-h2">
+            1. Choose Your Date
+          </h2>
 
           {/* Date buttons */}
           <div className="flex flex-wrap justify-center gap-3">
