@@ -437,7 +437,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           className="w-full flex flex-col items-center gap-6"
         >
           <h2 className="carrd-font-heading text-2xl md:text-3xl">
-            3. Complete Reservation
+            3. Complete Your Reservation
           </h2>
           <form
             id="carrd-form"
