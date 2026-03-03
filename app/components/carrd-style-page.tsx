@@ -208,12 +208,38 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           <h2 className="carrd-font-heading text-2xl md:text-3xl">
             Crossing into Spring
           </h2>
-          <p className="carrd-font-muted leading-relaxed">
-            March 18-20, 2026
-            <br />
-            7-11pm<br />
-            SoMA, SF
-          </p>
+          <div className="w-full max-w-[56rem] flex flex-col md:flex-row justify-between gap-8 text-left">
+            <div className="space-y-1">
+              <p className="carrd-font-muted text-xs tracking-[0.2em] uppercase">
+                Hosted by
+              </p>
+              <p className="carrd-font-body">
+                Midnight Teahouse
+              </p>
+            </div>
+            <div className="space-y-1">
+              <p className="carrd-font-muted text-xs tracking-[0.2em] uppercase">
+                Date
+              </p>
+              <p className="carrd-font-body">
+                March 18-20, 2026
+                <br />
+                7-11pm
+              </p>
+            </div>
+            <div className="space-y-1">
+              <p className="carrd-font-muted text-xs tracking-[0.2em] uppercase">
+                Location
+              </p>
+              <p className="carrd-font-body">
+                Private home in SoMA, SF
+                <br />
+                <span className="carrd-font-muted text-xs">
+                  (Exact location shared after RSVP)
+                </span>
+              </p>
+            </div>
+          </div>
           <div className="carrd-font-body text-left space-y-4 w-full max-w-[56rem]">
             {welcomeContent.split(/\n\n+/).map((para, i) => (
               <p key={i} className="leading-relaxed">
