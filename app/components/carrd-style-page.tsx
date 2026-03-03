@@ -667,7 +667,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   }}
                   className="carrd-btn px-10 py-3 disabled:opacity-70 disabled:cursor-not-allowed mt-6"
                 >
-                  {isSubmitting ? 'Redirecting…' : 'Confirm'}
+                  {isSubmitting ? 'Redirecting…' : 'Finish Booking'}
                 </button>
               )}
             </div>
