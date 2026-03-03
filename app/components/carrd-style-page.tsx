@@ -268,22 +268,37 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
             1. Choose Your Date
           </h2>
 
-          {/* Date buttons */}
-          <div className="flex flex-wrap justify-center gap-3">
+          {/* Date rows: date/time left, musicians center, Select right */}
+          <div className="w-full max-w-[56rem] space-y-4">
             {dates.map((d) => (
-              <button
+              <div
                 key={d.id}
-                type="button"
-                onClick={() => {
-                  setSelectedDate(d.id)
-                  if (!selectedDate) setTimeout(() => scrollToSection(tierRef), 50)
-                }}
-                className={`carrd-btn px-8 py-4 whitespace-normal leading-tight text-center min-w-[10rem] flex-1 max-w-[14rem] shrink-0 max-h-[3.5rem] ${
-                  selectedDate === d.id ? 'bg-[#FAE0B9]/20' : ''
-                }`}
+                className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 py-3 border-b border-[#D9D0BF]/30 last:border-b-0"
               >
-                {d.label}
-              </button>
+                <div className="carrd-font-body flex-shrink-0 min-w-[10rem]">
+                  <p className="font-medium text-[#FAEBD4]">{d.day}</p>
+                  <p className="text-[#D9D0BF] text-sm">{d.dateTime}</p>
+                </div>
+                <div className="carrd-font-body flex-1 space-y-0.5 text-[#FAEBD4]">
+                  {d.musicians.map((line, i) => (
+                    <p key={i} className="font-medium italic">
+                      {line}
+                    </p>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedDate(d.id)
+                    if (!selectedDate) setTimeout(() => scrollToSection(tierRef), 50)
+                  }}
+                  className={`carrd-btn px-6 py-3 flex-shrink-0 self-start sm:self-center ${
+                    selectedDate === d.id ? 'bg-[#FAE0B9]/20' : ''
+                  }`}
+                >
+                  Select
+                </button>
+              </div>
             ))}
           </div>
         </section>
