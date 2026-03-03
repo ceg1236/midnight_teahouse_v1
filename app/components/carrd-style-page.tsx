@@ -341,10 +341,20 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                           {expandedBlurbId === d.id ? (
                             <>
                               <p className="leading-relaxed">{d.blurb}</p>
+                              {d.spotifyUrl ? (
+                                <a
+                                  href={d.spotifyUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="mt-2 inline-block italic text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline"
+                                >
+                                  {d.spotifyLabel}
+                                </a>
+                              ) : null}
                               <button
                                 type="button"
                                 onClick={() => setExpandedBlurbId(null)}
-                                className="mt-1 italic text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
+                                className="mt-1 block italic text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
                               >
                                 ...less
                               </button>
