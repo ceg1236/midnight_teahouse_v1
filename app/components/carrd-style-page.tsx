@@ -206,22 +206,19 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
     <div className="carrd-page flex flex-col items-center min-h-screen overflow-x-hidden pt-8">
       <div className="w-full max-w-[60rem] flex flex-col items-center px-6 md:px-12 py-8 md:py-12 gap-8">
         {/* Hero: Title + Subtitle with Our Story top-right aligned */}
-        <div className="w-full flex items-start justify-between gap-4">
-          <div className="flex-1 min-w-0" />
-          <div className="flex flex-col items-center gap-1 shrink-0">
-            <h1 className="carrd-font-heading carrd-font-title text-center">
-              Midnight Teahouse
-            </h1>
-            <p className="carrd-font-subtitle text-center italic">
-              an enchanted world hidden in San Francisco
-            </p>
-          </div>
+        <div className="relative w-full flex flex-col items-center gap-1">
           <Link
             href="/our-story"
-            className="flex-1 flex justify-end items-start carrd-link text-sm whitespace-nowrap"
+            className="absolute top-0 right-0 carrd-link text-sm whitespace-nowrap"
           >
             Our Story
           </Link>
+          <h1 className="carrd-font-heading carrd-font-title text-center">
+            Midnight Teahouse
+          </h1>
+          <p className="carrd-font-subtitle text-center italic">
+            an enchanted world hidden in San Francisco
+          </p>
         </div>
 
         {/* Video */}
