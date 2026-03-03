@@ -315,12 +315,12 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           >
             {/* Panel 1: Choose your evening */}
             <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-6 px-3">
-              <p className="carrd-font-intro text-left w-full max-w-[56rem]">
-                To keep our gatherings intimate, we are open by reservation and have limited seats. Reserve a seat to gift a cozy evening to yourself or someone you love.
-              </p>
               <h2 className="carrd-font-heading carrd-font-h2">
                 1. Choose Your Evening
               </h2>
+              <p className="carrd-font-intro text-left w-full max-w-[56rem]">
+                To keep our gatherings intimate, we are open by reservation and have limited seats. Reserve a seat to gift a cozy evening to yourself or someone you love.
+              </p>
               <div className="w-full max-w-[56rem] space-y-4">
                 {dates.map((d) => (
                   <div
