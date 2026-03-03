@@ -419,7 +419,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     <div className="carrd-font-body flex-1 min-w-0 space-y-1 text-[#FAEBD4] mr-4 sm:mr-6">
                       <p className="font-medium italic leading-tight">{t.blurb}</p>
                     </div>
-                    <div className="flex flex-col items-start gap-2 flex-shrink-0">
+                    <div className="flex flex-col items-end gap-2 flex-shrink-0 min-w-[7.5rem]">
                       <div className="flex items-center gap-3 rounded-lg bg-[#FAEBD4]/5 px-4 py-2.5">
                         <div className="flex items-baseline gap-1">
                           <span className="carrd-font-body text-[#D9D0BF] text-sm">$</span>
@@ -533,7 +533,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                             )}
                           </div>
                         </div>
-                        <div className="flex flex-col items-start gap-2 flex-shrink-0">
+                        <div className="flex flex-col items-end gap-2 flex-shrink-0 min-w-[7.5rem]">
                           {qty > 0 ? (
                             <div className="flex items-center gap-1">
                               <button
@@ -559,7 +559,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                             <button
                               type="button"
                               onClick={() => handleTierClick(t.id)}
-                              className="carrd-btn px-6 py-3 self-start"
+                              className="carrd-btn px-6 py-3 self-end"
                             >
                               Select
                             </button>
