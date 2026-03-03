@@ -343,15 +343,21 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   })}
               </div>
               <p className="carrd-font-body text-left w-full max-w-[56rem] leading-relaxed">
-                Our prices aim to support the sustainability of our project, but we recognize the skewed economic situation of our city. If cost is a barrier, please{' '}
+                Like the Bay Area as a whole, our community includes people in wildly different financial situations. Using tiered pricing helps us balance two essential but divergent goals: ensuring that the teahouse is both <em>financially sustainable</em> and <em>accessible</em>. We invite you to choose the level that feels right for you — one that honors your own capacity while helping us keep this space open, welcoming, and alive.
+              </p>
+              <p className="carrd-font-body text-left w-full max-w-[56rem] leading-relaxed">
+                If cost is a barrier please consider our{' '}
                 <button
                   type="button"
-                  onClick={() => setShowSupportedTier(true)}
+                  onClick={() => {
+                    setShowSupportedTier(true)
+                    setTimeout(() => scrollToSection(tierRef), 50)
+                  }}
                   className="underline hover:no-underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline"
                 >
-                  click here
+                  supported ticket option
                 </button>
-                {' '}for a supported ticket.
+                .
               </p>
               <div
                 className={`grid transition-all duration-500 ease-out overflow-hidden w-full max-w-[56rem] ${
