@@ -18,6 +18,14 @@ type CarrdStylePageProps = {
 const SCROLL_DURATION = 1200
 const SCROLL_OFFSET_TOP = 48
 
+const BOOKING_NOTES = [
+  'Doors open at 7pm and close at 11pm. Feel free to join us anytime in this window.',
+  'Reservation includes unlimited tea and all other amenities.',
+  'We are a phone and laptop-free space.',
+  "Unfortunately, we aren't able to offer refunds or exchanges for future events.",
+  "We'll share the location once you make the reservation. If you don't hear from us within a few days, please send us an email.",
+]
+
 function scrollToSection(ref: React.RefObject<HTMLElement | null>) {
   const el = ref.current
   if (!el) return
@@ -346,6 +354,17 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   </div>
                 ))}
               </div>
+              <div className="w-full max-w-[56rem] text-left mt-6">
+                <p className="carrd-font-body font-medium mb-2">A few things to note before booking:</p>
+                <ul className="carrd-font-body space-y-3 list-none pl-0">
+                  {BOOKING_NOTES.map((item, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <span className="text-[#D9D0BF] mt-[0.45em] w-2 h-2 rounded-full bg-[#D9D0BF] shrink-0 flex-shrink-0" aria-hidden />
+                      <span className="flex-1">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
 
             {/* Panel 2: Choose your ticket */}
@@ -503,6 +522,17 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   Continue
                 </button>
               </div>
+              <div className="w-full max-w-[56rem] text-left mt-6">
+                <p className="carrd-font-body font-medium mb-2">A few things to note before booking:</p>
+                <ul className="carrd-font-body space-y-3 list-none pl-0">
+                  {BOOKING_NOTES.map((item, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <span className="text-[#D9D0BF] mt-[0.45em] w-2 h-2 rounded-full bg-[#D9D0BF] shrink-0 flex-shrink-0" aria-hidden />
+                      <span className="flex-1">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
 
             {/* Panel 3: Complete your reservation (summary + form + reserve) */}
@@ -601,23 +631,6 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               </form>
               {selectedDate && hasSelection && (
                 <>
-                  <div className="w-full max-w-[56rem] text-left mt-4">
-                    <p className="carrd-font-body font-medium mb-2">A few things to note before booking:</p>
-                    <ul className="carrd-font-body space-y-3 list-none pl-0">
-                      {[
-                        'Doors open at 7pm and close at 11pm. Feel free to join us anytime in this window.',
-                        'Reservation includes unlimited tea and all other amenities.',
-                        'We are a phone and laptop-free space.',
-                        "Unfortunately, we aren't able to offer refunds or exchanges for future events.",
-                        "We'll share the location once you make the reservation. If you don't hear from us within a few days, please send us an email.",
-                      ].map((item, i) => (
-                        <li key={i} className="flex items-start gap-3">
-                          <span className="text-[#D9D0BF] mt-[0.45em] w-2 h-2 rounded-full bg-[#D9D0BF] shrink-0 flex-shrink-0" aria-hidden />
-                          <span className="flex-1">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
                   {checkoutError && (
                     <p className="carrd-font-body text-sm text-red-300" role="alert">
                       {checkoutError}
@@ -670,6 +683,17 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   </button>
                 </>
               )}
+              <div className="w-full max-w-[56rem] text-left mt-6">
+                <p className="carrd-font-body font-medium mb-2">A few things to note before booking:</p>
+                <ul className="carrd-font-body space-y-3 list-none pl-0">
+                  {BOOKING_NOTES.map((item, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <span className="text-[#D9D0BF] mt-[0.45em] w-2 h-2 rounded-full bg-[#D9D0BF] shrink-0 flex-shrink-0" aria-hidden />
+                      <span className="flex-1">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
         </section>
