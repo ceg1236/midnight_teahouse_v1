@@ -96,7 +96,7 @@ Then open [http://localhost:3000](http://localhost:3000) in a browser. She shoul
 
 ---
 
-## Part 4: Where to edit copy and content
+## Part 4: Where to edit
 
 | What to change | File to edit |
 |----------------|--------------|
@@ -104,56 +104,65 @@ Then open [http://localhost:3000](http://localhost:3000) in a browser. She shoul
 | Dates and tier names/prices | `content/event-invite.config.ts` |
 | “Midnight Teahouse” modal text | `content/title-modal.md` |
 | Tea / Candle / Kora / Table modal text | `content/modals/tea.md`, `candle.md`, `kora.md`, `table.md` |
+| Layout, styling, fonts | `app/components/*.tsx`, `app/global.css` |
 
-For copy edits, she should focus on the `content/` folder. The `content/README.md` file has more details.
+The `content/` folder is for copy. Layout and CSS live in `app/components/` and `app/global.css`. See `content/README.md` for more details.
 
 ---
 
-## Part 5: Making and sharing changes
+## Part 5: Making and sharing changes (use branches + PRs)
 
-### Simple workflow (direct to main)
+Because layout and CSS changes can break the site, **always use a branch and pull request.** That lets the repo owner review before changes go live.
 
-1. Edit a file (e.g. `content/event-invite.md`)
-2. Save
-3. In Cursor’s terminal (or Source Control panel):
+### Step-by-step
 
-```bash
-git add content/event-invite.md
-git commit -m "Update welcome paragraph"
-git push
-```
-
-### Safer workflow (branch + pull request)
-
-1. Create a branch before editing:
+1. **Before editing**, create a branch and make sure you're on main with latest changes:
 
 ```bash
-git checkout -b update-welcome-copy
+git checkout main
+git pull
+git checkout -b update-hero-layout
 ```
 
-2. Edit the file(s) and save
-3. Commit and push:
+2. Edit your files and save.
+
+3. **Before pushing**, run a build to catch errors:
+
+```bash
+pnpm build
+```
+
+If it fails, fix the errors before pushing.
+
+4. Commit and push:
 
 ```bash
 git add .
-git commit -m "Update welcome paragraph"
-git push -u origin update-welcome-copy
+git commit -m "Update hero layout and spacing"
+git push -u origin update-hero-layout
 ```
 
-4. On GitHub, open the repo and click **Compare & pull request** (or create a PR from the branch)
-5. You review and merge
+5. On GitHub, open the repo. You should see a banner: **“Compare & pull request”.** Click it, add a brief description, and submit.
+
+6. The repo owner will review and merge. Once merged, you can delete the branch and switch back to main:
+
+```bash
+git checkout main
+git pull
+```
 
 ---
 
 ## Part 6: Staying in sync
 
-Before starting new work, pull the latest changes:
+Before starting new work, always pull the latest:
 
 ```bash
+git checkout main
 git pull
 ```
 
-If she sees merge conflicts, she can ask you for help.
+Then create a new branch for your changes. If you see merge conflicts, ask the repo owner for help.
 
 ---
 
@@ -162,10 +171,12 @@ If she sees merge conflicts, she can ask you for help.
 | Task | Command |
 |------|---------|
 | Start the dev server | `pnpm dev` |
-| Pull latest changes | `git pull` |
+| Run build (check for errors) | `pnpm build` |
+| Pull latest changes | `git checkout main` then `git pull` |
+| Create a new branch | `git checkout -b your-branch-name` |
 | Stage all changes | `git add .` |
 | Commit | `git commit -m "Brief description"` |
-| Push | `git push` |
+| Push your branch | `git push -u origin your-branch-name` |
 
 ---
 

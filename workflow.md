@@ -6,6 +6,16 @@
 - **design-v1** = Preserved branch with the icon-animation design. Use as reference or fallback.
 - To spin off a new design branch: `git checkout -b design-<name>` from main, push with `git push -u origin design-<name>`.
 
+### Collaborator workflow (layout, CSS, copy)
+
+Collaborators should **always use branches and pull requests** so changes can be reviewed before going live:
+
+1. `git checkout main` → `git pull`
+2. `git checkout -b descriptive-branch-name`
+3. Make changes, run `pnpm build` to verify
+4. `git add .` → `git commit -m "message"` → `git push -u origin descriptive-branch-name`
+5. Open a PR on GitHub; owner reviews and merges
+
 ## Commit Workflow
 
 - **Commit after every series of changes**: After completing a logical set of changes (e.g., styling updates, feature additions, bug fixes), create a commit.
