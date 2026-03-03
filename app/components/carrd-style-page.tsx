@@ -266,7 +266,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
             To keep our gatherings intimate, we are open by reservation and have limited seats. Reserve a spot to gift a cozy evening to yourself or someone you love.
           </p>
           <h2 className="carrd-font-heading carrd-font-h2">
-            1. Choose Your Date
+            1. Choose Your Evening
           </h2>
 
           {/* Date rows: date/time left, musicians + subtitle center, Select right — top-aligned */}
