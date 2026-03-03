@@ -468,18 +468,18 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                               <button
                                 type="button"
                                 onClick={() => handleQuantityChange('supported', -1)}
-                                className="flex h-8 w-8 items-center justify-center rounded border border-[#D9D0BF]/50 text-[#FAEBD4] transition-colors hover:bg-[#FAE0B9]/10 hover:border-[#FAE0B9]/50"
+                                className="flex h-6 w-6 items-center justify-center rounded-full border border-[#D9D0BF]/40 text-[#FAEBD4] text-sm transition-colors hover:bg-[#FAE0B9]/10 hover:border-[#FAE0B9]/50"
                                 aria-label="Decrease Supported quantity"
                               >
                                 −
                               </button>
-                              <span className="carrd-font-body w-6 text-center text-sm tabular-nums text-[#FAEBD4]">
+                              <span className="carrd-font-body w-5 text-center text-sm tabular-nums text-[#FAEBD4]">
                                 {selections['supported'] ?? 0}
                               </span>
                               <button
                                 type="button"
                                 onClick={() => handleQuantityChange('supported', 1)}
-                                className="flex h-8 w-8 items-center justify-center rounded border border-[#D9D0BF]/50 text-[#FAEBD4] transition-colors hover:bg-[#FAE0B9]/10 hover:border-[#FAE0B9]/50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                                className="flex h-6 w-6 items-center justify-center rounded-full border border-[#D9D0BF]/40 text-[#FAEBD4] text-sm transition-colors hover:bg-[#FAE0B9]/10 hover:border-[#FAE0B9]/50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                                 disabled={totalQuantity >= 4}
                                 aria-label="Increase Supported quantity"
                               >
@@ -535,20 +535,20 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         </div>
                         <div className="flex flex-col items-start gap-2 flex-shrink-0">
                           {qty > 0 ? (
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1">
                               <button
                                 type="button"
                                 onClick={() => handleQuantityChange(t.id, -1)}
-                                className="carrd-btn w-9 h-9 flex items-center justify-center p-0 text-lg leading-none"
+                                className="flex h-6 w-6 items-center justify-center rounded-full border border-[#D9D0BF]/40 text-[#FAEBD4] text-sm transition-colors hover:bg-[#FAE0B9]/10 hover:border-[#FAE0B9]/50"
                                 aria-label={`Decrease ${t.label} quantity`}
                               >
                                 −
                               </button>
-                              <span className="carrd-font-body w-8 text-center tabular-nums">{qty}</span>
+                              <span className="carrd-font-body w-5 text-center text-sm tabular-nums text-[#FAEBD4]">{qty}</span>
                               <button
                                 type="button"
                                 onClick={() => handleQuantityChange(t.id, 1)}
-                                className="carrd-btn w-9 h-9 flex items-center justify-center p-0 text-lg leading-none disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex h-6 w-6 items-center justify-center rounded-full border border-[#D9D0BF]/40 text-[#FAEBD4] text-sm transition-colors hover:bg-[#FAE0B9]/10 hover:border-[#FAE0B9]/50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                                 disabled={totalQuantity >= 4}
                                 aria-label={`Increase ${t.label} quantity`}
                               >
