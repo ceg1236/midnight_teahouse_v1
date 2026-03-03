@@ -330,7 +330,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       <p className="font-medium text-[#FAEBD4]">{d.day}</p>
                       <p className="text-[#D9D0BF] text-sm">{d.dateTime}</p>
                     </div>
-                    <div className="carrd-font-body flex-1 min-w-0 space-y-1 text-[#FAEBD4]">
+                    <div className="carrd-font-body flex-1 min-w-0 space-y-1 text-[#FAEBD4] mr-4 sm:mr-6">
                       {d.musicians.map((line, i) => (
                         <p key={i} className="font-medium italic">
                           {line}
