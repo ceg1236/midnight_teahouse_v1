@@ -554,7 +554,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 })}
               </div>
               <p className="carrd-font-intro text-left w-full max-w-[56rem]">
-                Like the Bay Area as a whole, our community includes people in wildly different financial situations. Using tiered pricing helps us balance two essential but divergent goals: ensuring that the teahouse is both <em>financially sustainable</em> and <em>accessible</em>. We invite you to choose the level that feels right for you — one that honors your own capacity while helping us keep this space open, welcoming, and alive.
+                Our community spans a wide range of financial situations. Our tiered pricing helps us balance the financial sustainability and accessibility of the teahouse. We invite you to choose the level that feels right for you — one that honors your own capacity, while helping us keep this space open, welcoming and alive.
               </p>
               <p className="carrd-font-intro text-left w-full max-w-[56rem]">
                 If cost is a barrier please consider our{' '}
