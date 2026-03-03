@@ -278,7 +278,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   setSelectedDate(d.id)
                   if (!selectedDate) setTimeout(() => scrollToSection(tierRef), 50)
                 }}
-                className={`carrd-btn px-6 py-3 whitespace-pre-line text-center max-w-[10rem] ${
+                className={`carrd-btn px-8 py-4 whitespace-pre-line text-center min-w-[10rem] flex-1 max-w-[14rem] shrink-0 max-h-[3.5rem] ${
                   selectedDate === d.id ? 'bg-[#FAE0B9]/20' : ''
                 }`}
               >
