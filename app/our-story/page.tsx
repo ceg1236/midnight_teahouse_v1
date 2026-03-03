@@ -23,21 +23,21 @@ export default function OurStoryPage() {
             </div>
 
             {/* Story copy */}
-            <div className="carrd-font-body-light space-y-4 w-full max-w-[56rem] text-left leading-relaxed">
+            <div className="carrd-font-body-light our-story-body space-y-4 w-full max-w-[56rem] text-left">
               <h1 className="carrd-font-heading text-3xl md:text-4xl">
                 Our Story
               </h1>
               <p>
                 Welcome to the Midnight Teahouse — a dreamy little world created by friends for friends, with support from our talented and loving community.
               </p>
-              <p className="font-medium carrd-font-body">What is the Midnight Teahouse?</p>
+              <p className="our-story-subheading">What is the Midnight Teahouse?</p>
               <p>
                 We are cultivating a beloved gathering spot for ourselves, our community, and the beautiful strangers we meet along the way. This is a space to savor: where body and mind can be softened, senses delighted, imaginations set loose.
               </p>
               <p>
                 For now, our teahouse is offered as a monthly pop-up: a curated evening of gongfu tea service, live music and cozy corners. It is a time and space carved out for rest, unfurling and gentle play.
               </p>
-              <p className="font-medium carrd-font-body">What&apos;s next?</p>
+              <p className="our-story-subheading">What&apos;s next?</p>
               <p>
                 Soon we hope to find a permanent home. A place where artists and musicians gather to play, where regulars come to unwind and new friends are always wandering in, hoping to be surprised.
               </p>
