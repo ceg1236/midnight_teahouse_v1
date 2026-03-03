@@ -763,7 +763,7 @@ html::-webkit-scrollbar {
 }
 .carrd-font-title {
   font-family: 'Allison', 'Great Vibes', cursive;
-  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-size: clamp(3.75rem, 9vw, 6rem);
   line-height: 1.1;
 }
 .carrd-font-intro {
