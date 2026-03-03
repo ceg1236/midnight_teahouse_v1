@@ -279,31 +279,34 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
 
         <hr className="carrd-divider-solid border-0 my-4" />
 
-        <div className="w-full relative">
-          {reservationStep > 1 && (
-            <button
-              type="button"
-              onClick={() => setReservationStep((s) => (s - 1) as 1 | 2 | 3)}
-              className="absolute top-0 left-0 z-10 carrd-font-body text-sm text-[#D9D0BF] hover:text-[#FAEBD4] underline focus:outline-none cursor-pointer"
-            >
-              ← Back
-            </button>
-          )}
-          <div className="flex flex-col items-center gap-1">
-            {/* Step indicator */}
-            <div className="flex justify-center gap-2" aria-hidden>
-              {([1, 2, 3] as const).map((step) => (
-                <span
-                  key={step}
-                  className={`w-2 h-2 rounded-full transition-colors duration-300 ${
-                    reservationStep === step ? 'bg-[#FAE0B9]' : 'bg-[#D9D0BF]/40'
-                  }`}
-                />
-              ))}
+        <div className="w-full flex flex-col items-center gap-1">
+          {/* Step indicator */}
+          <div className="flex justify-center gap-2" aria-hidden>
+            {([1, 2, 3] as const).map((step) => (
+              <span
+                key={step}
+                className={`w-2 h-2 rounded-full transition-colors duration-300 ${
+                  reservationStep === step ? 'bg-[#FAE0B9]' : 'bg-[#D9D0BF]/40'
+                }`}
+              />
+            ))}
+          </div>
+          <div className="flex items-start justify-between w-full">
+            <div className="flex-1 flex justify-start min-w-0">
+              {reservationStep > 1 && (
+                <button
+                  type="button"
+                  onClick={() => setReservationStep((s) => (s - 1) as 1 | 2 | 3)}
+                  className="carrd-font-body text-sm text-[#D9D0BF] hover:text-[#FAEBD4] underline focus:outline-none cursor-pointer"
+                >
+                  ← Back
+                </button>
+              )}
             </div>
-            <h2 className="carrd-font-heading carrd-font-heading-sm text-center">
+            <h2 className="carrd-font-heading carrd-font-heading-sm flex-1 text-center">
               Reservation
             </h2>
+            <div className="flex-1 min-w-0" aria-hidden />
           </div>
         </div>
 
