@@ -606,8 +606,6 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
             </div>
           )}
         </section>
-
-        <hr className="carrd-divider border-0 my-2" />
       </div>
       <SiteFooter variant="main" />
     </div>
