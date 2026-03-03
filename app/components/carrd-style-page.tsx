@@ -118,6 +118,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
   const [hydrated, setHydrated] = useState(false)
   const [expandedBlurbId, setExpandedBlurbId] = useState<string | null>(null)
+  const [expandedTierBlurbId, setExpandedTierBlurbId] = useState<string | null>(null)
   /** 1 = Choose evening, 2 = Choose ticket, 3 = Complete reservation */
   const [reservationStep, setReservationStep] = useState<1 | 2 | 3>(1)
 
@@ -410,7 +411,33 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                           <p className="font-medium text-[#FAEBD4]">{t.label} ${t.price}</p>
                         </div>
                         <div className="carrd-font-body flex-1 min-w-0 mr-4 sm:mr-6">
-                          <p className="font-medium italic text-[#FAEBD4] leading-tight">{t.description}</p>
+                          <div className="text-[#D9D0BF] text-sm">
+                            {expandedTierBlurbId === t.id ? (
+                              <>
+                                <p className="font-medium italic text-[#FAEBD4] leading-tight">{t.mainLine}</p>
+                                <p className="leading-tight mt-1 text-[#D9D0BF]">{t.blurb}</p>
+                                <button
+                                  type="button"
+                                  onClick={() => setExpandedTierBlurbId(null)}
+                                  className="mt-1 italic text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
+                                >
+                                  ...less
+                                </button>
+                              </>
+                            ) : (
+                              <p className="leading-tight flex items-baseline gap-1 min-w-0">
+                                <span className="font-medium italic text-[#FAEBD4]">{t.mainLine}</span>
+                                {' '}
+                                <button
+                                  type="button"
+                                  onClick={() => setExpandedTierBlurbId(t.id)}
+                                  className="italic flex-shrink-0 text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
+                                >
+                                  ...more
+                                </button>
+                              </p>
+                            )}
+                          </div>
                         </div>
                         <div className="flex flex-col items-start gap-2 flex-shrink-0">
                           {qty > 0 ? (
@@ -447,41 +474,21 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       </div>
                     )
                   })}
-              </div>
-              <p className="carrd-font-body text-left w-full max-w-[56rem] leading-relaxed">
-                Like the Bay Area as a whole, our community includes people in wildly different financial situations. Using tiered pricing helps us balance two essential but divergent goals: ensuring that the teahouse is both <em>financially sustainable</em> and <em>accessible</em>. We invite you to choose the level that feels right for you — one that honors your own capacity while helping us keep this space open, welcoming, and alive.
-              </p>
-              <p className="carrd-font-body text-left w-full max-w-[56rem] leading-relaxed">
-                If cost is a barrier please consider our{' '}
-                <button
-                  type="button"
-                  onClick={() => setShowSupportedTier(true)}
-                  className="underline hover:no-underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline"
-                >
-                  supported ticket option
-                </button>
-                .
-              </p>
-              <div
-                className={`grid transition-all duration-500 ease-out overflow-hidden w-full max-w-[56rem] ${
-                  showSupportedTier ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
-                }`}
-              >
-                <div className="min-h-0 flex flex-col items-center gap-2">
-                  {tiers
-                    .filter((t) => t.id === 'supported')
-                    .map((t) => (
-                      <div key={t.id} className="flex flex-col items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => handleTierClick(t.id)}
-                          className={`carrd-btn px-8 py-4 whitespace-normal min-w-[10rem] shrink-0 max-h-[3.5rem] ${
-                            (selections['supported'] ?? 0) > 0 ? 'bg-[#FAE0B9]/20' : ''
-                          }`}
-                        >
-                          {t.label}
-                        </button>
-                        {(selections['supported'] ?? 0) > 0 && (
+                {showSupportedTier && tiers.filter((t) => t.id === 'supported').map((t) => {
+                  const qty = selections[t.id] ?? 0
+                  return (
+                    <div
+                      key={t.id}
+                      className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-6 py-3 border-b border-[#D9D0BF]/30 last:border-b-0"
+                    >
+                      <div className="carrd-font-body flex-shrink-0 min-w-[10rem]">
+                        <p className="font-medium text-[#FAEBD4]">{t.mainLine}</p>
+                      </div>
+                      <div className="carrd-font-body flex-1 min-w-0 mr-4 sm:mr-6">
+                        <p className="font-medium italic text-[#FAEBD4] leading-tight">{t.blurb}</p>
+                      </div>
+                      <div className="flex flex-col items-start gap-2 flex-shrink-0">
+                        {qty > 0 ? (
                           <>
                             <div className="flex items-center gap-2">
                               <button
@@ -492,7 +499,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                               >
                                 −
                               </button>
-                              <span className="carrd-font-body w-8 text-center tabular-nums">{selections['supported'] ?? 0}</span>
+                              <span className="carrd-font-body w-8 text-center tabular-nums">{qty}</span>
                               <button
                                 type="button"
                                 onClick={() => handleQuantityChange('supported', 1)}
@@ -503,11 +510,11 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                                 +
                               </button>
                             </div>
-                            <div className="flex flex-col items-center gap-1 w-full max-w-[40rem]">
-                              <p className="carrd-font-body text-xs text-center opacity-90 w-full px-2">
+                            <div className="flex flex-col items-start gap-1 mt-2">
+                              <p className="carrd-font-body text-xs opacity-90">
                                 Sliding scale: choose an amount between $20 and $39 that works for you.
                               </p>
-                              <div className="flex items-center justify-center gap-1">
+                              <div className="flex items-center gap-1">
                                 <span className="carrd-font-body text-lg text-[#FAEBD4]">$</span>
                                 <input
                                   type="number"
@@ -534,11 +541,34 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                               </div>
                             </div>
                           </>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleTierClick(t.id)}
+                            className="carrd-btn px-6 py-3 self-start"
+                          >
+                            Select
+                          </button>
                         )}
                       </div>
-                    ))}
-                </div>
+                    </div>
+                  )
+                })}
               </div>
+              <p className="carrd-font-body text-left w-full max-w-[56rem] leading-relaxed">
+                Like the Bay Area as a whole, our community includes people in wildly different financial situations. Using tiered pricing helps us balance two essential but divergent goals: ensuring that the teahouse is both <em>financially sustainable</em> and <em>accessible</em>. We invite you to choose the level that feels right for you — one that honors your own capacity while helping us keep this space open, welcoming, and alive.
+              </p>
+              <p className="carrd-font-body text-left w-full max-w-[56rem] leading-relaxed">
+                If cost is a barrier please consider our{' '}
+                <button
+                  type="button"
+                  onClick={() => setShowSupportedTier(true)}
+                  className="underline hover:no-underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline"
+                >
+                  supported ticket option
+                </button>
+                .
+              </p>
               <div className="flex flex-wrap items-center justify-center gap-4 w-full max-w-[56rem]">
                 <button
                   type="button"
