@@ -406,6 +406,9 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               <h2 className="carrd-font-heading carrd-font-h2">
                 2. Choose Your Ticket
               </h2>
+              <p className="carrd-font-intro text-left w-full max-w-[56rem]">
+                Our community spans a wide range of financial situations. Our tiered pricing helps us balance the financial sustainability and accessibility of the teahouse. We invite you to choose the level that feels right for you — one that honors your own capacity, while helping us keep this space open, welcoming and alive.
+              </p>
               <div className="w-full max-w-[56rem] space-y-4">
                 {showSupportedTier && tiers.filter((t) => t.id === 'supported').map((t) => (
                   <div
@@ -567,9 +570,6 @@ className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D9D0BF]/25
                     )
                   })}
               </div>
-              <p className="carrd-font-intro text-left w-full max-w-[56rem]">
-                Our community spans a wide range of financial situations. Our tiered pricing helps us balance the financial sustainability and accessibility of the teahouse. We invite you to choose the level that feels right for you — one that honors your own capacity, while helping us keep this space open, welcoming and alive.
-              </p>
               <p className="carrd-font-intro text-left w-full max-w-[56rem]">
                 If cost is a barrier please consider our{' '}
                 <button
