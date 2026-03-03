@@ -211,12 +211,14 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
       </Link>
       <div className="w-full max-w-[60rem] flex flex-col items-center px-6 md:px-12 py-8 md:py-12 gap-8">
         {/* Hero: Title + Subtitle */}
-        <h1 className="carrd-font-heading carrd-font-title text-center">
-          Midnight Teahouse
-        </h1>
-        <p className="carrd-font-subtitle text-center italic">
-          welcome to our evening world
-        </p>
+        <div className="flex flex-col items-center gap-2">
+          <h1 className="carrd-font-heading carrd-font-title text-center">
+            Midnight Teahouse
+          </h1>
+          <p className="carrd-font-subtitle text-center italic">
+            welcome to our evening world
+          </p>
+        </div>
 
         {/* Video */}
         <div className="carrd-video-fade w-full -mx-6 md:-mx-12 aspect-video overflow-hidden">
