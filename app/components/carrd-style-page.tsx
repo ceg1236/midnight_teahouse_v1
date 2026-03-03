@@ -417,7 +417,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       <p className="font-medium italic leading-tight">{t.blurb}</p>
                     </div>
                     <div className="flex flex-col items-start gap-2 flex-shrink-0">
-                      <div className="flex items-center gap-3 rounded-lg border border-[#D9D0BF]/40 bg-[#FAEBD4]/5 px-4 py-2.5">
+                      <div className="flex items-center gap-3 rounded-lg bg-[#FAEBD4]/5 px-4 py-2.5">
                         <div className="flex items-baseline gap-1">
                           <span className="carrd-font-body text-[#D9D0BF] text-sm">$</span>
                           <input
@@ -465,7 +465,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                               <button
                                 type="button"
                                 onClick={() => handleQuantityChange('supported', -1)}
-                                className="flex h-8 w-8 items-center justify-center rounded border border-[#D9D0BF]/50 text-[#FAEBD4] transition-colors hover:bg-[#FAE0B9]/10 hover:border-[#FAE0B9]/50"
+                                className="flex h-8 w-8 items-center justify-center rounded text-[#FAEBD4] transition-colors hover:bg-[#FAE0B9]/10"
                                 aria-label="Decrease Supported quantity"
                               >
                                 −
@@ -476,7 +476,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                               <button
                                 type="button"
                                 onClick={() => handleQuantityChange('supported', 1)}
-                                className="flex h-8 w-8 items-center justify-center rounded border border-[#D9D0BF]/50 text-[#FAEBD4] transition-colors hover:bg-[#FAE0B9]/10 hover:border-[#FAE0B9]/50 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                                className="flex h-8 w-8 items-center justify-center rounded text-[#FAEBD4] transition-colors hover:bg-[#FAE0B9]/10 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                                 disabled={totalQuantity >= 4}
                                 aria-label="Increase Supported quantity"
                               >
