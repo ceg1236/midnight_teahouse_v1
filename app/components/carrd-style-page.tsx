@@ -208,7 +208,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         {/* Hero: Title + Subtitle with Our Story top-right aligned */}
         <div className="w-full flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0" />
-          <div className="flex flex-col items-center gap-2 shrink-0">
+          <div className="flex flex-col items-center gap-1 shrink-0">
             <h1 className="carrd-font-heading carrd-font-title text-center">
               Midnight Teahouse
             </h1>
