@@ -7,10 +7,6 @@ export default function OurStoryPage() {
     <>
       <div className="carrd-page flex flex-col items-center min-h-screen overflow-x-hidden pt-8">
         <div className="w-full max-w-[60rem] flex flex-col items-center px-6 md:px-12 py-8 md:py-12 gap-8">
-          <h1 className="carrd-font-heading text-3xl md:text-4xl text-center">
-            Our Story
-          </h1>
-
           <div className="w-full flex flex-col gap-6 md:grid md:grid-cols-2 md:items-start md:gap-10">
             {/* Photo: centered with equal side margins on all screens */}
             <div className="w-full flex justify-center">
@@ -28,6 +24,9 @@ export default function OurStoryPage() {
 
             {/* Story copy */}
             <div className="carrd-font-body-light space-y-4 w-full max-w-[56rem] text-left leading-relaxed">
+              <h1 className="carrd-font-heading text-3xl md:text-4xl">
+                Our Story
+              </h1>
               <p>
                 Welcome to the Midnight Teahouse — a little world being created in San Francisco, born from our shared love of tea, music, community, and beautiful spaces.
               </p>
