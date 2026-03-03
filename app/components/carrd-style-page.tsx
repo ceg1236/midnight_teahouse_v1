@@ -250,7 +250,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           </button>
         </section>
 
-        <hr className="carrd-divider border-0 my-2" />
+        <hr className="carrd-divider-solid border-0 my-2" />
 
         {/* Join us - Dates + Tiers */}
         <section

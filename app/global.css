@@ -786,10 +786,20 @@ h1, h2, h3, h4, h5, h6 {
 .carrd-btn:hover {
   background-color: rgba(250, 224, 185, 0.15);
 }
+.carrd-divider-solid {
+  width: 100%;
+  height: 1px;
+  border: 0;
+  background-color: #D9D0BF;
+}
 .carrd-divider {
   width: 100%;
-  height: 0;
-  border-top: 1px dotted #D9D0BF;
+  height: 1px;
+  border: none;
+  background-image: radial-gradient(circle, #D9D0BF 1px, transparent 1px);
+  background-size: 10px 1px;
+  background-position: 0 0;
+  background-repeat: repeat-x;
 }
 
 /* Video fade-in on load */
