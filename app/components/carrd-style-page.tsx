@@ -272,26 +272,22 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
 
         <hr className="carrd-divider-solid border-0 my-4" />
 
-        <div className="flex flex-col items-center gap-1">
-          <div className="flex items-center justify-between w-full">
-            <div className="flex-1 flex justify-start min-w-0">
-              {reservationStep > 1 && (
-                <button
-                  type="button"
-                  onClick={() => setReservationStep((s) => (s - 1) as 1 | 2 | 3)}
-                  className="carrd-font-body text-sm text-[#D9D0BF] hover:text-[#FAEBD4] underline focus:outline-none cursor-pointer"
-                >
-                  ← Back
-                </button>
-              )}
-            </div>
-            <h2 className="carrd-font-heading carrd-font-heading-sm flex-1 text-center">
+        <div className="w-full relative">
+          {reservationStep > 1 && (
+            <button
+              type="button"
+              onClick={() => setReservationStep((s) => (s - 1) as 1 | 2 | 3)}
+              className="absolute top-0 left-0 z-10 carrd-font-body text-sm text-[#D9D0BF] hover:text-[#FAEBD4] underline focus:outline-none cursor-pointer"
+            >
+              ← Back
+            </button>
+          )}
+          <div className="flex flex-col items-center gap-1">
+            <h2 className="carrd-font-heading carrd-font-heading-sm text-center">
               Reservation
             </h2>
-            <div className="flex-1 min-w-0" aria-hidden />
-          </div>
-          {/* Step indicator */}
-          <div className="flex justify-center gap-2" aria-hidden>
+            {/* Step indicator */}
+            <div className="flex justify-center gap-2" aria-hidden>
             {([1, 2, 3] as const).map((step) => (
               <span
                 key={step}
@@ -300,6 +296,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 }`}
               />
             ))}
+            </div>
           </div>
         </div>
 
