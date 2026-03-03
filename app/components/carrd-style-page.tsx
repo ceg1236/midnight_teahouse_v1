@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { CountdownTimer } from './countdown-timer'
 import type { eventDates, eventTiers } from '../../content/event-invite.config'
+import { SiteFooter } from './site-footer'
 
 const STORAGE_KEY = 'teahouse_reservation'
 
@@ -609,43 +610,8 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         </section>
 
         <hr className="carrd-divider border-0 my-2" />
-
-        {/* Footer icons */}
-        <div className="flex flex-col items-center gap-3 pb-4">
-          <a
-            href="/our-story"
-            className="carrd-font-body text-sm tracking-[0.18em] uppercase text-[#D9D0BF] hover:text-[#FAE0B9] transition-colors"
-          >
-            Our Story
-          </a>
-          <ul className="flex justify-center gap-4">
-            <li>
-              <a
-                href="mailto:hello@midnightteahouse.com"
-                className="text-[#D9D0BF] hover:text-[#FAE0B9] transition-colors"
-                aria-label="Email"
-              >
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 40 40" aria-hidden>
-                  <path d="M37.5,12.6l-17.5,11.9L2.5,12.6c-.2-.1-.3-.2-.5-.2v-2.7c0-.8.6-1.4,1.4-1.4h33.1c.8,0,1.4.6,1.4,1.4v2.7c-.2,0-.4,0-.5.2ZM19.5,26.3c.2.1.3.2.5.2s.4,0,.5-.2l17.5-11.9v16.9c0,.8-.6,1.4-1.4,1.4H3.4c-.8,0-1.4-.6-1.4-1.4V14.4l17.5,11.9Z" />
-                </svg>
-              </a>
-            </li>
-            <li>
-              <a
-                href="https://instagram.com/midnightteahouse"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#D9D0BF] hover:text-[#FAE0B9] transition-colors"
-                aria-label="Instagram"
-              >
-                <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 40 40" aria-hidden>
-                  <path d="M20,7c4.2,0,4.7,0,6.3,0.1c1.5,0.1,2.3,0.3,3,0.5C30,8,30.5,8.3,31.1,8.9c0.5,0.5,0.9,1.1,1.2,1.8c0.2,0.5,0.5,1.4,0.5,3C33,15.3,33,15.8,33,20s0,4.7-0.1,6.3c-0.1,1.5-0.3,2.3-0.5,3c-0.3,0.7-0.6,1.2-1.2,1.8c-0.5,0.5-1.1,0.9-1.8,1.2c-0.5,0.2-1.4,0.5-3,0.5C24.7,33,24.2,33,20,33s-4.7,0-6.3-0.1c-1.5-0.1-2.3-0.3-3-0.5C10,32,9.5,31.7,8.9,31.1C8.4,30.6,8,30,7.7,29.3c-0.2-0.5-0.5-1.4-0.5-3C7,24.7,7,24.2,7,20s0-4.7,0.1-6.3c0.1-1.5,0.3-2.3,0.5-3C8,10,8.3,9.5,8.9,8.9C9.4,8.4,10,8,10.7,7.7c0.5-0.2,1.4-0.5,3-0.5C15.3,7.1,15.8,7,20,7z" />
-                </svg>
-              </a>
-            </li>
-          </ul>
-        </div>
       </div>
+      <SiteFooter />
     </div>
   )
 }
