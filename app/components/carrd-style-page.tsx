@@ -271,9 +271,23 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
 
         <hr className="carrd-divider-solid border-0 my-2" />
 
-        <h2 className="carrd-font-heading text-2xl md:text-3xl">
-          Reservation
-        </h2>
+        <div className="flex items-center justify-between w-full">
+          <div className="flex-1 flex justify-start min-w-0">
+            {reservationStep > 1 && (
+              <button
+                type="button"
+                onClick={() => setReservationStep((s) => (s - 1) as 1 | 2 | 3)}
+                className="carrd-font-body text-sm text-[#D9D0BF] hover:text-[#FAEBD4] underline focus:outline-none cursor-pointer"
+              >
+                ← Back
+              </button>
+            )}
+          </div>
+          <h2 className="carrd-font-heading text-2xl md:text-3xl flex-1 text-center">
+            Reservation
+          </h2>
+          <div className="flex-1 min-w-0" aria-hidden />
+        </div>
 
         {/* Reservation: three sliding panels (evening → ticket → form) */}
         <section
@@ -369,13 +383,6 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
 
             {/* Panel 2: Choose your ticket */}
             <div ref={tierRef} className="flex-shrink-0 w-1/3 flex flex-col items-center gap-6 px-1">
-              <button
-                type="button"
-                onClick={() => setReservationStep(1)}
-                className="carrd-font-body text-[#D9D0BF] hover:text-[#FAEBD4] underline focus:outline-none cursor-pointer self-start -mt-1"
-              >
-                ← Back
-              </button>
               <h2 className="carrd-font-heading carrd-font-h2">
                 2. Choose Your Ticket
               </h2>
@@ -526,13 +533,6 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
 
             {/* Panel 3: Complete your reservation (summary + form + reserve) */}
             <div ref={formRef} className="flex-shrink-0 w-1/3 flex flex-col items-center gap-6 px-1">
-              <button
-                type="button"
-                onClick={() => setReservationStep(2)}
-                className="carrd-font-body text-[#D9D0BF] hover:text-[#FAEBD4] underline focus:outline-none cursor-pointer self-start -mt-1"
-              >
-                ← Back
-              </button>
               <h2 className="carrd-font-heading carrd-font-h2">
                 3. Complete Your Reservation
               </h2>
