@@ -67,12 +67,14 @@ export default function OurStoryPage() {
             <p>
               Thank you for being part of our unfolding. We are grateful to be building it with you.
             </p>
-            <p>
-              With love,
-            </p>
-            <p>
-              Your Tea Keepers
-            </p>
+            <div className="text-right">
+              <p>
+                With love,
+              </p>
+              <p>
+                Your Tea Keepers
+              </p>
+            </div>
 
             {/* Clear floats before RSVP button */}
             <div className="clear-both" />
