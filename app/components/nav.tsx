@@ -74,7 +74,7 @@ export function Navbar() {
           </span>
         </button>
         <Link
-          href="/reservations"
+          href="/"
           className={`nav-link-hover font-cursive text-lg ${isCarrdHome ? 'text-[#FAE0B9]' : 'text-[#f8f6f2]'}`}
         >
           {/* reservations */}
