@@ -110,7 +110,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [selections, setSelections] = useState<TierSelections>({})
   const [supportedPrice, setSupportedPrice] = useState(20)
-  const [supportedPriceInput, setSupportedPriceInput] = useState('20')
+  const [supportedPriceInput, setSupportedPriceInput] = useState('')
   const [showSupportedTier, setShowSupportedTier] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', notes: '' })
   const [deviceType, setDeviceType] = useState<'mobile' | 'tablet' | 'desktop'>('desktop')
@@ -397,6 +397,63 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 2. Choose Your Ticket
               </h2>
               <div className="w-full max-w-[56rem] space-y-4">
+                {showSupportedTier && tiers.filter((t) => t.id === 'supported').map((t) => (
+                  <div
+                    key={t.id}
+                    className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-6 py-3 border-b border-[#D9D0BF]/30"
+                  >
+                    <div className="carrd-font-body flex-shrink-0 min-w-[10rem]">
+                      <p className="font-medium text-[#FAEBD4]">Supported</p>
+                      <p className="text-[#D9D0BF] text-sm">$20+</p>
+                    </div>
+                    <div className="carrd-font-body flex-1 min-w-0 space-y-1 text-[#FAEBD4] mr-4 sm:mr-6">
+                      <p className="font-medium italic leading-tight">{t.blurb}</p>
+                    </div>
+                    <div className="flex flex-col items-start gap-2 flex-shrink-0">
+                      <div className="flex items-center gap-1">
+                        <span className="carrd-font-body text-lg text-[#FAEBD4]">$</span>
+                        <input
+                          type="number"
+                          min={20}
+                          max={40}
+                          value={supportedPriceInput}
+                          onChange={(e) => {
+                            const raw = e.target.value
+                            setSupportedPriceInput(raw)
+                            const v = parseInt(raw, 10)
+                            if (!isNaN(v) && v >= 20 && v <= 40) {
+                              setSupportedPrice(v)
+                              setSelections((prev) => ({ ...prev, supported: 1 }))
+                            } else if (raw === '') {
+                              setSelections((prev) => {
+                                const next = { ...prev }
+                                delete next.supported
+                                return next
+                              })
+                            }
+                          }}
+                          onBlur={() => {
+                            const v = parseInt(supportedPriceInput, 10)
+                            if (!isNaN(v) && v >= 20 && v <= 40) {
+                              setSupportedPrice(v)
+                              setSupportedPriceInput(String(v))
+                              setSelections((prev) => ({ ...prev, supported: 1 }))
+                            } else if (supportedPriceInput === '') {
+                              setSelections((prev) => {
+                                const next = { ...prev }
+                                delete next.supported
+                                return next
+                              })
+                            } else {
+                              setSupportedPriceInput(String(supportedPrice))
+                            }
+                          }}
+                          className="w-20 text-center rounded-md border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-2 py-1 text-[#FAEBD4] text-lg focus:border-[#FAE0B9] focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
                 {tiers
                   .filter((t) => t.id === 'community' || t.id === 'patron')
                   .map((t) => {
@@ -473,87 +530,6 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       </div>
                     )
                   })}
-                {showSupportedTier && tiers.filter((t) => t.id === 'supported').map((t) => {
-                  const qty = selections[t.id] ?? 0
-                  return (
-                    <div
-                      key={t.id}
-                      className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-6 py-3 border-b border-[#D9D0BF]/30 last:border-b-0"
-                    >
-                      <div className="carrd-font-body flex-shrink-0 min-w-[10rem]">
-                        <p className="font-medium text-[#FAEBD4]">Supported</p>
-                        <p className="text-[#D9D0BF] text-sm">$20+</p>
-                      </div>
-                      <div className="carrd-font-body flex-1 min-w-0 space-y-1 text-[#FAEBD4] mr-4 sm:mr-6">
-                        <p className="font-medium italic leading-tight">{t.blurb}</p>
-                      </div>
-                      <div className="flex flex-col items-start gap-2 flex-shrink-0">
-                        {qty > 0 ? (
-                          <>
-                            <div className="flex items-center gap-2">
-                              <button
-                                type="button"
-                                onClick={() => handleQuantityChange('supported', -1)}
-                                className="carrd-btn w-9 h-9 flex items-center justify-center p-0 text-lg leading-none"
-                                aria-label="Decrease Supported quantity"
-                              >
-                                −
-                              </button>
-                              <span className="carrd-font-body w-8 text-center tabular-nums">{qty}</span>
-                              <button
-                                type="button"
-                                onClick={() => handleQuantityChange('supported', 1)}
-                                className="carrd-btn w-9 h-9 flex items-center justify-center p-0 text-lg leading-none disabled:opacity-50 disabled:cursor-not-allowed"
-                                disabled={totalQuantity >= 4}
-                                aria-label="Increase Supported quantity"
-                              >
-                                +
-                              </button>
-                            </div>
-                            <div className="flex flex-col items-start gap-1 mt-2">
-                              <p className="carrd-font-body text-xs opacity-90">
-                                Sliding scale: choose an amount between $20 and $39 that works for you.
-                              </p>
-                              <div className="flex items-center gap-1">
-                                <span className="carrd-font-body text-lg text-[#FAEBD4]">$</span>
-                                <input
-                                  type="number"
-                                  min={20}
-                                  max={39}
-                                  value={supportedPriceInput}
-                                  onChange={(e) => {
-                                    const raw = e.target.value
-                                    setSupportedPriceInput(raw)
-                                    const v = parseInt(raw, 10)
-                                    if (!isNaN(v) && v >= 20 && v <= 39) setSupportedPrice(v)
-                                  }}
-                                  onBlur={() => {
-                                    const v = parseInt(supportedPriceInput, 10)
-                                    if (!isNaN(v) && v >= 20 && v <= 39) {
-                                      setSupportedPrice(v)
-                                      setSupportedPriceInput(String(v))
-                                    } else {
-                                      setSupportedPriceInput(String(supportedPrice))
-                                    }
-                                  }}
-                                  className="w-20 text-center rounded-md border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-2 py-1 text-[#FAEBD4] text-lg focus:border-[#FAE0B9] focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                />
-                              </div>
-                            </div>
-                          </>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => handleTierClick(t.id)}
-                            className="carrd-btn px-6 py-3 self-start"
-                          >
-                            Select
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  )
-                })}
               </div>
               <p className="carrd-font-intro text-left w-full max-w-[56rem]">
                 Our community spans a wide range of financial situations. Our tiered pricing helps us balance the financial sustainability and accessibility of the teahouse. We invite you to choose the level that feels right for you — one that honors your own capacity, while helping us keep this space open, welcoming and alive.
