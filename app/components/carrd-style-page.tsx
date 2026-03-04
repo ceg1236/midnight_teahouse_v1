@@ -359,7 +359,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         setSelectedDate(d.id)
                         setReservationStep(2)
                       }}
-                      className={`carrd-btn px-6 py-3 flex-shrink-0 row-span-2 self-center ml-4 ${
+                      className={`carrd-btn px-6 py-3 flex-shrink-0 row-span-2 self-start ml-4 ${
                         selectedDate === d.id ? 'bg-[#FAE0B9]/20' : ''
                       }`}
                     >
@@ -430,7 +430,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       >
                         <p className="carrd-font-body font-medium text-[#C4AF86] text-[1.625rem]">{t.label}</p>
                         <p className="carrd-font-body font-medium italic text-[#C4AF86] text-[1.625rem]">{t.mainLine}</p>
-                        <div className="flex items-start justify-end min-w-[4.5rem] row-span-2 self-center">
+                        <div className="flex items-start justify-end min-w-[4.5rem] row-span-2 self-start">
                           {qty > 0 ? (
                             <div className="flex items-center gap-1">
                               <button
@@ -486,7 +486,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 >
                   <p className="carrd-font-body font-medium text-[#C4AF86] text-[1.625rem]">Supported</p>
                   <p className="carrd-font-body font-medium italic text-[#C4AF86] text-[1.625rem]">{t.blurb}</p>
-                  <div className="flex items-start justify-end min-w-[4.5rem] row-span-2 self-center">
+                  <div className="flex items-start justify-end min-w-[4.5rem] row-span-2 self-start">
                     {(selections['supported'] ?? 0) > 0 ? (
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-0.5 rounded-lg bg-[#FAEBD4]/5 px-1.5 py-1">
