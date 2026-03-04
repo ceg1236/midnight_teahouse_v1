@@ -378,10 +378,21 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         </div>
                       )
                     })}
-                    <p className="carrd-font-body text-left text-[0.8125rem]">
-                      If cost is a barrier, please consider our{' '}
-                      <button type="button" onClick={() => setShowSupportedTier(true)} className="underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline">supported ticket option</button>.
-                    </p>
+                    <button type="button" onClick={() => setExpandedPricingNote((v) => !v)} className="carrd-font-body text-[0.8125rem] text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit flex items-center gap-1">
+                      {expandedPricingNote ? 'Hide' : 'About our pricing'}
+                      <span className="text-[0.75rem] transition-transform" style={{ transform: expandedPricingNote ? 'rotate(180deg)' : 'none' }}>▾</span>
+                    </button>
+                    {expandedPricingNote && (
+                      <div className="carrd-font-body text-left text-[0.8125rem] text-[#D9D0BF]/95 space-y-3">
+                        <p>
+                          Our community spans a wide range of financial situations. Our tiered pricing helps us balance the financial sustainability and accessibility of the teahouse. We invite you to choose the level that feels right for you — one that honors your own capacity, while helping us keep this space open, welcoming and alive.
+                        </p>
+                        <p>
+                          If cost is a barrier, please consider our{' '}
+                          <button type="button" onClick={() => setShowSupportedTier(true)} className="underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline">supported ticket option</button>.
+                        </p>
+                      </div>
+                    )}
                     {(showSupportedTier || (selections['supported'] ?? 0) > 0) && (
                       <div className={`carrd-mobile-pill flex flex-col gap-1.5 text-left w-full ${(selections['supported'] ?? 0) > 0 ? 'carrd-mobile-pill--selected' : ''}`}>
                         <div className="flex items-start justify-between gap-4">
@@ -407,15 +418,6 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                           )}
                         </div>
                       </div>
-                    )}
-                    <button type="button" onClick={() => setExpandedPricingNote((v) => !v)} className="carrd-font-body text-[0.8125rem] text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit flex items-center gap-1">
-                      {expandedPricingNote ? 'Hide' : 'About our pricing'}
-                      <span className="text-[0.75rem] transition-transform" style={{ transform: expandedPricingNote ? 'rotate(180deg)' : 'none' }}>▾</span>
-                    </button>
-                    {expandedPricingNote && (
-                      <p className="carrd-font-body text-left text-[0.8125rem] text-[#D9D0BF]/95">
-                        Our community spans a wide range of financial situations. Our tiered pricing helps us balance the financial sustainability and accessibility of the teahouse. We invite you to choose the level that feels right for you — one that honors your own capacity, while helping us keep this space open, welcoming and alive.
-                      </p>
                     )}
                   </div>
                   <button type="button" onClick={() => setReservationStep(3)} disabled={!hasSelection} className="carrd-btn px-6 py-3 disabled:opacity-50 disabled:cursor-not-allowed">Continue</button>
@@ -830,17 +832,32 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       </div>
                     )
                   })}
-                <p className="carrd-font-body text-left text-[0.8125rem]">
-                  If cost is a barrier, please consider our{' '}
-                  <button
-                    type="button"
-                    onClick={() => setShowSupportedTier(true)}
-                    className="underline hover:no-underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline"
-                  >
-                    supported ticket option
-                  </button>
-                  .
-                </p>
+                <button
+                  type="button"
+                  onClick={() => setExpandedPricingNote((v) => !v)}
+                  className="carrd-font-body text-[0.8125rem] text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit flex items-center gap-1"
+                >
+                  {expandedPricingNote ? 'Hide' : 'About our pricing'}
+                  <span className="text-[0.75rem] transition-transform" style={{ transform: expandedPricingNote ? 'rotate(180deg)' : 'none' }}>▾</span>
+                </button>
+                {expandedPricingNote && (
+                  <div className="carrd-font-body text-left text-[0.8125rem] text-[#D9D0BF]/95 space-y-3">
+                    <p>
+                      Our community spans a wide range of financial situations. Our tiered pricing helps us balance the financial sustainability and accessibility of the teahouse. We invite you to choose the level that feels right for you — one that honors your own capacity, while helping us keep this space open, welcoming and alive.
+                    </p>
+                    <p>
+                      If cost is a barrier, please consider our{' '}
+                      <button
+                        type="button"
+                        onClick={() => setShowSupportedTier(true)}
+                        className="underline hover:no-underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline"
+                      >
+                        supported ticket option
+                      </button>
+                      .
+                    </p>
+                  </div>
+                )}
                 {(showSupportedTier || (selections['supported'] ?? 0) > 0) && (
                   <div
                     className={`carrd-mobile-pill flex flex-col gap-1.5 text-left w-full ${(selections['supported'] ?? 0) > 0 ? 'carrd-mobile-pill--selected' : ''}`}
@@ -934,19 +951,6 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     </div>
                   </div>
                 )}
-                <button
-                  type="button"
-                  onClick={() => setExpandedPricingNote((v) => !v)}
-                  className="carrd-font-body text-[0.8125rem] text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit flex items-center gap-1"
-                >
-                  {expandedPricingNote ? 'Hide' : 'About our pricing'}
-                  <span className="text-[0.75rem] transition-transform" style={{ transform: expandedPricingNote ? 'rotate(180deg)' : 'none' }}>▾</span>
-                </button>
-                {expandedPricingNote && (
-                  <p className="carrd-font-body text-left text-[0.8125rem] text-[#D9D0BF]/95">
-                    Our community spans a wide range of financial situations. Our tiered pricing helps us balance the financial sustainability and accessibility of the teahouse. We invite you to choose the level that feels right for you — one that honors your own capacity, while helping us keep this space open, welcoming and alive.
-                  </p>
-                )}
                 {expandedTierDetails && (
                   <div className="carrd-font-body carrd-table-row-2-sm text-[#D9D0BF] space-y-3 text-[0.9375rem]">
                     {tiers.filter((t) => t.id === 'community' || t.id === 'patron' || t.id === 'supported').map((t) => (
@@ -958,23 +962,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   </div>
                 )}
               </div>
-              {/* Desktop: pricing note dropdown + tier cards */}
-              <div className="hidden md:block w-full max-w-[650px] space-y-4">
-                <button
-                  type="button"
-                  onClick={() => setExpandedPricingNote((v) => !v)}
-                  className="carrd-font-body text-sm text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit flex items-center gap-1"
-                >
-                  {expandedPricingNote ? 'Hide' : 'About our pricing'}
-                  <span className="text-xs transition-transform" style={{ transform: expandedPricingNote ? 'rotate(180deg)' : 'none' }}>▾</span>
-                </button>
-                {expandedPricingNote && (
-                  <p className="carrd-font-body text-left w-full max-w-[650px]">
-                    Our community spans a wide range of financial situations. Our tiered pricing helps us balance the financial sustainability and accessibility of the teahouse. We invite you to choose the level that feels right for you — one that honors your own capacity, while helping us keep this space open, welcoming and alive.
-                  </p>
-                )}
-              </div>
-              {/* Desktop: tier cards */}
+              {/* Desktop: tier cards first, then About our pricing */}
               <div className="hidden md:block w-full max-w-[650px] space-y-4">
                 {tiers
                   .filter((t) => t.id === 'community' || t.id === 'patron')
@@ -1025,18 +1013,35 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     )
                   })}
               </div>
-              <p className="hidden md:block carrd-font-body text-left w-full max-w-[650px]">
-                If cost is a barrier, please consider our{' '}
+              <div className="hidden md:block w-full max-w-[650px] space-y-4">
                 <button
                   type="button"
-                  onClick={() => setShowSupportedTier(true)}
-                  className="underline hover:no-underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline"
+                  onClick={() => setExpandedPricingNote((v) => !v)}
+                  className="carrd-font-body text-sm text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit flex items-center gap-1"
                 >
-                  supported ticket option
+                  {expandedPricingNote ? 'Hide' : 'About our pricing'}
+                  <span className="text-xs transition-transform" style={{ transform: expandedPricingNote ? 'rotate(180deg)' : 'none' }}>▾</span>
                 </button>
-                .
-              </p>
-              {showSupportedTier && (
+                {expandedPricingNote && (
+                  <div className="carrd-font-body text-left w-full max-w-[650px] space-y-3">
+                    <p>
+                      Our community spans a wide range of financial situations. Our tiered pricing helps us balance the financial sustainability and accessibility of the teahouse. We invite you to choose the level that feels right for you — one that honors your own capacity, while helping us keep this space open, welcoming and alive.
+                    </p>
+                    <p>
+                      If cost is a barrier, please consider our{' '}
+                      <button
+                        type="button"
+                        onClick={() => setShowSupportedTier(true)}
+                        className="underline hover:no-underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline"
+                      >
+                        supported ticket option
+                      </button>
+                      .
+                    </p>
+                  </div>
+                )}
+              </div>
+              {(showSupportedTier || (selections['supported'] ?? 0) > 0) && (
               <div className="hidden md:block w-full max-w-[650px]">
               {tiers.filter((t) => t.id === 'supported').map((t) => (
                 <div
@@ -1118,7 +1123,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         onClick={() => {
                           setSupportedPrice(20)
                           setSupportedPriceInput('20')
-                          setSelections({ supported: 1 })
+                          setSelections((prev) => ({ ...prev, supported: 1 }))
                         }}
                         className="carrd-btn px-6 py-3 md:ml-4"
                       >
