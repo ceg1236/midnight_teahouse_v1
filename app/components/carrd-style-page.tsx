@@ -235,21 +235,23 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         </div>
 
         {/* Countdown */}
-        <div className="flex justify-center py-6" style={{ transform: 'scale(1.3)' }}>
+        <div className="flex justify-center pt-6" style={{ transform: 'scale(1.3)' }}>
           <CountdownTimer targetTimestamp={countdownTarget} length={3} />
         </div>
 
         {/* March Gatherings */}
         <section className="w-full flex flex-col items-center gap-8 text-center">
-          <h2 className="carrd-font-heading text-2xl md:text-3xl italic" style={{ letterSpacing: '-2px' }}>
-            Crossing into Spring
-          </h2>
-          <div className="carrd-font-body text-left space-y-4 w-full max-w-[650px]">
+          <div className="flex flex-col items-center gap-[0.5em] w-full">
+            <h2 className="carrd-font-heading text-2xl md:text-3xl italic" style={{ letterSpacing: '-2px' }}>
+              Crossing into Spring
+            </h2>
+            <div className="carrd-font-body text-left space-y-4 w-full max-w-[650px]">
             {welcomeContent.split(/\n\n+/).map((para, i) => (
               <p key={i} className="whitespace-pre-line">
                 {para}
               </p>
             ))}
+            </div>
           </div>
           <div className="w-full max-w-[650px] flex flex-col md:flex-row items-center md:items-start justify-center gap-10 md:gap-16 text-center pt-2">
             <div className="space-y-2">
