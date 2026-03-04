@@ -390,16 +390,16 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                             </button>
                           </>
                         ) : (
-                          <p className="leading-relaxed flex items-start gap-1 min-w-0">
-                            <span className="line-clamp-2 min-w-0 flex-1">{d.blurb}</span>
+                          <div className="leading-relaxed min-w-0">
+                            <p className="line-clamp-2">{d.blurb}</p>
                             <button
                               type="button"
                               onClick={() => setExpandedBlurbId(d.id)}
-                              className="italic flex-shrink-0 text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
+                              className="mt-0.5 block italic text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
                             >
                               ...more
                             </button>
-                          </p>
+                          </div>
                         )}
                       </div>
                     ) : (
