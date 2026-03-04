@@ -225,12 +225,12 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         </Link>
       </div>
       {/* Mobile: two-panel slide (invite | reservation) */}
-      <div className="md:hidden w-full flex-1 min-h-0 min-w-0 overflow-hidden" style={{ maxHeight: '100dvh' }}>
+      <div className="md:hidden w-full flex-1 min-h-0 min-w-0 overflow-x-hidden" style={{ height: '100dvh', maxHeight: '100dvh' }}>
         <div
           className="flex transition-transform duration-500 ease-in-out h-full"
           style={{ width: '200%', transform: showReservationView ? 'translateX(-50%)' : 'translateX(0)' }}
         >
-          <div className="w-1/2 flex-shrink-0 flex flex-col items-center px-6 py-8 gap-[1.25em] overflow-y-auto min-h-0">
+          <div className="w-1/2 flex-shrink-0 flex flex-col items-center px-6 py-8 gap-[1.25em] overflow-y-auto overflow-x-hidden min-h-0 h-full">
             <div className="relative w-full flex flex-col items-center gap-1">
               <h1 className="carrd-font-heading carrd-font-title text-center">Midnight Teahouse</h1>
               <p className="carrd-font-subtitle text-center italic">an enchanted world hidden in San Francisco</p>
@@ -283,7 +283,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
             </section>
             <SiteFooter variant="main" />
           </div>
-          <div ref={mobileReservationPanelRef} className="w-1/2 flex-shrink-0 flex flex-col items-center px-4 py-3 gap-2 overflow-y-auto min-h-0 min-w-0">
+          <div ref={mobileReservationPanelRef} className="w-1/2 flex-shrink-0 flex flex-col items-center px-4 py-3 gap-2 overflow-y-auto overflow-x-hidden min-h-0 min-w-0 h-full">
             <div className="w-full flex flex-col items-center gap-1 shrink-0">
               <div className="flex justify-center gap-2" aria-hidden>
                 {([1, 2, 3] as const).map((step) => (
