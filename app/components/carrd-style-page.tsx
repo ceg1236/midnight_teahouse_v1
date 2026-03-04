@@ -119,7 +119,6 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
   const [hydrated, setHydrated] = useState(false)
   const [expandedBlurbId, setExpandedBlurbId] = useState<string | null>(null)
-  const [expandedTierBlurbId, setExpandedTierBlurbId] = useState<string | null>(null)
   /** 1 = Choose evening, 2 = Choose ticket, 3 = Complete reservation */
   const [reservationStep, setReservationStep] = useState<1 | 2 | 3>(1)
 
@@ -366,9 +365,9 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     >
                       Select
                     </button>
-                    <p className="carrd-font-body text-[#D9D0BF] text-[1.125rem]">{d.dateTime}</p>
+                    <p className="carrd-font-body min-w-0">{d.dateTime}</p>
                     {d.blurb ? (
-                      <div className="text-[#D9D0BF] text-[1.125rem] min-w-0">
+                      <div className="carrd-font-body min-w-0">
                         {expandedBlurbId === d.id ? (
                           <>
                             <p className="leading-relaxed">{d.blurb}</p>
@@ -391,16 +390,16 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                             </button>
                           </>
                         ) : (
-                          <p className="leading-relaxed flex items-baseline gap-1 min-w-0">
-                            <span className="truncate min-w-0">{d.blurb}</span>
+                          <div className="min-w-0">
+                            <p className="line-clamp-2 leading-relaxed">{d.blurb}</p>
                             <button
                               type="button"
                               onClick={() => setExpandedBlurbId(d.id)}
-                              className="italic flex-shrink-0 text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
+                              className="mt-0.5 block italic text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
                             >
                               ...more
                             </button>
-                          </p>
+                          </div>
                         )}
                       </div>
                     ) : (
@@ -463,32 +462,8 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                             </button>
                           )}
                         </div>
-                        <p className="carrd-font-body text-[#D9D0BF] text-[1.125rem]">${t.price}</p>
-                        <div className="text-[#D9D0BF] text-[1.125rem] min-w-0">
-                          {expandedTierBlurbId === t.id ? (
-                            <>
-                              <p className="leading-relaxed">{t.blurb}</p>
-                              <button
-                                type="button"
-                                onClick={() => setExpandedTierBlurbId(null)}
-                                className="mt-1 block italic text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
-                              >
-                                ...less
-                              </button>
-                            </>
-                          ) : (
-                            <p className="leading-relaxed flex items-baseline gap-1 min-w-0">
-                              <span className="truncate min-w-0">{t.blurb}</span>
-                              <button
-                                type="button"
-                                onClick={() => setExpandedTierBlurbId(t.id)}
-                                className="italic flex-shrink-0 text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
-                              >
-                                ...more
-                              </button>
-                            </p>
-                          )}
-                        </div>
+                        <p className="carrd-font-body min-w-0">${t.price}</p>
+                        <p className="carrd-font-body leading-relaxed min-w-0">{t.blurb}</p>
                       </div>
                     )
                   })}
@@ -592,7 +567,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       </button>
                     )}
                   </div>
-                  <p className="carrd-font-body text-[#D9D0BF] text-[1.125rem]">$20+</p>
+                  <p className="carrd-font-body min-w-0">$20+</p>
                   <div />
                 </div>
               ))}
