@@ -365,7 +365,17 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     >
                       Select
                     </button>
-                    <p className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0">{d.dateTime}</p>
+                    <p className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0">
+                      {d.dateTime.includes(', ') ? (
+                        <>
+                          {d.dateTime.split(', ')[0]}
+                          <br />
+                          {d.dateTime.split(', ')[1] ?? ''}
+                        </>
+                      ) : (
+                        d.dateTime
+                      )}
+                    </p>
                     {d.blurb ? (
                       <div className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0">
                         {expandedBlurbId === d.id ? (
