@@ -119,7 +119,8 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
   const [hydrated, setHydrated] = useState(false)
   const [expandedBlurbId, setExpandedBlurbId] = useState<string | null>(null)
-  const [expandedTierDetails, setExpandedTierDetails] = useState(false)
+  /** Per-tier blurb expansion on mobile (tier id or null) */
+  const [expandedTierBlurbId, setExpandedTierBlurbId] = useState<string | null>(null)
   const [expandedPricingNote, setExpandedPricingNote] = useState(false)
   /** On mobile: true when Reserve Your Seat clicked (whole screen slides to reservation) */
   const [showReservationView, setShowReservationView] = useState(false)
@@ -362,10 +363,12 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                               <span className="text-[#C4AF86] font-medium">{t.label}</span>
                               <span className="text-[#FAEBD4]/90 font-normal">, ${t.price}</span>
                             </p>
-                            <p className="text-[#D9D0BF]/90 text-lg leading-snug mt-0.5 line-clamp-2">{t.blurb}</p>
-                            <button type="button" onClick={() => setExpandedTierDetails((v) => !v)} className="text-base text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit mt-1">
-                              {expandedTierDetails ? 'Hide pricing details' : 'More on pricing'}
-                            </button>
+                            <p className={`text-[#D9D0BF]/90 text-lg leading-snug mt-0.5 ${expandedTierBlurbId === t.id ? '' : 'line-clamp-2'}`}>{t.blurb}</p>
+                            {t.blurb.length > 70 && (
+                              <button type="button" onClick={() => setExpandedTierBlurbId((v) => (v === t.id ? null : t.id))} className="text-base text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit mt-1">
+                                {expandedTierBlurbId === t.id ? 'Show less' : 'More on pricing'}
+                              </button>
+                            )}
                           </div>
                           {qty > 0 ? (
                             <div className="flex items-center justify-center gap-2">
@@ -380,9 +383,9 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         </div>
                       )
                     })}
-                    <button type="button" onClick={() => setExpandedPricingNote((v) => !v)} className="carrd-font-body text-base text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit flex items-center gap-1">
+                    <button type="button" onClick={() => setExpandedPricingNote((v) => !v)} className="carrd-font-body text-lg text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit flex items-center gap-1">
                       {expandedPricingNote ? 'Hide' : 'About our pricing'}
-                      <span className="text-base transition-transform" style={{ transform: expandedPricingNote ? 'rotate(180deg)' : 'none' }}>▾</span>
+                      <span className="text-lg transition-transform" style={{ transform: expandedPricingNote ? 'rotate(180deg)' : 'none' }}>▾</span>
                     </button>
                     {expandedPricingNote && (
                       <div className="carrd-font-body text-left text-base text-[#D9D0BF]/95 space-y-2">
@@ -397,7 +400,21 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       <div className={`carrd-mobile-pill flex flex-col gap-3 text-left w-full mt-3 ${(selections['supported'] ?? 0) > 0 ? 'carrd-mobile-pill--selected' : ''}`}>
                         <div className="min-w-0">
                           <p className="leading-tight text-xl"><span className="text-[#C4AF86] font-medium">Supported</span><span className="text-[#FAEBD4]/90 font-normal">, $20+</span></p>
-                          <p className="text-[#D9D0BF]/90 text-lg leading-snug mt-0.5 line-clamp-2">{tiers.find((t) => t.id === 'supported')?.blurb}</p>
+                          {(() => {
+                            const supportedTier = tiers.find((t) => t.id === 'supported')
+                            const blurb = supportedTier?.blurb ?? ''
+                            const isExpanded = expandedTierBlurbId === 'supported'
+                            return (
+                              <>
+                                <p className={`text-[#D9D0BF]/90 text-lg leading-snug mt-0.5 ${isExpanded ? '' : 'line-clamp-2'}`}>{blurb}</p>
+                                {blurb.length > 70 && (
+                                  <button type="button" onClick={() => setExpandedTierBlurbId((v) => (v === 'supported' ? null : 'supported'))} className="text-base text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit mt-1">
+                                    {isExpanded ? 'Show less' : 'More on pricing'}
+                                  </button>
+                                )}
+                              </>
+                            )
+                          })()}
                         </div>
                         {(selections['supported'] ?? 0) > 0 ? (
                           <div className="flex flex-col gap-3 items-center">
@@ -786,16 +803,18 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                             <span className="text-[#C4AF86] font-medium">{t.label}</span>
                             <span className="text-[#FAEBD4]/90 font-normal">, ${t.price}</span>
                           </p>
-                          <p className="text-[#D9D0BF]/90 text-[0.9375rem] leading-snug mt-0.5 line-clamp-2">
+                          <p className={`text-[#D9D0BF]/90 text-[0.9375rem] leading-snug mt-0.5 ${expandedTierBlurbId === t.id ? '' : 'line-clamp-2'}`}>
                             {t.blurb}
                           </p>
-                          <button
-                            type="button"
-                            onClick={() => setExpandedTierDetails((v) => !v)}
-                            className="text-[0.9375rem] text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit mt-1"
-                          >
-                            {expandedTierDetails ? 'Hide pricing details' : 'More on pricing'}
-                          </button>
+                          {t.blurb.length > 70 && (
+                            <button
+                              type="button"
+                              onClick={() => setExpandedTierBlurbId((v) => (v === t.id ? null : t.id))}
+                              className="text-[0.9375rem] text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit mt-1"
+                            >
+                              {expandedTierBlurbId === t.id ? 'Show less' : 'More on pricing'}
+                            </button>
+                          )}
                         </div>
                         {qty > 0 ? (
                           <div className="flex items-center justify-center gap-2">
@@ -834,10 +853,10 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 <button
                   type="button"
                   onClick={() => setExpandedPricingNote((v) => !v)}
-                  className="carrd-font-body text-base text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit flex items-center gap-1"
+                  className="carrd-font-body text-lg text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit flex items-center gap-1"
                 >
                   {expandedPricingNote ? 'Hide' : 'About our pricing'}
-                  <span className="text-base transition-transform" style={{ transform: expandedPricingNote ? 'rotate(180deg)' : 'none' }}>▾</span>
+                  <span className="text-lg transition-transform" style={{ transform: expandedPricingNote ? 'rotate(180deg)' : 'none' }}>▾</span>
                 </button>
                 {expandedPricingNote && (
                   <div className="carrd-font-body text-left text-base text-[#D9D0BF]/95 space-y-3">
@@ -864,16 +883,25 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         <span className="text-[#C4AF86] font-medium">Supported</span>
                         <span className="text-[#FAEBD4]/90 font-normal">, $20+</span>
                       </p>
-                      <p className="text-[#D9D0BF]/90 text-[0.9375rem] leading-snug mt-0.5 line-clamp-2">
-                        {tiers.find((t) => t.id === 'supported')?.blurb}
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => setExpandedTierDetails((v) => !v)}
-                        className="text-[0.9375rem] text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit mt-1"
-                      >
-                        {expandedTierDetails ? 'Hide pricing details' : 'More on pricing'}
-                      </button>
+                      {(() => {
+                        const supportedTier = tiers.find((t) => t.id === 'supported')
+                        const blurb = supportedTier?.blurb ?? ''
+                        const isExpanded = expandedTierBlurbId === 'supported'
+                        return (
+                          <>
+                            <p className={`text-[#D9D0BF]/90 text-[0.9375rem] leading-snug mt-0.5 ${isExpanded ? '' : 'line-clamp-2'}`}>{blurb}</p>
+                            {blurb.length > 70 && (
+                              <button
+                                type="button"
+                                onClick={() => setExpandedTierBlurbId((v) => (v === 'supported' ? null : 'supported'))}
+                                className="text-[0.9375rem] text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit mt-1"
+                              >
+                                {isExpanded ? 'Show less' : 'More on pricing'}
+                              </button>
+                            )}
+                          </>
+                        )
+                      })()}
                     </div>
                     {(selections['supported'] ?? 0) > 0 ? (
                       <div className="flex flex-col gap-3 items-center">
@@ -948,16 +976,6 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     )}
                   </div>
                 )}
-                {expandedTierDetails && (
-                  <div className="carrd-font-body carrd-table-row-2-sm text-[#D9D0BF] space-y-3 text-[0.9375rem]">
-                    {tiers.filter((t) => t.id === 'community' || t.id === 'patron' || t.id === 'supported').map((t) => (
-                      <div key={t.id}>
-                        <p className="font-medium text-[#C4AF86]">{t.label} — ${t.id === 'supported' ? '20+' : t.price}</p>
-                        <p>{t.blurb}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
               {/* Desktop: tier cards first, then About our pricing */}
               <div className="hidden md:block w-full max-w-[650px] space-y-6">
@@ -1014,10 +1032,10 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 <button
                   type="button"
                   onClick={() => setExpandedPricingNote((v) => !v)}
-                  className="carrd-font-body text-sm text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit flex items-center gap-1"
+                  className="carrd-font-body text-base text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit flex items-center gap-1"
                 >
                   {expandedPricingNote ? 'Hide' : 'About our pricing'}
-                  <span className="text-xs transition-transform" style={{ transform: expandedPricingNote ? 'rotate(180deg)' : 'none' }}>▾</span>
+                  <span className="text-base transition-transform" style={{ transform: expandedPricingNote ? 'rotate(180deg)' : 'none' }}>▾</span>
                 </button>
                 {expandedPricingNote && (
                   <div className="carrd-font-body text-left w-full max-w-[650px] space-y-3">
