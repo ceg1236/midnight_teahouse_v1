@@ -2,47 +2,49 @@ import Link from 'next/link'
 
 type SiteFooterProps = {
   variant?: 'main' | 'default'
+  className?: string
 }
 
-export function SiteFooter({ variant = 'default' }: SiteFooterProps) {
+export function SiteFooter({ variant = 'default', className }: SiteFooterProps) {
   const isMain = variant === 'main'
 
   return (
-    <footer className="w-full flex justify-center">
-      <div className="w-full max-w-[60rem] px-6 md:px-12 py-5 flex items-center justify-center gap-8">
-        <div className="flex items-center justify-center gap-6">
+    <footer className={`w-full flex justify-center ${className ?? ''}`}>
+      <div className="w-full max-w-[60rem] px-4 md:px-12 py-4 md:py-6 flex items-center justify-center gap-8 md:gap-10">
+        <div className="flex items-center justify-center gap-8">
           <a
             href="mailto:hello@midnightteahouse.com"
-            className="text-[#D9D0BF] hover:text-[#FAE0B9] transition-colors"
+            className="text-[#D9D0BF] hover:text-[#FAE0B9] transition-colors shrink-0"
             aria-label="Email"
           >
-            <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 40 40" aria-hidden>
+            <svg className="size-7 shrink-0 min-w-7 min-h-7" fill="currentColor" viewBox="0 0 40 40" aria-hidden>
               <path d="M37.5,12.6l-17.5,11.9L2.5,12.6c-.2-.1-.3-.2-.5-.2v-2.7c0-.8.6-1.4,1.4-1.4h33.1c.8,0,1.4.6,1.4,1.4v2.7c-.2,0-.4,0-.5.2ZM19.5,26.3c.2.1.3.2.5.2s.4,0,.5-.2l17.5-11.9v16.9c0,.8-.6,1.4-1.4,1.4H3.4c-.8,0-1.4-.6-1.4-1.4V14.4l17.5,11.9Z" />
+            </svg>
+          </a>
+          <a
+            href="https://www.instagram.com/midnight_teahouse/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#D9D0BF] hover:text-[#FAE0B9] transition-colors shrink-0"
+            aria-label="Instagram"
+          >
+            <svg className="size-7 shrink-0 min-w-7 min-h-7" viewBox="0 0 28 28" fill="none" aria-hidden>
+              <rect x="4" y="4" width="20" height="20" rx="4" stroke="currentColor" strokeWidth="1.8" />
+              <circle cx="14" cy="14" r="4" stroke="currentColor" strokeWidth="1.8" />
+              <circle cx="17.5" cy="10.5" r="1" stroke="currentColor" strokeWidth="1.5" />
             </svg>
           </a>
           <a
             href="https://forms.gle/fC6RsHUwzndXRb6L9"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#D9D0BF] hover:text-[#FAE0B9] transition-colors"
+            className="text-[#D9D0BF] hover:text-[#FAE0B9] transition-colors shrink-0"
             aria-label="Leave a note form"
           >
-            <svg className="w-7 h-7" viewBox="0 0 40 40" fill="none" aria-hidden>
-              <rect x="7" y="9" width="26" height="22" rx="3" stroke="currentColor" strokeWidth="2" />
-              <path d="M12 16h16M12 21h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-          </a>
-          <a
-            href="https://instagram.com/midnightteahouse"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#D9D0BF] hover:text-[#FAE0B9] transition-colors"
-            aria-label="Instagram"
-          >
-            <svg className="w-7 h-7" viewBox="0 0 40 40" fill="none" aria-hidden>
-              <rect x="11" y="11" width="18" height="18" rx="5" stroke="currentColor" strokeWidth="2" />
-              <circle cx="20" cy="20" r="5" stroke="currentColor" strokeWidth="2" />
-              <circle cx="24.5" cy="15.5" r="1.3" stroke="currentColor" strokeWidth="1.8" />
+            <svg className="size-7 shrink-0 min-w-7 min-h-7" viewBox="0 0 40 40" fill="none" aria-hidden>
+              <rect x="10" y="10" width="18" height="22" rx="2" stroke="currentColor" strokeWidth="2" />
+              <path d="M14 16h10M14 20h8M14 24h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              <path d="M26 8l5 5-9 9h-2l9-9-5-5h2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </a>
         </div>
@@ -51,7 +53,7 @@ export function SiteFooter({ variant = 'default' }: SiteFooterProps) {
           <div className="ml-2">
             <Link
               href="/our-story"
-              className="carrd-font-body text-xs md:text-sm tracking-[0.18em] uppercase text-[#D9D0BF] hover:text-[#FAE0B9] transition-colors whitespace-nowrap"
+              className="carrd-link text-sm whitespace-nowrap"
             >
               Our Story
             </Link>

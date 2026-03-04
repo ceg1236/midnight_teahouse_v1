@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
+import React, { useEffect, useRef, useState } from 'react'
 import { CountdownTimer } from './countdown-timer'
 import type { eventDates, eventTiers } from '../../content/event-invite.config'
 import { SiteFooter } from './site-footer'
@@ -17,6 +18,14 @@ type CarrdStylePageProps = {
 
 const SCROLL_DURATION = 1200
 const SCROLL_OFFSET_TOP = 48
+
+const BOOKING_NOTES: Array<string | React.ReactNode> = [
+  'Doors open at 7pm and close at 11pm. Join us anytime in this window.',
+  'Reservation includes unlimited tea and all other amenities.',
+  'We are a phone and laptop-free space.',
+  "Unfortunately, we don't offer refunds or exchanges for future events.",
+  <>If you have any questions about the reservation, please <a href="mailto:midnight.teahouse.sf@gmail.com" className="text-[#FAE0B9] underline hover:underline focus:outline-none focus:underline">send us an email</a>.</>,
+]
 
 function scrollToSection(ref: React.RefObject<HTMLElement | null>) {
   const el = ref.current
@@ -102,26 +111,39 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [selections, setSelections] = useState<TierSelections>({})
   const [supportedPrice, setSupportedPrice] = useState(20)
-  const [supportedPriceInput, setSupportedPriceInput] = useState('20')
+  const [supportedPriceInput, setSupportedPriceInput] = useState('')
   const [showSupportedTier, setShowSupportedTier] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', notes: '' })
   const [deviceType, setDeviceType] = useState<'mobile' | 'tablet' | 'desktop'>('desktop')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
   const [hydrated, setHydrated] = useState(false)
+  const [expandedBlurbId, setExpandedBlurbId] = useState<string | null>(null)
+  /** Per-tier blurb expansion on mobile (tier id or null) */
+  const [expandedTierBlurbId, setExpandedTierBlurbId] = useState<string | null>(null)
+  const [expandedPricingNote, setExpandedPricingNote] = useState(false)
+  /** On mobile: true when Reserve Your Seat clicked (whole screen slides to reservation) */
+  const [showReservationView, setShowReservationView] = useState(false)
+  /** 1 = Choose evening, 2 = Choose ticket, 3 = Complete reservation */
+  const [reservationStep, setReservationStep] = useState<1 | 2 | 3>(1)
 
   const joinRef = useRef<HTMLElement>(null)
-  const tierRef = useRef<HTMLElement>(null)
-  const formRef = useRef<HTMLElement>(null)
-  const paymentRef = useRef<HTMLElement>(null)
+  const tierRef = useRef<HTMLDivElement>(null)
+  const mobileReservationPanelRef = useRef<HTMLDivElement>(null)
+  const formRef = useRef<HTMLDivElement>(null)
+  const mobileFormRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const persisted = loadPersisted(dates, tiers)
     setSelectedDate(persisted.date)
     setSelections(persisted.selections)
     setFormData(persisted.form)
-    if (Object.keys(persisted.selections).some((id) => id === 'supported')) setShowSupportedTier(true)
+    if (Object.keys(persisted.selections).some((id) => id === 'supported')) {
+      setShowSupportedTier(true)
+      setSupportedPriceInput('20')
+    }
     setHydrated(true)
+    if (persisted.date) setReservationStep(2)
   }, [dates, tiers])
 
   useEffect(() => {
@@ -138,90 +160,402 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
     savePersisted(selectedDate, selections, formData)
   }, [hydrated, selectedDate, selections, formData])
 
+  useEffect(() => {
+    if (showReservationView) {
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: 0, behavior: 'auto' })
+      })
+    }
+  }, [showReservationView])
+
+  useEffect(() => {
+    if (reservationStep === 3) {
+      const el = typeof window !== 'undefined' && window.innerWidth < 768 ? mobileFormRef.current : formRef.current
+      const t = setTimeout(() => {
+        el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 100)
+      return () => clearTimeout(t)
+    }
+  }, [reservationStep])
+
   const hasSelection = Object.values(selections).some((q) => q > 0)
   const totalQuantity = Object.values(selections).reduce((s, q) => s + q, 0)
+  const hasValidSupportedPrice = (() => {
+    const v = parseInt(supportedPriceInput, 10)
+    return !isNaN(v) && v >= 20 && v <= 40
+  })()
   const totalPrice = Object.entries(selections).reduce((sum, [tierId, qty]) => {
     if (qty <= 0) return sum
     const tier = tiers.find((t) => t.id === tierId)
     const price = tierId === 'supported' ? supportedPrice : (tier?.price ?? 0)
     return sum + price * qty
   }, 0)
+  const selectedDateData = dates.find((d) => d.id === selectedDate)
+  const selectedDateDisplay = selectedDateData
+    ? (() => {
+        const parts = selectedDateData.dateTime.split(', ')
+        const timePart = parts.length > 1 ? parts.slice(1).join(', ') : ''
+        return timePart ? `${selectedDateData.label} ${timePart}` : selectedDateData.label
+      })()
+    : ''
   const handleTierClick = (tierId: string) => {
     setSelections((prev) => {
       const q = prev[tierId] ?? 0
-      const othersTotal = Object.entries(prev).reduce((s, [id, n]) => (id === tierId ? s : s + n), 0)
       if (q > 0) {
         const next = { ...prev }
         delete next[tierId]
         return next
       }
-      if (othersTotal >= 4) return prev
-      return { ...prev, [tierId]: 1 }
+      return { [tierId]: 1 }
     })
   }
 
   const handleQuantityChange = (tierId: string, delta: number) => {
     setSelections((prev) => {
       const q = prev[tierId] ?? 0
-      const othersTotal = Object.entries(prev).reduce((s, [id, n]) => (id === tierId ? s : s + n), 0)
       if (delta === -1 && q <= 1) {
         const next = { ...prev }
         delete next[tierId]
         return next
       }
-      if (delta === 1 && othersTotal + q >= 4) return prev
-      return { ...prev, [tierId]: q + delta }
+      if (delta === 1 && q >= 4) return prev
+      return { [tierId]: q + delta }
     })
   }
 
   return (
     <div className="carrd-page flex flex-col items-center min-h-screen overflow-x-hidden pt-8">
-      <div className="w-full max-w-[60rem] flex flex-col items-center px-6 md:px-12 py-8 md:py-12 gap-6">
+      {/* Top-right link block (scrolls with page, not sticky) */}
+      <div className="w-full flex justify-end px-6 md:px-12 pt-2 md:pt-4">
+        <Link
+          href="/our-story"
+          className="carrd-link carrd-link--muted text-sm whitespace-nowrap hidden md:inline"
+        >
+          Our Story
+        </Link>
+      </div>
+      {/* Mobile: single container, swaps invite ↔ reservation (no fixed height, no empty space) */}
+      <div className="md:hidden w-full flex-1 min-w-0 overflow-x-hidden max-w-full">
+        {!showReservationView ? (
+          <div className="flex flex-col items-center px-6 py-8 gap-[1.25em] overflow-x-hidden w-full max-w-full">
+            <div className="relative w-full flex flex-col items-center gap-1">
+              <h1 className="carrd-font-heading carrd-font-title text-center">Midnight Teahouse</h1>
+              <p className="carrd-font-subtitle text-center italic">an enchanted world hidden in San Francisco</p>
+            </div>
+            <div className="carrd-video-fade w-full py-6 overflow-hidden">
+              <div className="aspect-video overflow-hidden">
+                <video autoPlay loop muted playsInline className="w-full h-full object-cover">
+                  <source src="/images/midnight_site_vid_hi_res.mp4" type="video/mp4" />
+                  <source src="/images/midnight_site_vid_hi_res.mov" type="video/quicktime" />
+                </video>
+              </div>
+            </div>
+            <div className="flex justify-center py-6" style={{ transform: 'scale(1.3)' }}>
+              <CountdownTimer targetTimestamp={countdownTarget} length={3} />
+            </div>
+            <section className="w-full flex flex-col items-center gap-10 text-center">
+              <div className="flex flex-col items-center gap-[1em] w-full">
+                <h2 className="carrd-font-heading text-[0.96rem] italic" style={{ letterSpacing: '-2px' }}>Crossing into Spring</h2>
+                <div className="carrd-font-body text-left space-y-4 w-full max-w-[650px]">
+                  {welcomeContent.split(/\n\n+/).map((para, i) => (
+                    <p key={i} className="whitespace-pre-line">{para}</p>
+                  ))}
+                </div>
+              </div>
+              <div className="w-full max-w-[650px] flex flex-col items-center justify-center gap-16 text-center pt-2">
+                <div className="space-y-2">
+                  <p className="carrd-font-label text-[1.3125rem]">Date</p>
+                  <div className="space-y-0.5">
+                    <p className="carrd-font-body">March 18-20, 2026</p>
+                    <p className="carrd-font-body">7-11pm</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <p className="carrd-font-label text-[1.3125rem]">Location</p>
+                  <div className="space-y-0.5">
+                    <p className="carrd-font-body">SoMA, SF</p>
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setReservationStep(1)
+                  setShowReservationView(true)
+                }}
+                className="carrd-btn px-10 py-4"
+              >
+                Reserve Your Seat
+              </button>
+            </section>
+            <SiteFooter variant="main" />
+          </div>
+        ) : (
+          <div ref={mobileReservationPanelRef} className="flex flex-col items-center px-4 py-4 gap-3 min-w-0 w-full max-w-full overflow-x-hidden">
+            <div className="w-full flex flex-col items-center gap-1 shrink-0">
+              <div className="flex justify-center gap-2" aria-hidden>
+                {([1, 2, 3] as const).map((step) => (
+                  <span key={step} className={`w-2 h-2 rounded-full transition-colors duration-300 ${reservationStep === step ? 'bg-[#FAE0B9]' : 'bg-[#D9D0BF]/40'}`} />
+                ))}
+              </div>
+              <div className="flex items-start justify-between w-full">
+                <div className="flex-1 flex justify-start min-w-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (reservationStep === 1) setShowReservationView(false)
+                      else setReservationStep((s) => (s - 1) as 1 | 2 | 3)
+                    }}
+                    className="carrd-font-body text-lg text-[#D9D0BF] hover:text-[#FAEBD4] underline focus:outline-none cursor-pointer"
+                  >
+                    ← Back
+                  </button>
+                </div>
+                <h2 className="carrd-font-heading carrd-font-heading-sm flex-1 text-center italic">Reservation</h2>
+                <div className="flex-1 min-w-0" aria-hidden />
+              </div>
+            </div>
+            <section className="carrd-reservation-section w-full min-w-0 overflow-x-hidden max-w-full">
+              <div
+                className="flex transition-transform duration-500 ease-in-out min-w-0"
+                style={{
+                  width: '300%',
+                  transform: `translateX(-${(reservationStep - 1) * (100 / 3)}%)`,
+                }}
+              >
+                {/* Mobile reservation reuses same panel structure - content is in desktop flow below, we need inline copy */}
+                <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full">
+                  <h2 className="carrd-font-heading carrd-font-h2 text-2xl">1. Choose Your Evening</h2>
+                  <p className="carrd-font-body text-left w-full max-w-full min-w-0 text-xl">The teahouse is open by reservation with limited seats. Reserve a spot to gift yourself a cozy evening.</p>
+                  <div className="w-full max-w-full min-w-0 flex flex-col gap-3 break-words">
+                    {dates.map((d) => {
+                      const [datePart, timePart] = d.dateTime.includes(', ') ? d.dateTime.split(', ') : [d.dateTime, '']
+                      const headerRest = timePart ? `${datePart} ${timePart.toUpperCase()}` : datePart
+                      const musicianLine = d.musicians[0] ?? ''
+                      const isSelected = selectedDate === d.id
+                      return (
+                        <div
+                          key={d.id}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => { setSelectedDate(d.id); setReservationStep(2) }}
+                          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedDate(d.id); setReservationStep(2) } }}
+                          className={`carrd-mobile-pill flex flex-col gap-3 text-left w-full cursor-pointer ${isSelected ? 'carrd-mobile-pill--selected' : ''}`}
+                        >
+                          <div className="min-w-0">
+                            <p className="leading-tight text-xl">
+                              <span className="text-[#C4AF86] font-medium">{d.day}</span>
+                              <span className="text-[#FAEBD4]/90 font-normal">, {headerRest}</span>
+                            </p>
+                            {d.spotifyUrl ? (
+                              <a href={d.spotifyUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-lg text-[#D9D0BF]/90 italic underline hover:text-[#FAEBD4] focus:outline-none focus:underline mt-0.5 block">
+                                {musicianLine}
+                              </a>
+                            ) : (
+                              <p className="text-[#D9D0BF]/90 text-lg italic mt-0.5">{musicianLine}</p>
+                            )}
+                          </div>
+                          <span className={`carrd-mobile-pill-select shrink-0 self-center ${isSelected ? 'carrd-mobile-pill-select--selected' : ''}`}>Select</span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+                <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full">
+                  <h2 className="carrd-font-heading carrd-font-h2 text-2xl">2. Choose Your Ticket</h2>
+                  <div className="w-full max-w-full min-w-0 flex flex-col gap-3 break-words">
+                    {tiers.filter((t) => t.id === 'community' || t.id === 'patron').map((t) => {
+                      const qty = selections[t.id] ?? 0
+                      const isSelected = qty > 0
+                      return (
+                        <div key={t.id} className={`carrd-mobile-pill flex flex-col gap-3 text-left w-full ${isSelected ? 'carrd-mobile-pill--selected' : ''}`}>
+                          <div className="min-w-0">
+                            <p className="leading-tight text-xl">
+                              <span className="text-[#C4AF86] font-medium">{t.label}</span>
+                              <span className="text-[#FAEBD4]/90 font-normal">, ${t.price}</span>
+                            </p>
+                            <p className={`text-[#D9D0BF]/90 text-lg leading-snug mt-0.5 ${expandedTierBlurbId === t.id ? '' : 'line-clamp-2'}`}>{t.blurb}</p>
+                            {t.blurb.length > 70 && (
+                              <button type="button" onClick={() => setExpandedTierBlurbId((v) => (v === t.id ? null : t.id))} className="text-base text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit mt-1">
+                                {expandedTierBlurbId === t.id ? 'Show less' : 'More on pricing'}
+                              </button>
+                            )}
+                          </div>
+                          {qty > 0 ? (
+                            <div className="flex items-center justify-center gap-2">
+                              <button type="button" onClick={() => handleQuantityChange(t.id, -1)} className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg" aria-label={`Decrease ${t.label}`}>−</button>
+                              <span className="w-8 text-center text-lg tabular-nums text-[#FAEBD4]">{qty}</span>
+                              <button type="button" onClick={() => handleQuantityChange(t.id, 1)} disabled={totalQuantity >= 4} className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg disabled:opacity-40" aria-label={`Increase ${t.label}`}>+</button>
+                            </div>
+                          ) : null}
+                          {qty === 0 && (
+                            <button type="button" onClick={() => handleTierClick(t.id)} className="carrd-mobile-pill-select shrink-0 self-center">Select</button>
+                          )}
+                        </div>
+                      )
+                    })}
+                    <p className="carrd-font-body text-left text-base text-[#D9D0BF]/95">
+                      If cost is a barrier, please consider our{' '}
+                      <button type="button" onClick={() => setShowSupportedTier(true)} className="underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline">supported ticket option</button>.
+                    </p>
+                    {(showSupportedTier || (selections['supported'] ?? 0) > 0) && (
+                      <div className={`carrd-mobile-pill flex flex-col gap-3 text-left w-full mt-2 ${(selections['supported'] ?? 0) > 0 ? 'carrd-mobile-pill--selected' : ''}`}>
+                        <div className="min-w-0">
+                          <p className="leading-tight text-xl"><span className="text-[#C4AF86] font-medium">Supported</span><span className="text-[#FAEBD4]/90 font-normal">, $20+</span></p>
+                          {(() => {
+                            const supportedTier = tiers.find((t) => t.id === 'supported')
+                            const blurb = supportedTier?.blurb ?? ''
+                            const isExpanded = expandedTierBlurbId === 'supported'
+                            return (
+                              <>
+                                <p className={`text-[#D9D0BF]/90 text-lg leading-snug mt-0.5 ${isExpanded ? '' : 'line-clamp-2'}`}>{blurb}</p>
+                                {blurb.length > 70 && (
+                                  <button type="button" onClick={() => setExpandedTierBlurbId((v) => (v === 'supported' ? null : 'supported'))} className="text-base text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit mt-1">
+                                    {isExpanded ? 'Show less' : 'More on pricing'}
+                                  </button>
+                                )}
+                              </>
+                            )
+                          })()}
+                        </div>
+                        {(selections['supported'] ?? 0) > 0 ? (
+                          <div className="flex flex-col gap-3 items-center">
+                            <div className="flex items-center gap-2 w-full max-w-[8rem]">
+                              <span className="text-[#D9D0BF] text-lg">$</span>
+                              <input type="number" min={20} max={40} value={supportedPriceInput} placeholder="20–40" onChange={(e) => { const raw = e.target.value; setSupportedPriceInput(raw); const v = parseInt(raw, 10); if (!isNaN(v) && v >= 20 && v <= 40) setSupportedPrice(v); else if (raw === '') setSelections((prev) => { const n = { ...prev }; delete n.supported; return n }); }} onBlur={() => { const v = parseInt(supportedPriceInput, 10); if (!isNaN(v) && v >= 20 && v <= 40) { setSupportedPrice(v); setSupportedPriceInput(String(v)) } else if (supportedPriceInput === '') setSelections((prev) => { const n = { ...prev }; delete n.supported; return n }); else setSupportedPriceInput(String(supportedPrice)) }} className="carrd-font-body flex-1 min-w-0 py-2.5 px-3 text-lg bg-[#2E0303]/40 rounded-lg border border-[#FAE0B9]/30 text-[#FAEBD4] focus:outline-none focus:border-[#FAE0B9]/60 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                            </div>
+                            <div className="flex items-center justify-center gap-2">
+                              <button type="button" onClick={() => handleQuantityChange('supported', -1)} className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg" aria-label="Decrease Supported">−</button>
+                              <span className="w-8 text-center text-lg tabular-nums text-[#FAEBD4]">{selections['supported'] ?? 0}</span>
+                              <button type="button" onClick={() => handleQuantityChange('supported', 1)} disabled={totalQuantity >= 4} className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg disabled:opacity-40" aria-label="Increase Supported">+</button>
+                            </div>
+                          </div>
+                        ) : null}
+                        {(selections['supported'] ?? 0) === 0 && (
+                          <button type="button" onClick={() => { setShowSupportedTier(true); setSupportedPrice(20); setSupportedPriceInput('20'); setSelections((prev) => ({ ...prev, supported: 1 })) }} className="carrd-mobile-pill-select shrink-0 self-center">Select</button>
+                        )}
+                      </div>
+                    )}
+                    <button type="button" onClick={() => setExpandedPricingNote((v) => !v)} className="carrd-font-body text-lg text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit flex items-center gap-1">
+                      {expandedPricingNote ? 'Hide' : 'About our pricing'}
+                      <span className="text-lg transition-transform" style={{ transform: expandedPricingNote ? 'rotate(180deg)' : 'none' }}>▾</span>
+                    </button>
+                    {expandedPricingNote && (
+                      <div className="carrd-font-body text-left text-base text-[#D9D0BF]/95">
+                        <p>
+                          Our city and community span a wide range of financial situations. Our tiered pricing helps us balance making the teahouse both financially sustainable and accessible. We invite you to choose the level that feels right for you — one that honors your own capacity while helping us keep this space open, welcoming and alive.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  <button type="button" onClick={() => setReservationStep(3)} disabled={!hasSelection} className="carrd-btn px-8 py-4 disabled:opacity-50 disabled:cursor-not-allowed">Continue</button>
+                </div>
+                <div ref={mobileFormRef} className="flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full">
+                  <h2 className="carrd-font-heading carrd-font-h2 text-2xl">3. Complete Your Reservation</h2>
+                  {selectedDate && hasSelection ? (
+                    <div className="carrd-font-body rounded-lg bg-[#FAEBD4]/20 px-4 py-4 text-left w-full max-w-full min-w-0">
+                      <div className="space-y-3">
+                        <div><p className="text-base text-[#D9D0BF]/80 uppercase tracking-wider">Date</p><p className="text-lg text-[#FAEBD4]">{selectedDateData?.dateTime}</p></div>
+                        <div><p className="text-base text-[#D9D0BF]/80 uppercase tracking-wider mb-1.5">Tickets</p><div className="space-y-1">{(['supported', 'community', 'patron'] as const).filter((tid) => (selections[tid] ?? 0) > 0).map((tierId) => { const qty = selections[tierId] ?? 0; const tier = tiers.find((t) => t.id === tierId); const price = tierId === 'supported' ? supportedPrice : (tier?.price ?? 0); const label = tier?.label ?? tierId; return <p key={tierId} className="text-lg text-[#FAEBD4]">{label} — ${price} × {qty} = ${price * qty}</p> })}</div></div>
+                        <div className="pt-2 border-t border-[#D9D0BF]/30"><p className="text-base text-[#D9D0BF]/80 uppercase tracking-wider">Total</p><p className="text-xl font-medium text-[#FAEBD4]">${totalPrice}</p></div>
+                      </div>
+                    </div>
+                  ) : null}
+                  <form className="w-full max-w-full min-w-0 flex flex-col gap-4 carrd-font-body">
+                    <input type="hidden" name="device_type" value={deviceType} />
+                    <input type="hidden" name="date" value={selectedDate ?? ''} />
+                    <label className="flex flex-col gap-1.5">Name *<input type="text" name="name" required value={formData.name} onChange={(e) => setFormData((d) => ({ ...d, name: e.target.value }))} className="mt-1 w-full rounded-lg border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] placeholder:text-[#D9D0BF]/60 focus:border-[#FAE0B9] focus:outline-none focus:ring-2 focus:ring-[#FAE0B9]/30" placeholder="Your name" /></label>
+                    <label className="flex flex-col gap-1.5">Email *<input type="email" name="email" required value={formData.email} onChange={(e) => setFormData((d) => ({ ...d, email: e.target.value }))} className="mt-1 w-full rounded-lg border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] placeholder:text-[#D9D0BF]/60 focus:border-[#FAE0B9] focus:outline-none focus:ring-2 focus:ring-[#FAE0B9]/30" placeholder="you@example.com" /></label>
+                    <label className="flex flex-col gap-1.5">Notes<textarea name="notes" value={formData.notes} onChange={(e) => setFormData((d) => ({ ...d, notes: e.target.value }))} rows={2} className="mt-1 w-full resize-none rounded-lg border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] placeholder:text-[#D9D0BF]/60 focus:border-[#FAE0B9] focus:outline-none focus:ring-2 focus:ring-[#FAE0B9]/30" placeholder="Anything else we should know?" /></label>
+                  </form>
+                  <div className="w-full max-w-full min-w-0 text-left px-4 md:px-0">
+                    <p className="carrd-font-body text-base font-medium mb-1.5">A few things to note before booking:</p>
+                    <ul className="carrd-font-body text-base space-y-1.5 list-none pl-0 leading-snug">
+                      {BOOKING_NOTES.map((item, i) => (
+                        <li key={i} className="flex items-start gap-2"><span className="text-[#D9D0BF] w-1.5 h-1.5 rounded-full bg-[#D9D0BF] shrink-0 mt-1.5" aria-hidden /><span className="flex-1 min-w-0 text-[#D9D0BF]/95">{item}</span></li>
+                      ))}
+                    </ul>
+                  </div>
+                  {selectedDate && hasSelection && checkoutError && (
+                    <p className="carrd-font-body text-base text-red-300 w-full max-w-full" role="alert">{checkoutError}</p>
+                  )}
+                  {selectedDate && hasSelection && (
+                    <button type="button" disabled={isSubmitting} onClick={async () => {
+                      if (!selectedDate || !hasSelection || !formData.name.trim() || !formData.email.trim()) return
+                      setIsSubmitting(true); setCheckoutError(null)
+                      try {
+                        const items = Object.entries(selections).filter(([, q]) => q > 0).map(([tierId, qty]) => ({ tierId, quantity: qty, ...(tierId === 'supported' && { supportedPrice }) }))
+                        const res = await fetch('/api/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dateId: selectedDate, items, supportedPrice: (selections['supported'] ?? 0) > 0 ? supportedPrice : undefined, name: formData.name.trim(), email: formData.email.trim(), notes: formData.notes.trim(), device: deviceType }) })
+                        const data = await res.json()
+                        if (!res.ok) { setCheckoutError(data.error ?? 'Something went wrong'); return }
+                        if (data.url) window.location.href = data.url
+                        else setCheckoutError('No checkout URL received')
+                      } catch { setCheckoutError('Network error. Please try again.') }
+                      finally { setIsSubmitting(false) }
+                    }} className="carrd-btn px-12 py-4 disabled:opacity-70 disabled:cursor-not-allowed mt-8">
+                      {isSubmitting ? 'Redirecting…' : 'Finish Booking'}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </section>
+            <SiteFooter variant="main" />
+          </div>
+        )}
+      </div>
+      {/* Desktop: single column */}
+      <div className="hidden md:flex w-full max-w-[60rem] flex-col items-center px-12 py-12 gap-[1.25em] overflow-x-hidden min-w-0">
         {/* Hero: Title + Subtitle */}
-        <h1 className="carrd-font-heading text-center text-3xl md:text-4xl">
-          Midnight Teahouse
-        </h1>
-        <p className="carrd-font-subtitle text-center italic">
-          welcome to our evening world
-        </p>
+        <div className="relative w-full flex flex-col items-center gap-1">
+          <h1 className="carrd-font-heading carrd-font-title text-center">
+            Midnight Teahouse
+          </h1>
+          <p className="carrd-font-subtitle text-center italic">
+            an enchanted world hidden in San Francisco
+          </p>
+        </div>
 
         {/* Video */}
-        <div className="carrd-video-fade w-full -mx-6 md:-mx-12 aspect-video overflow-hidden">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover"
-          >
-            <source src="/images/midnight_site_vid_hi_res.mp4" type="video/mp4" />
-            <source src="/images/midnight_site_vid_hi_res.mov" type="video/quicktime" />
-          </video>
+        <div className="carrd-video-fade w-full py-6 overflow-hidden">
+          <div className="aspect-video overflow-hidden">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            >
+              <source src="/images/midnight_site_vid_hi_res.mp4" type="video/mp4" />
+              <source src="/images/midnight_site_vid_hi_res.mov" type="video/quicktime" />
+            </video>
+          </div>
         </div>
 
         {/* Countdown */}
-        <div className="flex justify-center py-2">
+        <div className="flex justify-center py-6" style={{ transform: 'scale(1.3)' }}>
           <CountdownTimer targetTimestamp={countdownTarget} length={3} />
         </div>
 
         {/* March Gatherings */}
-        <section className="w-full flex flex-col items-center gap-6 text-center">
-          <h2 className="carrd-font-heading text-2xl md:text-3xl">
-            Crossing into Spring
-          </h2>
-          <div className="carrd-font-body text-left space-y-4 w-full max-w-[56rem]">
+        <section className="w-full flex flex-col items-center gap-10 text-center">
+          <div className="flex flex-col items-center gap-[1em] w-full">
+            <h2 className="carrd-font-heading text-[0.96rem] md:text-3xl italic" style={{ letterSpacing: '-2px' }}>
+              Crossing into Spring
+            </h2>
+            <div className="carrd-font-body text-left space-y-4 w-full max-w-[650px]">
             {welcomeContent.split(/\n\n+/).map((para, i) => (
-              <p key={i} className="leading-relaxed">
+              <p key={i} className="whitespace-pre-line">
                 {para}
               </p>
             ))}
+            </div>
           </div>
-          <div className="w-full max-w-[56rem] flex flex-col md:flex-row items-center justify-center gap-10 md:gap-16 text-center pt-2">
+          <div className="w-full max-w-[650px] flex flex-col md:flex-row items-center md:items-start justify-center gap-16 md:gap-28 text-center pt-2">
             <div className="space-y-2">
-              <p className="carrd-font-muted text-xs tracking-[0.2em] uppercase">
+              <p className="carrd-font-label text-[1.3125rem]">
                 Date
               </p>
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 <p className="carrd-font-body">
                   March 18-20, 2026
                 </p>
@@ -231,10 +565,10 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               </div>
             </div>
             <div className="space-y-2">
-              <p className="carrd-font-muted text-xs tracking-[0.2em] uppercase">
+              <p className="carrd-font-label text-[1.3125rem]">
                 Location
               </p>
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 <p className="carrd-font-body">
                   SoMA, SF
                 </p>
@@ -243,88 +577,271 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           </div>
           <button
             type="button"
-            onClick={() => scrollToSection(joinRef)}
-            className="carrd-btn px-8 py-3"
+            onClick={() => {
+              if (typeof window !== 'undefined' && window.innerWidth < 768) {
+                setShowReservationView(true)
+                joinRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+              } else {
+                scrollToSection(joinRef)
+              }
+            }}
+            className="carrd-btn px-10 py-4"
           >
-            Reserve your spot
+            Reserve Your Seat
           </button>
         </section>
 
-        {/* Join us - Dates + Tiers */}
-        <section
-          ref={joinRef}
-          className="w-full flex flex-col items-center gap-6"
-        >
-          <h2 className="carrd-font-heading text-2xl md:text-3xl">
-            Choose Date
-          </h2>
-          <p className="carrd-font-body text-center w-full max-w-[56rem] leading-relaxed">
-            To keep our gatherings intimate, we are open by reservation and have limited seats. Reserve a spot to gift a cozy evening to yourself or someone you love.
-          </p>
+        <hr className="carrd-divider-solid border-0 my-8" />
 
-          {/* Date buttons */}
-          <div className="flex flex-wrap justify-center gap-3">
-            {dates.map((d) => (
-              <button
-                key={d.id}
-                type="button"
-                onClick={() => {
-                  setSelectedDate(d.id)
-                  if (!selectedDate) setTimeout(() => scrollToSection(tierRef), 50)
-                }}
-                className={`carrd-btn px-6 py-3 whitespace-pre-line text-center max-w-[10rem] ${
-                  selectedDate === d.id ? 'bg-[#FAE0B9]/20' : ''
+        <div className="w-full flex flex-col items-center gap-1">
+          {/* Step indicator */}
+          <div className="flex justify-center gap-2" aria-hidden>
+            {([1, 2, 3] as const).map((step) => (
+              <span
+                key={step}
+                className={`w-2 h-2 rounded-full transition-colors duration-300 ${
+                  reservationStep === step ? 'bg-[#FAE0B9]' : 'bg-[#D9D0BF]/40'
                 }`}
-              >
-                {d.label}
-              </button>
+              />
             ))}
           </div>
-        </section>
+          <div className="flex items-start justify-between w-full">
+            <div className="flex-1 flex justify-start min-w-0">
+              {(reservationStep > 1 || showReservationView) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (reservationStep === 1 && showReservationView) {
+                      setShowReservationView(false)
+                    } else if (reservationStep > 1) {
+                      setReservationStep((s) => (s - 1) as 1 | 2 | 3)
+                    }
+                  }}
+                  className="carrd-font-body text-lg text-[#D9D0BF] hover:text-[#FAEBD4] underline focus:outline-none cursor-pointer"
+                >
+                  ← Back
+                </button>
+              )}
+            </div>
+            <h2 className="carrd-font-heading carrd-font-heading-sm flex-1 text-center italic">
+              Reservation
+            </h2>
+            <div className="flex-1 min-w-0" aria-hidden />
+          </div>
+        </div>
 
-        <hr className="carrd-divider border-0 my-2" />
-
-        {/* Tier section - shown after date selected, with smooth transition */}
-        {selectedDate && (
-          <>
-            <section
-              ref={tierRef}
-              className="w-full flex flex-col items-center gap-6"
-            >
-              <h2 className="carrd-font-heading text-2xl md:text-3xl">
-                Choose Ticket
+        {/* Reservation: three sliding panels (evening → ticket → form) */}
+        <section
+          ref={joinRef}
+          className="carrd-reservation-section w-full min-w-0 overflow-x-hidden max-w-full mt-1"
+        >
+          <div
+            className="flex transition-transform duration-500 ease-in-out min-w-0"
+            style={{
+              width: '300%',
+              transform: `translateX(-${(reservationStep - 1) * (100 / 3)}%)`,
+            }}
+          >
+            {/* Panel 1: Choose your evening */}
+            <div className="flex-shrink-0 w-1/3 min-w-0 flex flex-col items-center gap-6 px-4 md:px-6 max-w-full">
+              <h2 className="carrd-font-heading carrd-font-h2">
+                1. Choose Your Evening
               </h2>
-              <div className="w-full max-w-[56rem] flex flex-wrap justify-evenly gap-6">
+              <p className="carrd-font-body text-left w-full max-w-[650px]">
+                The teahouse is open by reservation with limited seats. Reserve a spot to gift yourself a cozy evening.
+              </p>
+              {/* Mobile: date cards (2-line, succinct) */}
+              <div className="md:hidden w-full max-w-full flex flex-col gap-5 break-words">
+                {dates.map((d) => {
+                  const [datePart, timePart] = d.dateTime.includes(', ') ? d.dateTime.split(', ') : [d.dateTime, '']
+                  const headerRest = timePart ? `${datePart} ${timePart.toUpperCase()}` : datePart
+                  const musicianLine = d.musicians[0] ?? ''
+                  const isSelected = selectedDate === d.id
+                  return (
+                    <div
+                      key={d.id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => {
+                        setSelectedDate(d.id)
+                        setReservationStep(2)
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          setSelectedDate(d.id)
+                          setReservationStep(2)
+                        }
+                      }}
+                      className={`carrd-mobile-pill flex flex-col gap-3 text-left w-full cursor-pointer ${
+                        isSelected ? 'carrd-mobile-pill--selected' : ''
+                      }`}
+                    >
+                      <div className="min-w-0">
+                        <p className="leading-tight text-base">
+                          <span className="text-[#C4AF86] font-medium">{d.day}</span>
+                          <span className="text-[#FAEBD4]/90 font-normal">, {headerRest}</span>
+                        </p>
+                        {d.spotifyUrl ? (
+                          <a
+                            href={d.spotifyUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-[0.9375rem] text-[#D9D0BF]/90 italic underline hover:text-[#FAEBD4] focus:outline-none focus:underline mt-0.5 block"
+                          >
+                            {musicianLine}
+                          </a>
+                        ) : (
+                          <p className="text-[#D9D0BF]/90 text-[0.9375rem] italic mt-0.5">{musicianLine}</p>
+                        )}
+                      </div>
+                      <span className={`carrd-mobile-pill-select shrink-0 self-center ${isSelected ? 'carrd-mobile-pill-select--selected' : ''}`}>
+                        Select
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+              {/* Desktop: date cards */}
+              <div className="hidden md:block w-full max-w-[650px] space-y-6">
+                {dates.map((d) => (
+                  <div
+                    key={d.id}
+                    className="carrd-reservation-card flex flex-col gap-2 md:grid md:grid-cols-[6rem_1fr_auto] md:grid-rows-[auto_auto] md:gap-x-6 md:gap-y-1 md:items-center"
+                  >
+                    <p className="carrd-font-body carrd-accent-color font-medium text-[1.625rem]">{d.day}</p>
+                    <div className="carrd-font-body carrd-accent-color min-w-0 space-y-0 text-[1.625rem]">
+                      {d.musicians.map((line, i) => (
+                        <p key={i} className="font-medium italic">
+                          {line}
+                        </p>
+                      ))}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedDate(d.id)
+                        setReservationStep(2)
+                      }}
+                      className={`carrd-btn px-8 py-4 flex-shrink-0 row-span-2 self-start order-last md:order-none md:ml-4 ${
+                        selectedDate === d.id ? 'bg-[#FAE0B9]/20' : ''
+                      }`}
+                    >
+                      Select
+                    </button>
+                    <p className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0">
+                      {d.dateTime.includes(', ') ? (
+                        <>
+                          {d.dateTime.split(', ')[0]}
+                          <br />
+                          {d.dateTime.split(', ')[1] ?? ''}
+                        </>
+                      ) : (
+                        d.dateTime
+                      )}
+                    </p>
+                    {d.blurb ? (
+                      <div className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0">
+                        {expandedBlurbId === d.id ? (
+                          <>
+                            <p className="carrd-table-row-2 whitespace-pre-line">{d.blurb}</p>
+                            {d.spotifyUrl ? (
+                              <a
+                                href={d.spotifyUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="mt-2 inline-block italic text-[#D9D0BF] underline hover:text-[#FAEBD4] focus:outline-none focus:underline"
+                              >
+                                {d.spotifyLabel}
+                              </a>
+                            ) : null}
+                            <button
+                              type="button"
+                              onClick={() => setExpandedBlurbId(null)}
+                              className="mt-1 block italic text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
+                            >
+                              ...less
+                            </button>
+                          </>
+                        ) : (
+                          <p className="carrd-table-row-2 min-w-0 w-full">
+                            {d.blurb.length > 90 ? (
+                              <>
+                                {d.blurb.slice(0, 90)}
+                                {' '}
+                                <button
+                                  type="button"
+                                  onClick={() => setExpandedBlurbId(d.id)}
+                                  className="inline italic text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer p-0 m-0 align-baseline"
+                                >
+                                  ...more
+                                </button>
+                              </>
+                            ) : (
+                              d.blurb
+                            )}
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <div />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Panel 2: Choose your ticket */}
+            <div ref={tierRef} className="flex-shrink-0 w-1/3 min-w-0 flex flex-col items-center gap-6 px-4 md:px-6 max-w-full">
+              <h2 className="carrd-font-heading carrd-font-h2">
+                2. Choose Your Ticket
+              </h2>
+              {/* Mobile: cards first, then dropdown for pricing note */}
+              <div className="md:hidden w-full max-w-full flex flex-col gap-5 break-words">
                 {tiers
                   .filter((t) => t.id === 'community' || t.id === 'patron')
                   .map((t) => {
                     const qty = selections[t.id] ?? 0
+                    const isSelected = qty > 0
                     return (
-                      <div key={t.id} className="flex flex-col items-center gap-2 min-h-[6.5rem]">
-                        <button
-                          type="button"
-                          onClick={() => handleTierClick(t.id)}
-                          className={`carrd-btn px-8 py-4 whitespace-normal min-w-[10rem] flex-1 max-w-[14rem] shrink-0 max-h-[3.5rem] ${
-                            qty > 0 ? 'bg-[#FAE0B9]/20' : ''
-                          }`}
-                        >
-                          {t.label} ${t.price}
-                        </button>
+                      <div
+                        key={t.id}
+                        className={`carrd-mobile-pill flex flex-col gap-3 text-left w-full ${isSelected ? 'carrd-mobile-pill--selected' : ''}`}
+                      >
+                        <div className="min-w-0">
+                          <p className="leading-tight text-base">
+                            <span className="text-[#C4AF86] font-medium">{t.label}</span>
+                            <span className="text-[#FAEBD4]/90 font-normal">, ${t.price}</span>
+                          </p>
+                          <p className={`text-[#D9D0BF]/90 text-[0.9375rem] leading-snug mt-0.5 ${expandedTierBlurbId === t.id ? '' : 'line-clamp-2'}`}>
+                            {t.blurb}
+                          </p>
+                          {t.blurb.length > 70 && (
+                            <button
+                              type="button"
+                              onClick={() => setExpandedTierBlurbId((v) => (v === t.id ? null : t.id))}
+                              className="text-[0.9375rem] text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit mt-1"
+                            >
+                              {expandedTierBlurbId === t.id ? 'Show less' : 'More on pricing'}
+                            </button>
+                          )}
+                        </div>
                         {qty > 0 ? (
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center justify-center gap-2">
                             <button
                               type="button"
                               onClick={() => handleQuantityChange(t.id, -1)}
-                              className="carrd-btn w-9 h-9 flex items-center justify-center p-0 text-lg leading-none"
+                              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg transition-colors hover:bg-[#FAE0B9]/25 active:bg-[#FAE0B9]/30"
                               aria-label={`Decrease ${t.label} quantity`}
                             >
                               −
                             </button>
-                            <span className="carrd-font-body w-8 text-center tabular-nums">{qty}</span>
+                            <span className="w-8 text-center text-lg tabular-nums text-[#FAEBD4]">{qty}</span>
                             <button
                               type="button"
                               onClick={() => handleQuantityChange(t.id, 1)}
-                              className="carrd-btn w-9 h-9 flex items-center justify-center p-0 text-lg leading-none disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg transition-colors hover:bg-[#FAE0B9]/25 active:bg-[#FAE0B9]/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#D9D0BF]/20"
                               disabled={totalQuantity >= 4}
                               aria-label={`Increase ${t.label} quantity`}
                             >
@@ -332,279 +849,510 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                             </button>
                           </div>
                         ) : null}
+                        {qty === 0 && (
+                          <button
+                            type="button"
+                            onClick={() => handleTierClick(t.id)}
+                            className={`carrd-mobile-pill-select shrink-0 self-center ${isSelected ? 'carrd-mobile-pill-select--selected' : ''}`}
+                          >
+                            Select
+                          </button>
+                        )}
                       </div>
                     )
                   })}
-              </div>
-              <p className="carrd-font-body text-center w-full max-w-[56rem] leading-relaxed">
-                Our prices aim to support the sustainability of our project, but we recognize the skewed economic situation of our city. If cost is a barrier, please{' '}
-                <button
-                  type="button"
-                  onClick={() => setShowSupportedTier(true)}
-                  className="underline hover:no-underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline"
-                >
-                  click here
-                </button>
-                {' '}for a supported ticket.
-              </p>
-              <div
-                className={`grid transition-all duration-500 ease-out overflow-hidden w-full max-w-[56rem] ${
-                  showSupportedTier ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
-                }`}
-              >
-                <div className="min-h-0 flex flex-col items-center gap-2">
-                  {tiers
-                    .filter((t) => t.id === 'supported')
-                    .map((t) => (
-                      <div key={t.id} className="flex flex-col items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => handleTierClick(t.id)}
-                          className={`carrd-btn px-8 py-4 whitespace-normal min-w-[10rem] shrink-0 max-h-[3.5rem] ${
-                            (selections['supported'] ?? 0) > 0 ? 'bg-[#FAE0B9]/20' : ''
-                          }`}
-                        >
-                          {t.label}
-                        </button>
-                        {(selections['supported'] ?? 0) > 0 && (
+                <p className="carrd-font-body text-left text-base text-[#D9D0BF]/95">
+                  If cost is a barrier, please consider our{' '}
+                  <button
+                    type="button"
+                    onClick={() => setShowSupportedTier(true)}
+                    className="underline hover:no-underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline"
+                  >
+                    supported ticket option
+                  </button>
+                  .
+                </p>
+                {(showSupportedTier || (selections['supported'] ?? 0) > 0) && (
+                  <div
+                    className={`carrd-mobile-pill flex flex-col gap-3 text-left w-full mt-2 ${(selections['supported'] ?? 0) > 0 ? 'carrd-mobile-pill--selected' : ''}`}
+                  >
+                    <div className="min-w-0">
+                      <p className="leading-tight text-base">
+                        <span className="text-[#C4AF86] font-medium">Supported</span>
+                        <span className="text-[#FAEBD4]/90 font-normal">, $20+</span>
+                      </p>
+                      {(() => {
+                        const supportedTier = tiers.find((t) => t.id === 'supported')
+                        const blurb = supportedTier?.blurb ?? ''
+                        const isExpanded = expandedTierBlurbId === 'supported'
+                        return (
                           <>
-                            <div className="flex items-center gap-2">
+                            <p className={`text-[#D9D0BF]/90 text-[0.9375rem] leading-snug mt-0.5 ${isExpanded ? '' : 'line-clamp-2'}`}>{blurb}</p>
+                            {blurb.length > 70 && (
                               <button
                                 type="button"
-                                onClick={() => handleQuantityChange('supported', -1)}
-                                className="carrd-btn w-9 h-9 flex items-center justify-center p-0 text-lg leading-none"
-                                aria-label="Decrease Supported quantity"
+                                onClick={() => setExpandedTierBlurbId((v) => (v === 'supported' ? null : 'supported'))}
+                                className="text-[0.9375rem] text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit mt-1"
+                              >
+                                {isExpanded ? 'Show less' : 'More on pricing'}
+                              </button>
+                            )}
+                          </>
+                        )
+                      })()}
+                    </div>
+                    {(selections['supported'] ?? 0) > 0 ? (
+                      <div className="flex flex-col gap-3 items-center">
+                        <div className="flex items-center gap-2 w-full max-w-[8rem]">
+                          <span className="text-[#D9D0BF] text-lg">$</span>
+                          <input
+                            type="number"
+                            min={20}
+                            max={40}
+                            value={supportedPriceInput}
+                            placeholder="20–40"
+                            onChange={(e) => {
+                              const raw = e.target.value
+                              setSupportedPriceInput(raw)
+                              const v = parseInt(raw, 10)
+                              if (!isNaN(v) && v >= 20 && v <= 40) setSupportedPrice(v)
+                              else if (raw === '') {
+                                setSelections((prev) => { const n = { ...prev }; delete n.supported; return n })
+                              }
+                            }}
+                            onBlur={() => {
+                              const v = parseInt(supportedPriceInput, 10)
+                              if (!isNaN(v) && v >= 20 && v <= 40) {
+                                setSupportedPrice(v)
+                                setSupportedPriceInput(String(v))
+                              } else if (supportedPriceInput === '') {
+                                setSelections((prev) => { const n = { ...prev }; delete n.supported; return n })
+                              } else setSupportedPriceInput(String(supportedPrice))
+                            }}
+                            className="carrd-font-body flex-1 min-w-0 py-2.5 px-3 text-lg bg-[#2E0303]/40 rounded-lg border border-[#FAE0B9]/30 text-[#FAEBD4] placeholder:text-[#D9D0BF]/50 focus:outline-none focus:border-[#FAE0B9]/60 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          />
+                        </div>
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleQuantityChange('supported', -1)}
+                            className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg transition-colors hover:bg-[#FAE0B9]/25"
+                            aria-label="Decrease Supported quantity"
+                          >
+                            −
+                          </button>
+                          <span className="w-8 text-center text-lg tabular-nums text-[#FAEBD4]">
+                              {selections['supported'] ?? 0}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handleQuantityChange('supported', 1)}
+                              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg transition-colors hover:bg-[#FAE0B9]/25 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#D9D0BF]/20"
+                              disabled={totalQuantity >= 4}
+                              aria-label="Increase Supported quantity"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                    ) : null}
+                    {(selections['supported'] ?? 0) === 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowSupportedTier(true)
+                          setSupportedPrice(20)
+                          setSupportedPriceInput('20')
+                          setSelections((prev) => ({ ...prev, supported: 1 }))
+                        }}
+                        className="carrd-mobile-pill-select shrink-0 self-center"
+                      >
+                        Select
+                      </button>
+                    )}
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setExpandedPricingNote((v) => !v)}
+                  className="carrd-font-body text-lg text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit flex items-center gap-1"
+                >
+                  {expandedPricingNote ? 'Hide' : 'About our pricing'}
+                  <span className="text-lg transition-transform" style={{ transform: expandedPricingNote ? 'rotate(180deg)' : 'none' }}>▾</span>
+                </button>
+                {expandedPricingNote && (
+                  <div className="carrd-font-body text-left text-base text-[#D9D0BF]/95">
+                    <p>
+                      Our city and community span a wide range of financial situations. Our tiered pricing helps us balance making the teahouse both financially sustainable and accessible. We invite you to choose the level that feels right for you — one that honors your own capacity while helping us keep this space open, welcoming and alive.
+                    </p>
+                  </div>
+                )}
+              </div>
+              {/* Desktop: tier cards first, then About our pricing */}
+              <div className="hidden md:block w-full max-w-[650px] space-y-6">
+                {tiers
+                  .filter((t) => t.id === 'community' || t.id === 'patron')
+                  .map((t) => {
+                    const qty = selections[t.id] ?? 0
+                    return (
+                      <div
+                        key={t.id}
+                        className="carrd-reservation-card flex flex-col gap-2 md:grid md:grid-cols-[6rem_1fr_auto] md:grid-rows-[auto_auto] md:gap-x-6 md:gap-y-1 md:items-center"
+                      >
+                        <p className="carrd-font-body carrd-accent-color font-medium text-[1.625rem]">{t.label}</p>
+                        <p className="carrd-font-body carrd-accent-color font-medium italic text-[1.625rem]">{t.mainLine}</p>
+                        <div className="flex items-start justify-end min-w-[4.5rem] row-span-2 self-start order-last md:order-none">
+                          {qty > 0 ? (
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={() => handleQuantityChange(t.id, -1)}
+                                className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-xs transition-colors hover:bg-[#FAE0B9]/30"
+                                aria-label={`Decrease ${t.label} quantity`}
                               >
                                 −
                               </button>
-                              <span className="carrd-font-body w-8 text-center tabular-nums">{selections['supported'] ?? 0}</span>
+                              <span className="carrd-font-body w-5 text-center text-sm tabular-nums text-[#FAEBD4]">{qty}</span>
                               <button
                                 type="button"
-                                onClick={() => handleQuantityChange('supported', 1)}
-                                className="carrd-btn w-9 h-9 flex items-center justify-center p-0 text-lg leading-none disabled:opacity-50 disabled:cursor-not-allowed"
+                                onClick={() => handleQuantityChange(t.id, 1)}
+                                className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-xs transition-colors hover:bg-[#FAE0B9]/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                                 disabled={totalQuantity >= 4}
-                                aria-label="Increase Supported quantity"
+                                aria-label={`Increase ${t.label} quantity`}
                               >
                                 +
                               </button>
                             </div>
-                            <div className="flex flex-col items-center gap-1 w-full max-w-[40rem]">
-                              <p className="carrd-font-body text-xs text-center opacity-90 w-full px-2">
-                                Sliding scale: choose an amount between $20 and $39 that works for you.
-                              </p>
-                              <div className="flex items-center justify-center gap-1">
-                                <span className="carrd-font-body text-lg text-[#FAEBD4]">$</span>
-                                <input
-                                  type="number"
-                                  min={20}
-                                  max={39}
-                                  value={supportedPriceInput}
-                                  onChange={(e) => {
-                                    const raw = e.target.value
-                                    setSupportedPriceInput(raw)
-                                    const v = parseInt(raw, 10)
-                                    if (!isNaN(v) && v >= 20 && v <= 39) setSupportedPrice(v)
-                                  }}
-                                  onBlur={() => {
-                                    const v = parseInt(supportedPriceInput, 10)
-                                    if (!isNaN(v) && v >= 20 && v <= 39) {
-                                      setSupportedPrice(v)
-                                      setSupportedPriceInput(String(v))
-                                    } else {
-                                      setSupportedPriceInput(String(supportedPrice))
-                                    }
-                                  }}
-                                  className="w-20 text-center rounded-md border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-2 py-1 text-[#FAEBD4] text-lg focus:border-[#FAE0B9] focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                />
-                              </div>
-                            </div>
-                          </>
-                        )}
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => handleTierClick(t.id)}
+                              className="carrd-btn px-8 py-4 md:ml-4"
+                            >
+                              Select
+                            </button>
+                          )}
+                        </div>
+                        <p className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0">${t.price}</p>
+                        <p className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0">{t.blurb}</p>
                       </div>
-                    ))}
-                </div>
+                    )
+                  })}
               </div>
-            </section>
-            <hr className="carrd-divider border-0 my-2" />
-          </>
-        )}
+              <div className="hidden md:block w-full max-w-[650px] space-y-4">
+                <p className="carrd-font-body text-left text-[#D9D0BF]/95">
+                  If cost is a barrier, please consider our{' '}
+                  <button
+                    type="button"
+                    onClick={() => setShowSupportedTier(true)}
+                    className="underline hover:no-underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline"
+                  >
+                    supported ticket option
+                  </button>
+                  .
+                </p>
+                {(showSupportedTier || (selections['supported'] ?? 0) > 0) && (
+              <div className="hidden md:block w-full max-w-[650px]">
+              {tiers.filter((t) => t.id === 'supported').map((t) => (
+                <div
+                  key={t.id}
+                  className="carrd-reservation-card flex flex-col gap-2 md:grid md:grid-cols-[6rem_1fr_auto] md:grid-rows-[auto_auto] md:gap-x-6 md:gap-y-1 md:items-center w-full max-w-[650px]"
+                >
+                  <p className="carrd-font-body carrd-accent-color font-medium text-[1.625rem]">Supported</p>
+                  <p className="carrd-font-body carrd-accent-color font-medium italic text-[1.625rem]">{t.blurb}</p>
+                  <div className="flex items-start justify-end min-w-[4.5rem] row-span-2 self-start order-last md:order-none">
+                    {(selections['supported'] ?? 0) > 0 ? (
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-0.5 rounded-lg bg-[#FAEBD4]/5 px-1.5 py-1">
+                          <span className="carrd-font-body text-[#D9D0BF] text-xs">$</span>
+                          <input
+                            type="number"
+                            min={20}
+                            max={40}
+                            value={supportedPriceInput}
+                            placeholder="20–40"
+                            onChange={(e) => {
+                              const raw = e.target.value
+                              setSupportedPriceInput(raw)
+                              const v = parseInt(raw, 10)
+                              if (!isNaN(v) && v >= 20 && v <= 40) {
+                                setSupportedPrice(v)
+                              } else if (raw === '') {
+                                setSelections((prev) => {
+                                  const next = { ...prev }
+                                  delete next.supported
+                                  return next
+                                })
+                              }
+                            }}
+                            onBlur={() => {
+                              const v = parseInt(supportedPriceInput, 10)
+                              if (!isNaN(v) && v >= 20 && v <= 40) {
+                                setSupportedPrice(v)
+                                setSupportedPriceInput(String(v))
+                              } else if (supportedPriceInput === '') {
+                                setSelections((prev) => {
+                                  const next = { ...prev }
+                                  delete next.supported
+                                  return next
+                                })
+                              } else {
+                                setSupportedPriceInput(String(supportedPrice))
+                              }
+                            }}
+                            className="carrd-font-body w-12 bg-transparent text-center text-[#FAEBD4] text-xs placeholder:text-[#D9D0BF]/50 placeholder:text-[0.65rem] focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          />
+                        </div>
+                        <span className="text-[#D9D0BF]/60 text-sm">×</span>
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => handleQuantityChange('supported', -1)}
+                            className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-xs transition-colors hover:bg-[#FAE0B9]/30"
+                            aria-label="Decrease Supported quantity"
+                          >
+                            −
+                          </button>
+                          <span className="carrd-font-body w-5 text-center text-sm tabular-nums text-[#FAEBD4]">
+                            {selections['supported'] ?? 0}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleQuantityChange('supported', 1)}
+                            className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-xs transition-colors hover:bg-[#FAE0B9]/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                            disabled={totalQuantity >= 4}
+                            aria-label="Increase Supported quantity"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSupportedPrice(20)
+                          setSupportedPriceInput('20')
+                          setSelections((prev) => ({ ...prev, supported: 1 }))
+                        }}
+                        className="carrd-btn px-8 py-4 md:ml-4"
+                      >
+                        Select
+                      </button>
+                    )}
+                  </div>
+                  <p className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0">$20+</p>
+                  <div className="hidden md:block" />
+                </div>
+              ))}
+              </div>
+              )}
+                <button
+                  type="button"
+                  onClick={() => setExpandedPricingNote((v) => !v)}
+                  className="carrd-font-body text-base text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit flex items-center gap-1"
+                >
+                  {expandedPricingNote ? 'Hide' : 'About our pricing'}
+                  <span className="text-base transition-transform" style={{ transform: expandedPricingNote ? 'rotate(180deg)' : 'none' }}>▾</span>
+                </button>
+                {expandedPricingNote && (
+                  <div className="carrd-font-body text-left w-full max-w-[650px]">
+                    <p>
+                      Our city and community span a wide range of financial situations. Our tiered pricing helps us balance making the teahouse both financially sustainable and accessible. We invite you to choose the level that feels right for you — one that honors your own capacity while helping us keep this space open, welcoming and alive.
+                    </p>
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-4 w-full max-w-[650px]">
+                <button
+                  type="button"
+                  onClick={() => setReservationStep(3)}
+                  disabled={!hasSelection}
+                  className="carrd-btn px-8 py-4 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Continue
+                </button>
+              </div>
+            </div>
 
-        {/* Form section */}
-        <section
-          ref={formRef}
-          className="w-full flex flex-col items-center gap-6"
-        >
-          <h2 className="carrd-font-heading text-2xl md:text-3xl">
-            A Few Details
-          </h2>
-          <form
-            id="carrd-form"
-            onSubmit={(e) => {
-              e.preventDefault()
-              scrollToSection(paymentRef)
-            }}
-            className="w-full max-w-md flex flex-col gap-4 carrd-font-body"
-          >
-            <input type="hidden" name="device_type" value={deviceType} />
-            <input type="hidden" name="date" value={selectedDate ?? ''} />
-            <label className="flex flex-col gap-1">
-              Name *
-              <input
-                type="text"
-                name="name"
-                required
-                value={formData.name}
-                onChange={(e) => setFormData((d) => ({ ...d, name: e.target.value }))}
-                className="mt-1 w-full rounded-md border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] placeholder:text-[#D9D0BF]/60 focus:border-[#FAE0B9] focus:outline-none"
-                placeholder="Your name"
-              />
-            </label>
-            <label className="flex flex-col gap-1">
-              Email *
-              <input
-                type="email"
-                name="email"
-                required
-                value={formData.email}
-                onChange={(e) => setFormData((d) => ({ ...d, email: e.target.value }))}
-                className="mt-1 w-full rounded-md border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] placeholder:text-[#D9D0BF]/60 focus:border-[#FAE0B9] focus:outline-none"
-                placeholder="you@example.com"
-              />
-            </label>
-            <label className="flex flex-col gap-1">
-              Notes
-              <textarea
-                name="notes"
-                value={formData.notes}
-                onChange={(e) => setFormData((d) => ({ ...d, notes: e.target.value }))}
-                rows={2}
-                className="mt-1 w-full resize-none rounded-md border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] placeholder:text-[#D9D0BF]/60 focus:border-[#FAE0B9] focus:outline-none"
-                placeholder="Anything else we should know?"
-              />
-            </label>
-            <button
-              type="submit"
-              className="carrd-btn w-full py-3 mt-2"
-            >
-              Continue to payment
-            </button>
-          </form>
-        </section>
-
-        <hr className="carrd-divider border-0 my-2" />
-
-        {/* Payment section */}
-        <section
-          ref={paymentRef}
-          className="w-full flex flex-col items-center gap-6"
-        >
-          <h2 className="carrd-font-heading text-2xl md:text-3xl">
-            Complete Your Reservation
-          </h2>
-          {selectedDate && hasSelection ? (
-            <>
-              <div className="carrd-font-body rounded-lg border border-[#D9D0BF]/40 bg-[#2E0303]/30 px-6 py-4 text-center">
-                <p>{dates.find((d) => d.id === selectedDate)?.label}</p>
-                <div className="mt-2 space-y-1">
-                  {Object.entries(selections)
-                    .filter(([, q]) => q > 0)
-                    .map(([tierId, qty]) => {
-                      const tier = tiers.find((t) => t.id === tierId)
-                      const price = tierId === 'supported' ? supportedPrice : (tier?.price ?? 0)
-                      return (
-                        <p key={tierId} className="carrd-font-heading text-lg">
-                          {qty} × {tier?.label} ${price} = ${price * qty}
+            {/* Panel 3: Complete your reservation (summary + form + reserve) */}
+            <div ref={formRef} className="flex-shrink-0 w-1/3 min-w-0 flex flex-col items-center gap-6 px-4 md:px-6 max-w-full">
+              <div className="inline-flex flex-col items-stretch gap-6">
+                <h2 className="carrd-font-heading carrd-font-h2">
+                  3. Complete Your Reservation
+                </h2>
+              {selectedDate && hasSelection ? (
+                <>
+                  {/* Summary box: same width as heading */}
+                  <div className="carrd-font-body rounded-lg bg-[#FAEBD4]/20 px-4 py-4 text-left w-full">
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-sm text-[#D9D0BF]/80 uppercase tracking-wider">Date</p>
+                        <p className="text-base text-[#FAEBD4]">
+                          {selectedDateData?.dateTime.includes(', ') ? (
+                            <>
+                              {selectedDateData.label}
+                              <br />
+                              {selectedDateData.dateTime.split(', ')[1] ?? ''}
+                            </>
+                          ) : (
+                            selectedDateDisplay
+                          )}
                         </p>
-                      )
-                    })}
+                      </div>
+                      <div>
+                        <p className="text-sm text-[#D9D0BF]/80 uppercase tracking-wider mb-1.5">Tickets</p>
+                        <div className="space-y-1">
+                          {(['supported', 'community', 'patron'] as const)
+                            .filter((tierId) => (selections[tierId] ?? 0) > 0)
+                            .map((tierId) => {
+                              const qty = selections[tierId] ?? 0
+                              const tier = tiers.find((t) => t.id === tierId)
+                              const price = tierId === 'supported' ? supportedPrice : (tier?.price ?? 0)
+                              const label = tier?.label ?? (tierId === 'supported' ? 'Supported' : tierId)
+                              return (
+                                <p key={tierId} className="text-base text-[#FAEBD4]">
+                                  {label} — ${price} × {qty} = ${price * qty}
+                                </p>
+                              )
+                            })}
+                        </div>
+                      </div>
+                      <div className="pt-2 border-t border-[#D9D0BF]/30">
+                        <p className="text-sm text-[#D9D0BF]/80 uppercase tracking-wider">Total</p>
+                        <p className="text-lg font-medium text-[#FAEBD4]">${totalPrice}</p>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="carrd-font-body space-y-3 text-center">
+                  <p className="opacity-80">
+                    Select an evening and ticket above to see your reservation summary.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setReservationStep(1)}
+                    className="carrd-btn px-10 py-4"
+                  >
+                    Choose evening & ticket
+                  </button>
                 </div>
-                <p className="mt-2 carrd-font-heading text-xl">Total: ${totalPrice}</p>
+              )}
               </div>
-              <div className="w-full max-w-[56rem] text-left">
-                <p className="carrd-font-body font-medium mb-2">A few things to note before booking:</p>
-                <ul className="carrd-font-body space-y-3 list-none pl-0">
-                  {[
-                    'Doors open at 7pm and close at 11pm. Feel free to join us anytime in this window.',
-                    'Reservation includes unlimited tea and all other amenities.',
-                    'We are a phone and laptop-free space.',
-                    'Unfortunately, we aren\'t able to offer refunds or exchanges for future events.',
-                    'We\'ll share the location once you make the reservation. If you don\'t hear from us within a few days, please send us an email.',
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <span className="text-[#D9D0BF] mt-[0.45em] w-2 h-2 rounded-full bg-[#D9D0BF] shrink-0 flex-shrink-0" aria-hidden />
-                      <span className="flex-1">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              {checkoutError && (
+              <form
+                id="carrd-form"
+                onSubmit={(e) => {
+                  e.preventDefault()
+                }}
+                className="w-full max-w-[650px] flex flex-col gap-4 carrd-font-body"
+              >
+                <input type="hidden" name="device_type" value={deviceType} />
+                <input type="hidden" name="date" value={selectedDate ?? ''} />
+                <label className="flex flex-col gap-1.5">
+                  Name *
+                  <input
+                    type="text"
+                    name="name"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData((d) => ({ ...d, name: e.target.value }))}
+                    className="mt-1 w-full rounded-lg border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] placeholder:text-[#D9D0BF]/60 focus:border-[#FAE0B9] focus:outline-none focus:ring-2 focus:ring-[#FAE0B9]/30"
+                    placeholder="Your name"
+                  />
+                </label>
+                <label className="flex flex-col gap-1.5">
+                  Email *
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData((d) => ({ ...d, email: e.target.value }))}
+                    className="mt-1 w-full rounded-lg border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] placeholder:text-[#D9D0BF]/60 focus:border-[#FAE0B9] focus:outline-none focus:ring-2 focus:ring-[#FAE0B9]/30"
+                    placeholder="you@example.com"
+                  />
+                </label>
+                <label className="flex flex-col gap-1.5">
+                  Notes
+                  <textarea
+                    name="notes"
+                    value={formData.notes}
+                    onChange={(e) => setFormData((d) => ({ ...d, notes: e.target.value }))}
+                    rows={2}
+                    className="mt-1 w-full resize-none rounded-lg border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] placeholder:text-[#D9D0BF]/60 focus:border-[#FAE0B9] focus:outline-none focus:ring-2 focus:ring-[#FAE0B9]/30"
+                    placeholder="Anything else we should know?"
+                  />
+                </label>
+              </form>
+              {selectedDate && hasSelection && checkoutError && (
                 <p className="carrd-font-body text-sm text-red-300" role="alert">
                   {checkoutError}
                 </p>
               )}
-              <button
-                type="button"
-                disabled={isSubmitting}
-                onClick={async () => {
-                  if (!selectedDate || !hasSelection || !formData.name.trim() || !formData.email.trim()) return
-                  setIsSubmitting(true)
-                  setCheckoutError(null)
-                  try {
-                    const items = Object.entries(selections)
-                      .filter(([, q]) => q > 0)
-                      .map(([tierId, qty]) => ({
-                        tierId,
-                        quantity: qty,
-                        ...(tierId === 'supported' && { supportedPrice }),
-                      }))
-                    const res = await fetch('/api/checkout', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        dateId: selectedDate,
-                        items,
-                        supportedPrice: (selections['supported'] ?? 0) > 0 ? supportedPrice : undefined,
-                        name: formData.name.trim(),
-                        email: formData.email.trim(),
-                        notes: formData.notes.trim(),
-                        device: deviceType,
-                      }),
-                    })
-                    const data = await res.json()
-                    if (!res.ok) {
-                      setCheckoutError(data.error ?? 'Something went wrong')
-                      return
+              <div className="w-full max-w-[650px] text-left mt-6 px-4 md:px-0">
+                <p className="carrd-font-body text-sm font-medium mb-1.5">A few things to note before booking:</p>
+                <ul className="carrd-font-body text-base space-y-1 list-none pl-0 leading-tight">
+                  {BOOKING_NOTES.map((item, i) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <span className="text-[#D9D0BF] w-1.5 h-1.5 rounded-full bg-[#D9D0BF] shrink-0 flex-shrink-0 mt-1.5" aria-hidden />
+                      <span className="flex-1 min-w-0 text-[#D9D0BF]/95">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              {selectedDate && hasSelection && (
+                <button
+                  type="button"
+                  disabled={isSubmitting}
+                  onClick={async () => {
+                    if (!selectedDate || !hasSelection || !formData.name.trim() || !formData.email.trim()) return
+                    setIsSubmitting(true)
+                    setCheckoutError(null)
+                    try {
+                      const items = Object.entries(selections)
+                        .filter(([, q]) => q > 0)
+                        .map(([tierId, qty]) => ({
+                          tierId,
+                          quantity: qty,
+                          ...(tierId === 'supported' && { supportedPrice }),
+                        }))
+                      const res = await fetch('/api/checkout', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          dateId: selectedDate,
+                          items,
+                          supportedPrice: (selections['supported'] ?? 0) > 0 ? supportedPrice : undefined,
+                          name: formData.name.trim(),
+                          email: formData.email.trim(),
+                          notes: formData.notes.trim(),
+                          device: deviceType,
+                        }),
+                      })
+                      const data = await res.json()
+                      if (!res.ok) {
+                        setCheckoutError(data.error ?? 'Something went wrong')
+                        return
+                      }
+                      if (data.url) window.location.href = data.url
+                      else setCheckoutError('No checkout URL received')
+                    } catch {
+                      setCheckoutError('Network error. Please try again.')
+                    } finally {
+                      setIsSubmitting(false)
                     }
-                    if (data.url) window.location.href = data.url
-                    else setCheckoutError('No checkout URL received')
-                  } catch {
-                    setCheckoutError('Network error. Please try again.')
-                  } finally {
-                    setIsSubmitting(false)
-                  }
-                }}
-                className="carrd-btn px-10 py-3 disabled:opacity-70 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? 'Redirecting…' : 'Reserve'}
-              </button>
-            </>
-          ) : (
-            <div className="carrd-font-body space-y-4 text-center">
-              <p className="opacity-80">
-                Select a date and tier above to complete your reservation.
-              </p>
-              <button
-                type="button"
-                onClick={() => scrollToSection(joinRef)}
-                className="carrd-btn px-8 py-3"
-              >
-                Choose date & ticket
-              </button>
+                  }}
+                    className="carrd-btn px-10 py-3 disabled:opacity-70 disabled:cursor-not-allowed mt-8"
+                >
+                  {isSubmitting ? 'Redirecting…' : 'Finish Booking'}
+                </button>
+              )}
             </div>
-          )}
+          </div>
         </section>
       </div>
-      <SiteFooter variant="main" />
+      <SiteFooter variant="main" className="hidden md:flex" />
     </div>
   )
 }

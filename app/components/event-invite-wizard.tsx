@@ -199,7 +199,7 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
               >
                 <span className="font-invite-title text-xl">{t.label}</span>
                 <span className="mt-1 text-base opacity-80">
-                  {t.description}
+                  {t.blurb}
                 </span>
                 <span className="mt-2 font-invite-title text-xl">${t.price}</span>
               </button>
