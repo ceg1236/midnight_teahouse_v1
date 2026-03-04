@@ -917,7 +917,11 @@ html::-webkit-scrollbar {
   .carrd-reservation-card {
     border-radius: 0;
     border: none;
-    padding: 1rem 0 1.25rem;
+    border-bottom: 1px solid rgba(217, 208, 191, 0.3);
+    padding: 0.3rem 0 0.375rem;
+  }
+  .carrd-reservation-card:last-child {
+    border-bottom: none;
   }
 }
 
