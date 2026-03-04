@@ -45,39 +45,38 @@ export default function InviteSuccessPage() {
   return (
     <div className="carrd-page flex min-h-[100dvh] flex-col items-center justify-center px-6 md:min-h-screen">
       <div className="mx-auto flex max-w-md flex-col items-center gap-6 text-center">
-        <h1 className="carrd-font-heading text-3xl md:text-4xl [font-variant:small-caps]">
+        <h1 className="carrd-font-heading text-3xl md:text-4xl [font-variant:small-caps] text-[#FAEBD4]">
           See you at the Teahouse
         </h1>
-        {/* Paper card invite — 600px wide, 5×7 portrait, paper texture */}
-        <div className="carrd-font-body success-card-paper w-full max-w-[600px] aspect-[5/7] flex flex-col rounded-lg border border-[#D9D0BF]/60 px-10 py-8 shadow-[0_4px_24px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.1)] text-left text-[#2E0303]">
+        <div className="carrd-font-body flex flex-col items-center gap-4 text-left w-full max-w-md">
           {firstName ? (
-            <p className="carrd-font-body text-lg mb-2">
+            <p className="text-lg text-[#FAEBD4] w-full">
               {firstName},
             </p>
           ) : null}
-          <p className="carrd-font-body text-base leading-relaxed mb-5">
+          <p className="text-base leading-relaxed text-[#FAEBD4] w-full">
             Thank you for reserving your spot. We are excited to share an evening with you.
           </p>
-          <div className="space-y-1 mb-4">
-            <p className="carrd-font-body text-xs uppercase tracking-wider">
+          <div className="space-y-1 w-full">
+            <p className="text-xs uppercase tracking-wider text-[#D9D0BF]">
               Date
             </p>
-            <p className="carrd-font-body text-base">
+            <p className="text-base text-[#FAEBD4]">
               {dateLabel}
             </p>
           </div>
-          <div className="space-y-1 mb-5">
-            <p className="carrd-font-body text-xs uppercase tracking-wider">
+          <div className="space-y-1 w-full">
+            <p className="text-xs uppercase tracking-wider text-[#D9D0BF]">
               Location
             </p>
-            <p className="carrd-font-body text-base">
+            <p className="text-base text-[#FAEBD4]">
               {ADDRESS}
             </p>
           </div>
-          <p className="carrd-font-body text-sm leading-relaxed mb-auto">
+          <p className="text-sm leading-relaxed text-[#FAEBD4] w-full">
             Please look out for our confirmation email.
           </p>
-          <p className="carrd-font-body text-base mt-2">
+          <p className="text-base text-[#FAEBD4] w-full">
             Warmly,
           </p>
         </div>
@@ -86,14 +85,14 @@ export default function InviteSuccessPage() {
             href={GOOGLE_CALENDAR_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="carrd-link carrd-link--muted text-sm underline hover:no-underline"
+            className="carrd-link text-sm underline hover:no-underline text-[#D9D0BF] hover:text-[#FAE0B9]"
           >
             Add to Google Calendar
           </a>
           <button
             type="button"
             onClick={handleForwardViaText}
-            className="carrd-link carrd-link--muted text-sm underline hover:no-underline bg-transparent border-none cursor-pointer p-0 font-inherit"
+            className="carrd-link text-sm underline hover:no-underline bg-transparent border-none cursor-pointer p-0 font-inherit text-[#D9D0BF] hover:text-[#FAE0B9]"
           >
             Forward invite via text
           </button>
