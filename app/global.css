@@ -762,7 +762,7 @@ html::-webkit-scrollbar {
   color: #E4D6B8;
 }
 .carrd-font-title {
-  font-family: 'Great Vibes', 'Dancing Script', cursive;
+  font-family: 'Aboreto', cursive;
   font-size: clamp(2.5rem, 6vw, 4rem);
   line-height: 1.1;
 }
