@@ -2,13 +2,14 @@ import Link from 'next/link'
 
 type SiteFooterProps = {
   variant?: 'main' | 'default'
+  className?: string
 }
 
-export function SiteFooter({ variant = 'default' }: SiteFooterProps) {
+export function SiteFooter({ variant = 'default', className }: SiteFooterProps) {
   const isMain = variant === 'main'
 
   return (
-    <footer className="w-full flex justify-center">
+    <footer className={`w-full flex justify-center ${className ?? ''}`}>
       <div className="w-full max-w-[60rem] px-6 md:px-12 py-6 flex items-center justify-center gap-10">
         <div className="flex items-center justify-center gap-8">
           <a
