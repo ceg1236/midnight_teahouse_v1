@@ -201,15 +201,15 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
 
   return (
     <div className="carrd-page flex flex-col items-center min-h-screen overflow-x-hidden pt-8">
+      <Link
+        href="/our-story"
+        className="fixed top-4 right-4 md:top-6 md:right-6 z-50 carrd-link carrd-link--muted text-sm whitespace-nowrap"
+      >
+        Our Story
+      </Link>
       <div className="w-full max-w-[60rem] flex flex-col items-center px-6 md:px-12 py-8 md:py-12 gap-[1.25em]">
-        {/* Hero: Title + Subtitle with Our Story in screen corner */}
+        {/* Hero: Title + Subtitle */}
         <div className="relative w-full flex flex-col items-center gap-1">
-          <Link
-            href="/our-story"
-            className="fixed top-4 right-4 md:top-6 md:right-6 z-10 carrd-link carrd-link--muted text-sm whitespace-nowrap"
-          >
-            Our Story
-          </Link>
           <h1 className="carrd-font-heading carrd-font-title text-center">
             Midnight Teahouse
           </h1>
@@ -348,7 +348,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   >
                     <div className="carrd-font-body flex-shrink-0 w-24 sm:w-28">
                       <p className="font-medium text-[#FAEBD4]">{d.day}</p>
-                      <p className="text-[#D9D0BF] text-sm">{d.dateTime}</p>
+                      <p className="text-[#D9D0BF] text-[1.125rem]">{d.dateTime}</p>
                     </div>
                     <div className="carrd-font-body flex-1 min-w-0 space-y-1 text-[#FAEBD4] ml-4">
                       {d.musicians.map((line, i) => (
@@ -357,7 +357,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         </p>
                       ))}
                       {d.blurb ? (
-                        <div className="text-[#D9D0BF] text-sm">
+                        <div className="text-[#D9D0BF] text-[1.125rem]">
                           {expandedBlurbId === d.id ? (
                             <>
                               <p className="leading-relaxed">{d.blurb}</p>
@@ -431,11 +431,11 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       >
                         <div className="carrd-font-body flex-shrink-0">
                           <p className="font-medium text-[#FAEBD4]">{t.label}</p>
-                          <p className="text-[#D9D0BF] text-sm">${t.price}</p>
+                          <p className="text-[#D9D0BF] text-[1.125rem]">${t.price}</p>
                         </div>
                         <div className="carrd-font-body min-w-0 space-y-1 text-[#FAEBD4] ml-4">
                           <p className="font-medium italic">{t.mainLine}</p>
-                          <div className="text-[#D9D0BF] text-sm">
+                          <div className="text-[#D9D0BF] text-[1.125rem]">
                             {expandedTierBlurbId === t.id ? (
                               <>
                                 <p className="leading-relaxed">{t.blurb}</p>
@@ -515,7 +515,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 >
                   <div className="carrd-font-body flex-shrink-0">
                     <p className="font-medium text-[#FAEBD4]">Supported</p>
-                    <p className="text-[#D9D0BF] text-sm">$20+</p>
+                    <p className="text-[#D9D0BF] text-[1.125rem]">$20+</p>
                   </div>
                   <div className="carrd-font-body min-w-0 space-y-1 text-[#FAEBD4] ml-4">
                     <p className="font-medium italic">{t.blurb}</p>
@@ -626,11 +626,11 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   <div className="carrd-font-body rounded-lg bg-[#FAEBD4]/20 px-4 py-4 text-left w-full max-w-[650px]">
                     <div className="space-y-3">
                       <div>
-                        <p className="text-xs text-[#D9D0BF]/80 uppercase tracking-wider">Date</p>
+                        <p className="text-sm text-[#D9D0BF]/80 uppercase tracking-wider">Date</p>
                         <p className="text-base text-[#FAEBD4]">{selectedDateDisplay}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-[#D9D0BF]/80 uppercase tracking-wider mb-1.5">Tickets</p>
+                        <p className="text-sm text-[#D9D0BF]/80 uppercase tracking-wider mb-1.5">Tickets</p>
                         <div className="space-y-1">
                           {(['supported', 'community', 'patron'] as const)
                             .filter((tierId) => (selections[tierId] ?? 0) > 0)
@@ -648,7 +648,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         </div>
                       </div>
                       <div className="pt-2 border-t border-[#D9D0BF]/30">
-                        <p className="text-xs text-[#D9D0BF]/80 uppercase tracking-wider">Total</p>
+                        <p className="text-sm text-[#D9D0BF]/80 uppercase tracking-wider">Total</p>
                         <p className="text-lg font-medium text-[#FAEBD4]">${totalPrice}</p>
                       </div>
                     </div>
@@ -720,7 +720,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               )}
               <div className="w-full max-w-[650px] text-left mt-6">
                 <p className="carrd-font-body text-sm font-medium mb-1.5">A few things to note before booking:</p>
-                <ul className="carrd-font-body text-[0.74375rem] space-y-1 list-none pl-0 leading-tight">
+                <ul className="carrd-font-body text-base space-y-1 list-none pl-0 leading-tight">
                   {BOOKING_NOTES.map((item, i) => (
                     <li key={i} className="flex items-center gap-2">
                       <span className="text-[#D9D0BF] w-1.5 h-1.5 rounded-full bg-[#D9D0BF] shrink-0 flex-shrink-0" aria-hidden />
