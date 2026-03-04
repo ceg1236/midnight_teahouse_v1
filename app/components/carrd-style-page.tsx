@@ -402,7 +402,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         </p>
                         <p>
                           If cost is a barrier, please consider our{' '}
-                          <button type="button" onClick={() => setShowSupportedTier(true)} className="underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline">supported ticket option</button>.
+                          <button type="button" onClick={() => setShowSupportedTier((v) => !v)} className="underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline">supported ticket option</button>.
                         </p>
                       </div>
                     )}
@@ -865,7 +865,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       If cost is a barrier, please consider our{' '}
                       <button
                         type="button"
-                        onClick={() => setShowSupportedTier(true)}
+                        onClick={() => setShowSupportedTier((v) => !v)}
                         className="underline hover:no-underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline"
                       >
                         supported ticket option
@@ -1046,7 +1046,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       If cost is a barrier, please consider our{' '}
                       <button
                         type="button"
-                        onClick={() => setShowSupportedTier(true)}
+                        onClick={() => setShowSupportedTier((v) => !v)}
                         className="underline hover:no-underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline"
                       >
                         supported ticket option
