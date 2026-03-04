@@ -160,7 +160,10 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
 
   useEffect(() => {
     if (showReservationView) {
-      mobileReservationPanelRef.current?.scrollTo({ top: 0, behavior: 'auto' })
+      const t = setTimeout(() => {
+        mobileReservationPanelRef.current?.scrollTo({ top: 0, behavior: 'auto' })
+      }, 520)
+      return () => clearTimeout(t)
     }
   }, [showReservationView])
 
@@ -401,13 +404,12 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                             <p className="text-[#D9D0BF]/90 text-[0.75rem] leading-snug mt-0.5 line-clamp-2">{tiers.find((t) => t.id === 'supported')?.blurb}</p>
                           </div>
                           {(selections['supported'] ?? 0) > 0 ? (
-                            <div className="flex flex-wrap items-center gap-2 shrink-0">
-                              <div className="flex items-center gap-0.5 rounded-lg bg-[#FAEBD4]/5 px-2 py-1.5 border border-[#D9D0BF]/25">
+                            <div className="flex flex-col items-end gap-2 shrink-0">
+                              <div className="flex items-center justify-end gap-0.5">
                                 <span className="text-[#D9D0BF] text-sm">$</span>
-                                <input type="number" min={20} max={40} value={supportedPriceInput} placeholder="20–40" onChange={(e) => { const raw = e.target.value; setSupportedPriceInput(raw); const v = parseInt(raw, 10); if (!isNaN(v) && v >= 20 && v <= 40) setSupportedPrice(v); else if (raw === '') setSelections((prev) => { const n = { ...prev }; delete n.supported; return n }); }} onBlur={() => { const v = parseInt(supportedPriceInput, 10); if (!isNaN(v) && v >= 20 && v <= 40) { setSupportedPrice(v); setSupportedPriceInput(String(v)) } else if (supportedPriceInput === '') setSelections((prev) => { const n = { ...prev }; delete n.supported; return n }); else setSupportedPriceInput(String(supportedPrice)) }} className="carrd-font-body w-12 bg-transparent text-center text-[#FAEBD4] text-sm focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                                <input type="number" min={20} max={40} value={supportedPriceInput} placeholder="20–40" onChange={(e) => { const raw = e.target.value; setSupportedPriceInput(raw); const v = parseInt(raw, 10); if (!isNaN(v) && v >= 20 && v <= 40) setSupportedPrice(v); else if (raw === '') setSelections((prev) => { const n = { ...prev }; delete n.supported; return n }); }} onBlur={() => { const v = parseInt(supportedPriceInput, 10); if (!isNaN(v) && v >= 20 && v <= 40) { setSupportedPrice(v); setSupportedPriceInput(String(v)) } else if (supportedPriceInput === '') setSelections((prev) => { const n = { ...prev }; delete n.supported; return n }); else setSupportedPriceInput(String(supportedPrice)) }} className="carrd-font-body w-12 bg-transparent text-right text-[#FAEBD4] text-sm border-0 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
                               </div>
-                              <span className="text-[#D9D0BF]/60 text-sm">×</span>
-                              <div className="flex items-center gap-1">
+                              <div className="flex items-center justify-end gap-1">
                                 <button type="button" onClick={() => handleQuantityChange('supported', -1)} className="flex h-8 w-8 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-sm" aria-label="Decrease Supported">−</button>
                                 <span className="w-6 text-center text-sm tabular-nums text-[#FAEBD4]">{selections['supported'] ?? 0}</span>
                                 <button type="button" onClick={() => handleQuantityChange('supported', 1)} disabled={totalQuantity >= 4} className="flex h-8 w-8 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-sm disabled:opacity-40" aria-label="Increase Supported">+</button>
@@ -880,8 +882,8 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         </button>
                       </div>
                       {(selections['supported'] ?? 0) > 0 ? (
-                        <div className="flex flex-wrap items-center gap-2 shrink-0">
-                          <div className="flex items-center gap-0.5 rounded-lg bg-[#FAEBD4]/5 px-2 py-1.5 border border-[#D9D0BF]/25">
+                        <div className="flex flex-col items-end gap-2 shrink-0">
+                          <div className="flex items-center justify-end gap-0.5">
                             <span className="text-[#D9D0BF] text-sm">$</span>
                             <input
                               type="number"
@@ -907,11 +909,10 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                                   setSelections((prev) => { const n = { ...prev }; delete n.supported; return n })
                                 } else setSupportedPriceInput(String(supportedPrice))
                               }}
-                              className="carrd-font-body w-12 bg-transparent text-center text-[#FAEBD4] text-sm placeholder:text-[#D9D0BF]/50 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              className="carrd-font-body w-12 bg-transparent text-right text-[#FAEBD4] text-sm border-0 placeholder:text-[#D9D0BF]/50 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
                           </div>
-                          <span className="text-[#D9D0BF]/60 text-sm">×</span>
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center justify-end gap-1">
                             <button
                               type="button"
                               onClick={() => handleQuantityChange('supported', -1)}
