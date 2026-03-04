@@ -1001,9 +1001,9 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       >
                         <p className="carrd-font-body carrd-accent-color font-medium text-[1.625rem]">{t.label}</p>
                         <p className="carrd-font-body carrd-accent-color font-medium italic text-[1.625rem]">{t.mainLine}</p>
-                        <div className="flex items-start justify-end min-w-[4.5rem] row-span-2 self-start order-last md:order-none">
+                        <div className="flex items-start justify-end min-w-[8rem] w-[8rem] row-span-2 self-start order-last md:order-none">
                           {qty > 0 ? (
-                            <div className="flex items-center gap-1">
+                            <div className="flex items-center justify-end gap-1 w-full">
                               <button
                                 type="button"
                                 onClick={() => handleQuantityChange(t.id, -1)}
@@ -1060,9 +1060,9 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 >
                   <p className="carrd-font-body carrd-accent-color font-medium text-[1.625rem]">Supported</p>
                   <p className="carrd-font-body carrd-accent-color font-medium italic text-[1.625rem]">{t.blurb}</p>
-                  <div className="flex items-start justify-end min-w-[4.5rem] row-span-2 self-start order-last md:order-none">
+                  <div className="flex items-start justify-end min-w-[8rem] w-[8rem] row-span-2 self-start order-last md:order-none">
                     {(selections['supported'] ?? 0) > 0 ? (
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center justify-end gap-2 w-full">
                         <div className="flex items-center gap-0.5 rounded-lg bg-[#FAEBD4]/5 px-1.5 py-1">
                           <span className="carrd-font-body text-[#D9D0BF] text-xs">$</span>
                           <input
