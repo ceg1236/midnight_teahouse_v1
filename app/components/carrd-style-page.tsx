@@ -479,8 +479,8 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                             </button>
                           )}
                         </div>
-                        <p className="carrd-font-body carrd-table-row-2 min-w-0">${t.price}</p>
-                        <p className="carrd-font-body carrd-table-row-2 min-w-0">{t.blurb}</p>
+                        <p className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0">${t.price}</p>
+                        <p className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0">{t.blurb}</p>
                       </div>
                     )
                   })}
@@ -584,7 +584,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       </button>
                     )}
                   </div>
-                  <p className="carrd-font-body carrd-table-row-2 min-w-0">$20+</p>
+                  <p className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0">$20+</p>
                   <div />
                 </div>
               ))}
@@ -612,7 +612,17 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     <div className="space-y-3">
                       <div>
                         <p className="text-sm text-[#D9D0BF]/80 uppercase tracking-wider">Date</p>
-                        <p className="text-base text-[#FAEBD4]">{selectedDateDisplay}</p>
+                        <p className="text-base text-[#FAEBD4]">
+                          {selectedDateData?.dateTime.includes(', ') ? (
+                            <>
+                              {selectedDateData.label}
+                              <br />
+                              {selectedDateData.dateTime.split(', ')[1] ?? ''}
+                            </>
+                          ) : (
+                            selectedDateDisplay
+                          )}
+                        </p>
                       </div>
                       <div>
                         <p className="text-sm text-[#D9D0BF]/80 uppercase tracking-wider mb-1.5">Tickets</p>
