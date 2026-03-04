@@ -201,7 +201,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
 
   return (
     <div className="carrd-page flex flex-col items-center min-h-screen overflow-x-hidden pt-8">
-      <div className="w-full max-w-[60rem] flex flex-col items-center px-6 md:px-12 py-8 md:py-12 gap-[0.5em]">
+      <div className="w-full max-w-[60rem] flex flex-col items-center px-6 md:px-12 py-8 md:py-12 gap-[1.25em]">
         {/* Hero: Title + Subtitle with Our Story top-right aligned */}
         <div className="relative w-full flex flex-col items-center gap-1">
           <Link
@@ -235,13 +235,13 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         </div>
 
         {/* Countdown */}
-        <div className="flex justify-center pt-6" style={{ transform: 'scale(1.3)' }}>
+        <div className="flex justify-center py-6" style={{ transform: 'scale(1.3)' }}>
           <CountdownTimer targetTimestamp={countdownTarget} length={3} />
         </div>
 
         {/* March Gatherings */}
         <section className="w-full flex flex-col items-center gap-10 text-center">
-          <div className="flex flex-col items-center gap-[0.5em] w-full">
+          <div className="flex flex-col items-center gap-[1em] w-full">
             <h2 className="carrd-font-heading text-2xl md:text-3xl italic" style={{ letterSpacing: '-2px' }}>
               Crossing into Spring
             </h2>
@@ -253,7 +253,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
             ))}
             </div>
           </div>
-          <div className="w-full max-w-[650px] flex flex-col md:flex-row items-center md:items-start justify-center gap-16 md:gap-28 text-center pt-4">
+          <div className="w-full max-w-[650px] flex flex-col md:flex-row items-center md:items-start justify-center gap-16 md:gap-28 text-center pt-2">
             <div className="space-y-2">
               <p className="carrd-font-label text-[1.3125rem]">
                 Date
@@ -281,7 +281,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           <button
             type="button"
             onClick={() => scrollToSection(joinRef)}
-            className="carrd-btn px-8 py-3 mt-2"
+            className="carrd-btn px-8 py-3"
           >
             Reserve Your Seat
           </button>
