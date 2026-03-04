@@ -926,9 +926,14 @@ html::-webkit-scrollbar {
   border: none;
   border-radius: 1rem;
   background: rgba(250, 235, 212, 0.04);
-  padding: 1.25rem 1.25rem;
+  padding: 1rem 1rem;
   transition: background 0.2s ease;
   -webkit-tap-highlight-color: rgba(250, 224, 185, 0.1);
+}
+@media (min-width: 768px) {
+  .carrd-mobile-pill {
+    padding: 1.25rem 1.25rem;
+  }
 }
 .carrd-mobile-pill:active,
 .carrd-mobile-pill.carrd-mobile-pill--selected {

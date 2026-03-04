@@ -160,9 +160,10 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
 
   useEffect(() => {
     if (showReservationView) {
+      window.scrollTo({ top: 0, behavior: 'auto' })
       const t = setTimeout(() => {
         mobileReservationPanelRef.current?.scrollTo({ top: 0, behavior: 'auto' })
-      }, 520)
+      }, 100)
       return () => clearTimeout(t)
     }
   }, [showReservationView])
@@ -224,7 +225,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         </Link>
       </div>
       {/* Mobile: two-panel slide (invite | reservation) */}
-      <div className="md:hidden w-full flex-1 min-h-0 overflow-x-hidden">
+      <div className="md:hidden w-full flex-1 min-h-0 min-w-0 overflow-hidden" style={{ maxHeight: '100dvh' }}>
         <div
           className="flex transition-transform duration-500 ease-in-out h-full"
           style={{ width: '200%', transform: showReservationView ? 'translateX(-50%)' : 'translateX(0)' }}
@@ -282,7 +283,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
             </section>
             <SiteFooter variant="main" />
           </div>
-          <div className="w-1/2 flex-shrink-0 flex flex-col items-center px-6 py-4 gap-3 overflow-y-auto min-h-0">
+          <div ref={mobileReservationPanelRef} className="w-1/2 flex-shrink-0 flex flex-col items-center px-4 py-3 gap-2 overflow-y-auto min-h-0 min-w-0">
             <div className="w-full flex flex-col items-center gap-1 shrink-0">
               <div className="flex justify-center gap-2" aria-hidden>
                 {([1, 2, 3] as const).map((step) => (
@@ -297,7 +298,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       if (reservationStep === 1) setShowReservationView(false)
                       else setReservationStep((s) => (s - 1) as 1 | 2 | 3)
                     }}
-                    className="carrd-font-body text-sm text-[#D9D0BF] hover:text-[#FAEBD4] underline focus:outline-none cursor-pointer"
+                    className="carrd-font-body text-base text-[#D9D0BF] hover:text-[#FAEBD4] underline focus:outline-none cursor-pointer"
                   >
                     ← Back
                   </button>
@@ -306,7 +307,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 <div className="flex-1 min-w-0" aria-hidden />
               </div>
             </div>
-            <section className="carrd-reservation-section w-full min-w-0 overflow-x-hidden flex flex-col shrink-0">
+            <section className="carrd-reservation-section w-full min-w-0 overflow-x-hidden flex flex-col flex-1 min-h-0">
               <div
                 className="flex transition-transform duration-500 ease-in-out flex-1 min-w-0"
                 style={{
@@ -315,10 +316,10 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 }}
               >
                 {/* Mobile reservation reuses same panel structure - content is in desktop flow below, we need inline copy */}
-                <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-8 px-3 overflow-y-auto">
-                  <h2 className="carrd-font-heading carrd-font-h2">1. Choose Your Evening</h2>
-                  <p className="carrd-font-body text-left w-full max-w-[650px] text-sm">The teahouse is open by reservation with limited seats. Reserve a spot to gift yourself a cozy evening.</p>
-                  <div className="w-full max-w-[650px] flex flex-col gap-5">
+                <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-2 min-w-0 overflow-y-auto overflow-x-hidden">
+                  <h2 className="carrd-font-heading carrd-font-h2 text-lg">1. Choose Your Evening</h2>
+                  <p className="carrd-font-body text-left w-full max-w-full min-w-0 text-base">The teahouse is open by reservation with limited seats. Reserve a spot to gift yourself a cozy evening.</p>
+                  <div className="w-full max-w-full min-w-0 flex flex-col gap-3">
                     {dates.map((d) => {
                       const [datePart, timePart] = d.dateTime.includes(', ') ? d.dateTime.split(', ') : [d.dateTime, '']
                       const headerRest = timePart ? `${datePart} ${timePart.toUpperCase()}` : datePart
@@ -334,16 +335,16 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                           className={`carrd-mobile-pill flex flex-row items-center justify-between gap-3 text-left w-full cursor-pointer ${isSelected ? 'carrd-mobile-pill--selected' : ''}`}
                         >
                           <div className="min-w-0 flex-1">
-                            <p className="leading-tight text-[0.875rem]">
+                            <p className="leading-tight text-base">
                               <span className="text-[#C4AF86] font-medium">{d.day}</span>
                               <span className="text-[#FAEBD4]/90 font-normal">, {headerRest}</span>
                             </p>
                             {d.spotifyUrl ? (
-                              <a href={d.spotifyUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[0.8125rem] text-[#D9D0BF]/90 italic underline hover:text-[#FAEBD4] focus:outline-none focus:underline mt-0.5 block">
+                              <a href={d.spotifyUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-sm text-[#D9D0BF]/90 italic underline hover:text-[#FAEBD4] focus:outline-none focus:underline mt-0.5 block">
                                 {musicianLine}
                               </a>
                             ) : (
-                              <p className="text-[#D9D0BF]/90 text-[0.8125rem] italic mt-0.5">{musicianLine}</p>
+                              <p className="text-[#D9D0BF]/90 text-sm italic mt-0.5">{musicianLine}</p>
                             )}
                           </div>
                           <span className={`carrd-mobile-pill-select shrink-0 ${isSelected ? 'carrd-mobile-pill-select--selected' : ''}`}>Select</span>
@@ -352,9 +353,9 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     })}
                   </div>
                 </div>
-                <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-8 px-3 overflow-y-auto">
-                  <h2 className="carrd-font-heading carrd-font-h2">2. Choose Your Ticket</h2>
-                  <div className="w-full max-w-[650px] flex flex-col gap-5">
+                <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-2 min-w-0 overflow-y-auto overflow-x-hidden">
+                  <h2 className="carrd-font-heading carrd-font-h2 text-lg">2. Choose Your Ticket</h2>
+                  <div className="w-full max-w-full min-w-0 flex flex-col gap-3">
                     {tiers.filter((t) => t.id === 'community' || t.id === 'patron').map((t) => {
                       const qty = selections[t.id] ?? 0
                       const isSelected = qty > 0
@@ -362,12 +363,12 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         <div key={t.id} className={`carrd-mobile-pill flex flex-col gap-1.5 text-left w-full ${isSelected ? 'carrd-mobile-pill--selected' : ''}`}>
                           <div className="flex items-start justify-between gap-4">
                             <div className="min-w-0 flex-1">
-                              <p className="leading-tight text-[0.875rem]">
+                              <p className="leading-tight text-base">
                                 <span className="text-[#C4AF86] font-medium">{t.label}</span>
                                 <span className="text-[#FAEBD4]/90 font-normal">, ${t.price}</span>
                               </p>
-                              <p className="text-[#D9D0BF]/90 text-[0.75rem] leading-snug mt-0.5 line-clamp-2">{t.blurb}</p>
-                              <button type="button" onClick={() => setExpandedTierDetails((v) => !v)} className="text-[0.75rem] text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit mt-1">
+                              <p className="text-[#D9D0BF]/90 text-sm leading-snug mt-0.5 line-clamp-2">{t.blurb}</p>
+                              <button type="button" onClick={() => setExpandedTierDetails((v) => !v)} className="text-sm text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit mt-1">
                                 {expandedTierDetails ? 'Hide pricing details' : 'More on pricing'}
                               </button>
                             </div>
@@ -384,12 +385,12 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         </div>
                       )
                     })}
-                    <button type="button" onClick={() => setExpandedPricingNote((v) => !v)} className="carrd-font-body text-[0.8125rem] text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit flex items-center gap-1">
+                    <button type="button" onClick={() => setExpandedPricingNote((v) => !v)} className="carrd-font-body text-sm text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit flex items-center gap-1">
                       {expandedPricingNote ? 'Hide' : 'About our pricing'}
-                      <span className="text-[0.75rem] transition-transform" style={{ transform: expandedPricingNote ? 'rotate(180deg)' : 'none' }}>▾</span>
+                      <span className="text-sm transition-transform" style={{ transform: expandedPricingNote ? 'rotate(180deg)' : 'none' }}>▾</span>
                     </button>
                     {expandedPricingNote && (
-                      <div className="carrd-font-body text-left text-[0.8125rem] text-[#D9D0BF]/95 space-y-3">
+                      <div className="carrd-font-body text-left text-sm text-[#D9D0BF]/95 space-y-2">
                         <p>
                           Our city and community span a wide range of financial situations. Our tiered pricing helps us balance the financial sustainability and accessibility of the teahouse. We invite you to choose the level that feels right for you — one that honors your own capacity while helping us keep this space open, welcoming and alive.
                         </p>
@@ -403,8 +404,8 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       <div className={`carrd-mobile-pill flex flex-col gap-1.5 text-left w-full ${(selections['supported'] ?? 0) > 0 ? 'carrd-mobile-pill--selected' : ''}`}>
                         <div className="flex items-start justify-between gap-4">
                           <div className="min-w-0 flex-1">
-                            <p className="leading-tight text-[0.875rem]"><span className="text-[#C4AF86] font-medium">Supported</span><span className="text-[#FAEBD4]/90 font-normal">, $20+</span></p>
-                            <p className="text-[#D9D0BF]/90 text-[0.75rem] leading-snug mt-0.5 line-clamp-2">{tiers.find((t) => t.id === 'supported')?.blurb}</p>
+                            <p className="leading-tight text-base"><span className="text-[#C4AF86] font-medium">Supported</span><span className="text-[#FAEBD4]/90 font-normal">, $20+</span></p>
+                            <p className="text-[#D9D0BF]/90 text-sm leading-snug mt-0.5 line-clamp-2">{tiers.find((t) => t.id === 'supported')?.blurb}</p>
                           </div>
                           {(selections['supported'] ?? 0) > 0 ? (
                             <div className="flex flex-col items-end gap-2 shrink-0">
@@ -427,10 +428,10 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   </div>
                   <button type="button" onClick={() => setReservationStep(3)} disabled={!hasSelection} className="carrd-btn px-6 py-3 disabled:opacity-50 disabled:cursor-not-allowed">Continue</button>
                 </div>
-                <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-8 px-3 overflow-y-auto">
-                  <h2 className="carrd-font-heading carrd-font-h2">3. Complete Your Reservation</h2>
+                <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-2 min-w-0 overflow-y-auto overflow-x-hidden">
+                  <h2 className="carrd-font-heading carrd-font-h2 text-lg">3. Complete Your Reservation</h2>
                   {selectedDate && hasSelection ? (
-                    <div className="carrd-font-body rounded-lg bg-[#FAEBD4]/20 px-4 py-4 text-left w-full max-w-[650px]">
+                    <div className="carrd-font-body rounded-lg bg-[#FAEBD4]/20 px-4 py-4 text-left w-full max-w-full min-w-0">
                       <div className="space-y-3">
                         <div><p className="text-sm text-[#D9D0BF]/80 uppercase tracking-wider">Date</p><p className="text-base text-[#FAEBD4]">{selectedDateData?.dateTime}</p></div>
                         <div><p className="text-sm text-[#D9D0BF]/80 uppercase tracking-wider mb-1.5">Tickets</p><div className="space-y-1">{(['supported', 'community', 'patron'] as const).filter((tid) => (selections[tid] ?? 0) > 0).map((tierId) => { const qty = selections[tierId] ?? 0; const tier = tiers.find((t) => t.id === tierId); const price = tierId === 'supported' ? supportedPrice : (tier?.price ?? 0); const label = tier?.label ?? tierId; return <p key={tierId} className="text-base text-[#FAEBD4]">{label} — ${price} × {qty} = ${price * qty}</p> })}</div></div>
@@ -438,23 +439,23 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       </div>
                     </div>
                   ) : null}
-                  <form className="w-full max-w-[650px] flex flex-col gap-4 carrd-font-body">
+                  <form className="w-full max-w-full min-w-0 flex flex-col gap-4 carrd-font-body">
                     <input type="hidden" name="device_type" value={deviceType} />
                     <input type="hidden" name="date" value={selectedDate ?? ''} />
                     <label className="flex flex-col gap-1.5">Name *<input type="text" name="name" required value={formData.name} onChange={(e) => setFormData((d) => ({ ...d, name: e.target.value }))} className="mt-1 w-full rounded-lg border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] placeholder:text-[#D9D0BF]/60 focus:border-[#FAE0B9] focus:outline-none focus:ring-2 focus:ring-[#FAE0B9]/30" placeholder="Your name" /></label>
                     <label className="flex flex-col gap-1.5">Email *<input type="email" name="email" required value={formData.email} onChange={(e) => setFormData((d) => ({ ...d, email: e.target.value }))} className="mt-1 w-full rounded-lg border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] placeholder:text-[#D9D0BF]/60 focus:border-[#FAE0B9] focus:outline-none focus:ring-2 focus:ring-[#FAE0B9]/30" placeholder="you@example.com" /></label>
                     <label className="flex flex-col gap-1.5">Notes<textarea name="notes" value={formData.notes} onChange={(e) => setFormData((d) => ({ ...d, notes: e.target.value }))} rows={2} className="mt-1 w-full resize-none rounded-lg border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] placeholder:text-[#D9D0BF]/60 focus:border-[#FAE0B9] focus:outline-none focus:ring-2 focus:ring-[#FAE0B9]/30" placeholder="Anything else we should know?" /></label>
                   </form>
-                  <div className="w-full max-w-[650px] text-left">
-                    <p className="carrd-font-body text-sm font-medium mb-1.5">A few things to note before booking:</p>
-                    <ul className="carrd-font-body text-base space-y-1 list-none pl-0 leading-tight">
+                  <div className="w-full max-w-full min-w-0 text-left">
+                    <p className="carrd-font-body text-base font-medium mb-1.5">A few things to note before booking:</p>
+                    <ul className="carrd-font-body text-base space-y-1.5 list-none pl-0 leading-snug">
                       {BOOKING_NOTES.map((item, i) => (
                         <li key={i} className="flex items-center gap-2"><span className="text-[#D9D0BF] w-1.5 h-1.5 rounded-full bg-[#D9D0BF] shrink-0" aria-hidden /><span className="flex-1 text-[#D9D0BF]/95">{item}</span></li>
                       ))}
                     </ul>
                   </div>
                   {selectedDate && hasSelection && checkoutError && (
-                    <p className="carrd-font-body text-sm text-red-300 w-full max-w-[650px]" role="alert">{checkoutError}</p>
+                    <p className="carrd-font-body text-base text-red-300 w-full max-w-full" role="alert">{checkoutError}</p>
                   )}
                   {selectedDate && hasSelection && (
                     <button type="button" disabled={isSubmitting} onClick={async () => {
