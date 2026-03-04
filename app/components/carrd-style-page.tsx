@@ -664,13 +664,12 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   </button>
                 </div>
               )}
-              </div>
               <form
                 id="carrd-form"
                 onSubmit={(e) => {
                   e.preventDefault()
                 }}
-                className="w-full max-w-[650px] flex flex-col gap-4 carrd-font-body"
+                className="w-full flex flex-col gap-4 carrd-font-body"
               >
                 <input type="hidden" name="device_type" value={deviceType} />
                 <input type="hidden" name="date" value={selectedDate ?? ''} />
@@ -715,7 +714,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   {checkoutError}
                 </p>
               )}
-              <div className="w-full max-w-[650px] text-left mt-6">
+              <div className="w-full text-left mt-6">
                 <p className="carrd-font-body text-sm font-medium mb-1.5">A few things to note before booking:</p>
                 <ul className="carrd-font-body text-base space-y-1 list-none pl-0 leading-tight">
                   {BOOKING_NOTES.map((item, i) => (
@@ -768,11 +767,12 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       setIsSubmitting(false)
                     }
                   }}
-                    className="carrd-btn px-10 py-3 disabled:opacity-70 disabled:cursor-not-allowed mt-8"
+                    className="carrd-btn px-10 py-3 disabled:opacity-70 disabled:cursor-not-allowed mt-8 w-full"
                 >
                   {isSubmitting ? 'Redirecting…' : 'Finish Booking'}
                 </button>
               )}
+              </div>
             </div>
           </div>
         </section>
