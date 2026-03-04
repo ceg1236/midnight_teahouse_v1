@@ -702,8 +702,8 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 <p className="carrd-font-body text-sm font-medium mb-1.5">A few things to note before booking:</p>
                 <ul className="carrd-font-body text-[0.74375rem] space-y-1 list-none pl-0 leading-tight">
                   {BOOKING_NOTES.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <span className="text-[#D9D0BF] mt-[0.3em] w-1.5 h-1.5 rounded-full bg-[#D9D0BF] shrink-0 flex-shrink-0" aria-hidden />
+                    <li key={i} className="flex items-center gap-2">
+                      <span className="text-[#D9D0BF] w-1.5 h-1.5 rounded-full bg-[#D9D0BF] shrink-0 flex-shrink-0" aria-hidden />
                       <span className="flex-1 text-[#D9D0BF]/95">{item}</span>
                     </li>
                   ))}
