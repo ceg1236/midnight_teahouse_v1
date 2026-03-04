@@ -100,7 +100,10 @@ export async function POST(req: NextRequest) {
   }
 
   const baseUrl = getBaseUrl()
-  const successUrl = `${baseUrl}/invite/success?session_id={CHECKOUT_SESSION_ID}`
+  const successUrl =
+    `${baseUrl}/invite/success?session_id={CHECKOUT_SESSION_ID}` +
+    `&date_id=${encodeURIComponent(date.id)}` +
+    `&name=${encodeURIComponent(trimmedName)}`
   const cancelUrl = `${baseUrl}`
 
   const orderStr = lineItems.map((li) => `${li.tier.id}:${li.quantity}`).join(',')

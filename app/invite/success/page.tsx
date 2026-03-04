@@ -2,6 +2,8 @@
 
 import Link from 'next/link'
 import { useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { eventDates } from '../../../content/event-invite.config'
 
 const STORAGE_KEY = 'teahouse_reservation'
 
@@ -13,10 +15,31 @@ const GOOGLE_CALENDAR_URL =
   '&details=An+enchanted+world+hidden+in+San+Francisco' +
   '&location=SoMA%2C+San+Francisco'
 
+function getFirstName(name: string): string {
+  const trimmed = name.trim()
+  return trimmed ? trimmed.split(/\s+/)[0] ?? trimmed : ''
+}
+
 export default function InviteSuccessPage() {
+  const searchParams = useSearchParams()
+
+  const handleForwardViaText = () => {
+    const name = searchParams.get('name') ?? ''
+    const dateId = searchParams.get('date_id') ?? ''
+    const event = dateId ? eventDates.find((d) => d.id === dateId) : eventDates[0]
+    const dateLabel = event?.dateTime ?? 'March 18–20, 2026'
+    const firstName = getFirstName(name)
+    const gatheringsUrl = `${window.location.origin}/invite/gatherings${dateId ? `?date=${dateId}` : ''}`
+    const smsBody =
+      (firstName ? `${firstName} invited you to join them at the Midnight Teahouse on ${dateLabel}. ` : '') +
+      `Here are some details about our gatherings. ${gatheringsUrl}`
+    window.location.href = `sms:?body=${encodeURIComponent(smsBody)}`
+  }
+
   useEffect(() => {
     sessionStorage.removeItem(STORAGE_KEY)
   }, [])
+
   return (
     <div className="carrd-page flex min-h-[100dvh] flex-col items-center justify-center px-6 md:min-h-screen">
       <div className="mx-auto flex max-w-md flex-col items-center gap-6 text-center">
@@ -35,6 +58,13 @@ export default function InviteSuccessPage() {
           >
             Add to Google Calendar
           </a>
+          <button
+            type="button"
+            onClick={handleForwardViaText}
+            className="carrd-link carrd-link--muted text-sm underline hover:no-underline bg-transparent border-none cursor-pointer p-0 font-inherit"
+          >
+            Forward invite via text
+          </button>
           <Link
             href="/"
             className="carrd-btn px-10 py-4 font-inherit text-xl"
