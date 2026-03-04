@@ -247,7 +247,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           </h2>
           <div className="carrd-font-body text-left space-y-4 w-full max-w-[56rem]">
             {welcomeContent.split(/\n\n+/).map((para, i) => (
-              <p key={i}>
+              <p key={i} className="whitespace-pre-line">
                 {para}
               </p>
             ))}
