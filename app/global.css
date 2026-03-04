@@ -745,6 +745,11 @@ html::-webkit-scrollbar {
   position: relative;
   z-index: 1;
 }
+/* Corner link (Our Story / Home) must stay fixed above page content */
+.carrd-corner-link {
+  position: fixed !important;
+  z-index: 50 !important;
+}
 /* Shared accent color for Reservation heading and table headers */
 .carrd-accent-color {
   color: #C4AF86;
