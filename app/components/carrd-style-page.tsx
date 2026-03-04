@@ -177,28 +177,25 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
   const handleTierClick = (tierId: string) => {
     setSelections((prev) => {
       const q = prev[tierId] ?? 0
-      const othersTotal = Object.entries(prev).reduce((s, [id, n]) => (id === tierId ? s : s + n), 0)
       if (q > 0) {
         const next = { ...prev }
         delete next[tierId]
         return next
       }
-      if (othersTotal >= 4) return prev
-      return { ...prev, [tierId]: 1 }
+      return { [tierId]: 1 }
     })
   }
 
   const handleQuantityChange = (tierId: string, delta: number) => {
     setSelections((prev) => {
       const q = prev[tierId] ?? 0
-      const othersTotal = Object.entries(prev).reduce((s, [id, n]) => (id === tierId ? s : s + n), 0)
       if (delta === -1 && q <= 1) {
         const next = { ...prev }
         delete next[tierId]
         return next
       }
-      if (delta === 1 && othersTotal + q >= 4) return prev
-      return { ...prev, [tierId]: q + delta }
+      if (delta === 1 && q >= 4) return prev
+      return { [tierId]: q + delta }
     })
   }
 
@@ -497,7 +494,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   })}
               </div>
               <p className="carrd-font-intro text-left w-full max-w-[56rem]">
-                If cost is a barrier please consider our{' '}
+                If cost is a barrier, please consider our{' '}
                 <button
                   type="button"
                   onClick={() => setShowSupportedTier(true)}
@@ -510,7 +507,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               {showSupportedTier && tiers.filter((t) => t.id === 'supported').map((t) => (
                 <div
                   key={t.id}
-                  className="grid grid-cols-1 sm:grid-cols-[minmax(10rem,auto)_1fr_auto] gap-3 sm:gap-6 py-3 border-b border-[#D9D0BF]/30 items-start w-full max-w-[56rem]"
+                  className="grid grid-cols-1 sm:grid-cols-[minmax(10rem,auto)_1fr_auto] gap-3 sm:gap-6 py-3 items-start w-full max-w-[56rem]"
                 >
                   <div className="carrd-font-body flex-shrink-0 min-w-[10rem]">
                     <p className="font-medium text-[#FAEBD4]">Supported</p>
