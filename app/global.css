@@ -763,7 +763,7 @@ html::-webkit-scrollbar {
 }
 .carrd-font-title {
   font-family: 'Aboreto', cursive;
-  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-size: 32px;
   line-height: 1.1;
 }
 .carrd-font-intro {
