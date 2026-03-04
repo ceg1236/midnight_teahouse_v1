@@ -48,36 +48,36 @@ export default function InviteSuccessPage() {
         <h1 className="carrd-font-heading text-3xl md:text-4xl [font-variant:small-caps]">
           See you at the Teahouse
         </h1>
-        {/* Paper card invite — 5×7 portrait */}
-        <div className="carrd-font-body w-[min(100%,12.5rem)] aspect-[5/7] flex flex-col rounded-lg border border-[#D9D0BF]/60 bg-[#f8f4ec] px-5 py-6 shadow-[0_4px_24px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.1)] text-[#2E0303] text-left">
+        {/* Paper card invite — 600px wide, 5×7 portrait, paper texture */}
+        <div className="carrd-font-body success-card-paper w-full max-w-[600px] aspect-[5/7] flex flex-col rounded-lg border border-[#D9D0BF]/60 px-10 py-8 shadow-[0_4px_24px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.1)] text-left text-[#2E0303]">
           {firstName ? (
-            <p className="carrd-font-body text-base text-[#2E0303] mb-2">
+            <p className="carrd-font-body text-lg mb-2">
               {firstName},
             </p>
           ) : null}
-          <p className="carrd-font-body text-[0.8125rem] text-[#3d2e2e] leading-relaxed mb-4">
+          <p className="carrd-font-body text-base leading-relaxed mb-5">
             Thank you for reserving your spot. We are excited to share an evening with you.
           </p>
-          <div className="space-y-1 mb-3">
-            <p className="carrd-font-body text-[0.6875rem] uppercase tracking-wider text-[#5c4a3a]">
+          <div className="space-y-1 mb-4">
+            <p className="carrd-font-body text-xs uppercase tracking-wider">
               Date
             </p>
-            <p className="carrd-font-body text-[0.8125rem] text-[#2E0303]">
+            <p className="carrd-font-body text-base">
               {dateLabel}
             </p>
           </div>
-          <div className="space-y-1 mb-4">
-            <p className="carrd-font-body text-[0.6875rem] uppercase tracking-wider text-[#5c4a3a]">
+          <div className="space-y-1 mb-5">
+            <p className="carrd-font-body text-xs uppercase tracking-wider">
               Location
             </p>
-            <p className="carrd-font-body text-[0.8125rem] text-[#2E0303]">
+            <p className="carrd-font-body text-base">
               {ADDRESS}
             </p>
           </div>
-          <p className="carrd-font-body text-[0.75rem] text-[#3d2e2e] leading-relaxed mb-auto">
+          <p className="carrd-font-body text-sm leading-relaxed mb-auto">
             Please look out for our confirmation email.
           </p>
-          <p className="carrd-font-body text-[0.8125rem] text-[#2E0303] mt-2">
+          <p className="carrd-font-body text-base mt-2">
             Warmly,
           </p>
         </div>

@@ -741,6 +741,14 @@ html::-webkit-scrollbar {
   height: 100dvh;
   pointer-events: none;
 }
+
+/* Success page paper card — cream base + paper texture */
+.success-card-paper {
+  background-color: #f8f4ec;
+  background-image: url('/images/paper_texture.svg');
+  background-repeat: repeat;
+  background-size: 200px 200px;
+}
 .carrd-page > * {
   position: relative;
   z-index: 1;
@@ -918,8 +926,12 @@ html::-webkit-scrollbar {
     border-radius: 0;
     border: none;
     border-bottom: 1px solid rgba(217, 208, 191, 0.3);
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
+    /* Optical balance: slightly less top, more bottom to counter perceived imbalance */
+    padding-top: 0.5rem;
+    padding-bottom: 1rem;
+  }
+  .carrd-reservation-card > * {
+    margin: 0;
   }
   .carrd-reservation-card:last-child {
     border-bottom: none;
