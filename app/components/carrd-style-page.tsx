@@ -131,6 +131,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
   const tierRef = useRef<HTMLDivElement>(null)
   const mobileReservationPanelRef = useRef<HTMLDivElement>(null)
   const formRef = useRef<HTMLDivElement>(null)
+  const mobileFormRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const persisted = loadPersisted(dates, tiers)
@@ -166,6 +167,16 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
       })
     }
   }, [showReservationView])
+
+  useEffect(() => {
+    if (reservationStep === 3) {
+      const el = typeof window !== 'undefined' && window.innerWidth < 768 ? mobileFormRef.current : formRef.current
+      const t = setTimeout(() => {
+        el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 100)
+      return () => clearTimeout(t)
+    }
+  }, [reservationStep])
 
   const hasSelection = Object.values(selections).some((q) => q > 0)
   const totalQuantity = Object.values(selections).reduce((s, q) => s + q, 0)
@@ -439,7 +450,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   </div>
                   <button type="button" onClick={() => setReservationStep(3)} disabled={!hasSelection} className="carrd-btn px-8 py-4 disabled:opacity-50 disabled:cursor-not-allowed">Continue</button>
                 </div>
-                <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full">
+                <div ref={mobileFormRef} className="flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full">
                   <h2 className="carrd-font-heading carrd-font-h2 text-2xl">3. Complete Your Reservation</h2>
                   {selectedDate && hasSelection ? (
                     <div className="carrd-font-body rounded-lg bg-[#FAEBD4]/20 px-4 py-4 text-left w-full max-w-full min-w-0">
