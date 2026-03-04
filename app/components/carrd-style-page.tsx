@@ -279,7 +279,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
             <SiteFooter variant="main" />
           </div>
         ) : (
-          <div ref={mobileReservationPanelRef} className="flex flex-col items-center px-4 py-4 gap-3 min-w-0">
+          <div ref={mobileReservationPanelRef} className="flex flex-col items-center px-4 py-4 gap-3 min-w-0 w-full max-w-[100vw] overflow-x-hidden">
             <div className="w-full flex flex-col items-center gap-1 shrink-0">
               <div className="flex justify-center gap-2" aria-hidden>
                 {([1, 2, 3] as const).map((step) => (
@@ -303,7 +303,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 <div className="flex-1 min-w-0" aria-hidden />
               </div>
             </div>
-            <section className="carrd-reservation-section w-full min-w-0 overflow-x-hidden">
+            <section className="carrd-reservation-section w-full min-w-0 overflow-x-hidden max-w-[100vw]">
               <div
                 className="flex transition-transform duration-500 ease-in-out min-w-0"
                 style={{
@@ -312,10 +312,10 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 }}
               >
                 {/* Mobile reservation reuses same panel structure - content is in desktop flow below, we need inline copy */}
-                <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-2 min-w-0 overflow-y-auto overflow-x-hidden">
+                <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-2 min-w-0 overflow-y-auto overflow-x-hidden max-w-[100vw]">
                   <h2 className="carrd-font-heading carrd-font-h2 text-2xl">1. Choose Your Evening</h2>
                   <p className="carrd-font-body text-left w-full max-w-full min-w-0 text-xl">The teahouse is open by reservation with limited seats. Reserve a spot to gift yourself a cozy evening.</p>
-                  <div className="w-full max-w-full min-w-0 flex flex-col gap-3">
+                  <div className="w-full max-w-full min-w-0 flex flex-col gap-3 break-words">
                     {dates.map((d) => {
                       const [datePart, timePart] = d.dateTime.includes(', ') ? d.dateTime.split(', ') : [d.dateTime, '']
                       const headerRest = timePart ? `${datePart} ${timePart.toUpperCase()}` : datePart
@@ -343,41 +343,39 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                               <p className="text-[#D9D0BF]/90 text-lg italic mt-0.5">{musicianLine}</p>
                             )}
                           </div>
-                          <span className={`carrd-mobile-pill-select shrink-0 self-start ${isSelected ? 'carrd-mobile-pill-select--selected' : ''}`}>Select</span>
+                          <span className={`carrd-mobile-pill-select shrink-0 self-center ${isSelected ? 'carrd-mobile-pill-select--selected' : ''}`}>Select</span>
                         </div>
                       )
                     })}
                   </div>
                 </div>
-                <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-2 min-w-0 overflow-y-auto overflow-x-hidden">
+                <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-2 min-w-0 overflow-y-auto overflow-x-hidden max-w-[100vw]">
                   <h2 className="carrd-font-heading carrd-font-h2 text-2xl">2. Choose Your Ticket</h2>
-                  <div className="w-full max-w-full min-w-0 flex flex-col gap-3">
+                  <div className="w-full max-w-full min-w-0 flex flex-col gap-3 break-words">
                     {tiers.filter((t) => t.id === 'community' || t.id === 'patron').map((t) => {
                       const qty = selections[t.id] ?? 0
                       const isSelected = qty > 0
                       return (
                         <div key={t.id} className={`carrd-mobile-pill flex flex-col gap-3 text-left w-full ${isSelected ? 'carrd-mobile-pill--selected' : ''}`}>
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="min-w-0 flex-1">
-                              <p className="leading-tight text-xl">
-                                <span className="text-[#C4AF86] font-medium">{t.label}</span>
-                                <span className="text-[#FAEBD4]/90 font-normal">, ${t.price}</span>
-                              </p>
-                              <p className="text-[#D9D0BF]/90 text-lg leading-snug mt-0.5 line-clamp-2">{t.blurb}</p>
-                              <button type="button" onClick={() => setExpandedTierDetails((v) => !v)} className="text-base text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit mt-1">
-                                {expandedTierDetails ? 'Hide pricing details' : 'More on pricing'}
-                              </button>
-                            </div>
-                            {qty > 0 ? (
-                              <div className="flex items-center gap-2 shrink-0">
-                                <button type="button" onClick={() => handleQuantityChange(t.id, -1)} className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg" aria-label={`Decrease ${t.label}`}>−</button>
-                                <span className="w-8 text-center text-lg tabular-nums text-[#FAEBD4]">{qty}</span>
-                                <button type="button" onClick={() => handleQuantityChange(t.id, 1)} disabled={totalQuantity >= 4} className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg disabled:opacity-40" aria-label={`Increase ${t.label}`}>+</button>
-                              </div>
-                            ) : null}
+                          <div className="min-w-0">
+                            <p className="leading-tight text-xl">
+                              <span className="text-[#C4AF86] font-medium">{t.label}</span>
+                              <span className="text-[#FAEBD4]/90 font-normal">, ${t.price}</span>
+                            </p>
+                            <p className="text-[#D9D0BF]/90 text-lg leading-snug mt-0.5 line-clamp-2">{t.blurb}</p>
+                            <button type="button" onClick={() => setExpandedTierDetails((v) => !v)} className="text-base text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit mt-1">
+                              {expandedTierDetails ? 'Hide pricing details' : 'More on pricing'}
+                            </button>
                           </div>
+                          {qty > 0 ? (
+                            <div className="flex items-center justify-center gap-2">
+                              <button type="button" onClick={() => handleQuantityChange(t.id, -1)} className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg" aria-label={`Decrease ${t.label}`}>−</button>
+                              <span className="w-8 text-center text-lg tabular-nums text-[#FAEBD4]">{qty}</span>
+                              <button type="button" onClick={() => handleQuantityChange(t.id, 1)} disabled={totalQuantity >= 4} className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg disabled:opacity-40" aria-label={`Increase ${t.label}`}>+</button>
+                            </div>
+                          ) : null}
                           {qty === 0 && (
-                            <button type="button" onClick={() => handleTierClick(t.id)} className="carrd-mobile-pill-select shrink-0 self-start">Select</button>
+                            <button type="button" onClick={() => handleTierClick(t.id)} className="carrd-mobile-pill-select shrink-0 self-center">Select</button>
                           )}
                         </div>
                       )
@@ -399,34 +397,32 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     )}
                     {(showSupportedTier || (selections['supported'] ?? 0) > 0) && (
                       <div className={`carrd-mobile-pill flex flex-col gap-3 text-left w-full ${(selections['supported'] ?? 0) > 0 ? 'carrd-mobile-pill--selected' : ''}`}>
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="min-w-0 flex-1">
-                            <p className="leading-tight text-xl"><span className="text-[#C4AF86] font-medium">Supported</span><span className="text-[#FAEBD4]/90 font-normal">, $20+</span></p>
-                            <p className="text-[#D9D0BF]/90 text-lg leading-snug mt-0.5 line-clamp-2">{tiers.find((t) => t.id === 'supported')?.blurb}</p>
-                          </div>
-                          {(selections['supported'] ?? 0) > 0 ? (
-                            <div className="flex flex-col items-end gap-2 shrink-0">
-                              <div className="flex items-center justify-end gap-0.5">
-                                <span className="text-[#D9D0BF] text-base">$</span>
-                                <input type="number" min={20} max={40} value={supportedPriceInput} placeholder="20–40" onChange={(e) => { const raw = e.target.value; setSupportedPriceInput(raw); const v = parseInt(raw, 10); if (!isNaN(v) && v >= 20 && v <= 40) setSupportedPrice(v); else if (raw === '') setSelections((prev) => { const n = { ...prev }; delete n.supported; return n }); }} onBlur={() => { const v = parseInt(supportedPriceInput, 10); if (!isNaN(v) && v >= 20 && v <= 40) { setSupportedPrice(v); setSupportedPriceInput(String(v)) } else if (supportedPriceInput === '') setSelections((prev) => { const n = { ...prev }; delete n.supported; return n }); else setSupportedPriceInput(String(supportedPrice)) }} className="carrd-font-body w-14 bg-transparent text-right text-[#FAEBD4] text-base border-0 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
-                              </div>
-                              <div className="flex items-center justify-end gap-2">
-                                <button type="button" onClick={() => handleQuantityChange('supported', -1)} className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg" aria-label="Decrease Supported">−</button>
-                                <span className="w-8 text-center text-lg tabular-nums text-[#FAEBD4]">{selections['supported'] ?? 0}</span>
-                                <button type="button" onClick={() => handleQuantityChange('supported', 1)} disabled={totalQuantity >= 4} className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg disabled:opacity-40" aria-label="Increase Supported">+</button>
-                              </div>
-                            </div>
-                          ) : null}
+                        <div className="min-w-0">
+                          <p className="leading-tight text-xl"><span className="text-[#C4AF86] font-medium">Supported</span><span className="text-[#FAEBD4]/90 font-normal">, $20+</span></p>
+                          <p className="text-[#D9D0BF]/90 text-lg leading-snug mt-0.5 line-clamp-2">{tiers.find((t) => t.id === 'supported')?.blurb}</p>
                         </div>
+                        {(selections['supported'] ?? 0) > 0 ? (
+                          <div className="flex flex-col gap-3 items-center">
+                            <div className="flex items-center gap-2 w-full max-w-[8rem]">
+                              <span className="text-[#D9D0BF] text-lg">$</span>
+                              <input type="number" min={20} max={40} value={supportedPriceInput} placeholder="20–40" onChange={(e) => { const raw = e.target.value; setSupportedPriceInput(raw); const v = parseInt(raw, 10); if (!isNaN(v) && v >= 20 && v <= 40) setSupportedPrice(v); else if (raw === '') setSelections((prev) => { const n = { ...prev }; delete n.supported; return n }); }} onBlur={() => { const v = parseInt(supportedPriceInput, 10); if (!isNaN(v) && v >= 20 && v <= 40) { setSupportedPrice(v); setSupportedPriceInput(String(v)) } else if (supportedPriceInput === '') setSelections((prev) => { const n = { ...prev }; delete n.supported; return n }); else setSupportedPriceInput(String(supportedPrice)) }} className="carrd-font-body flex-1 min-w-0 py-2.5 px-3 text-lg bg-[#2E0303]/40 rounded-lg border border-[#FAE0B9]/30 text-[#FAEBD4] focus:outline-none focus:border-[#FAE0B9]/60 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                            </div>
+                            <div className="flex items-center justify-center gap-2">
+                              <button type="button" onClick={() => handleQuantityChange('supported', -1)} className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg" aria-label="Decrease Supported">−</button>
+                              <span className="w-8 text-center text-lg tabular-nums text-[#FAEBD4]">{selections['supported'] ?? 0}</span>
+                              <button type="button" onClick={() => handleQuantityChange('supported', 1)} disabled={totalQuantity >= 4} className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg disabled:opacity-40" aria-label="Increase Supported">+</button>
+                            </div>
+                          </div>
+                        ) : null}
                         {(selections['supported'] ?? 0) === 0 && (
-                          <button type="button" onClick={() => { setShowSupportedTier(true); setSupportedPrice(20); setSupportedPriceInput('20'); setSelections((prev) => ({ ...prev, supported: 1 })) }} className="carrd-mobile-pill-select shrink-0 self-start">Select</button>
+                          <button type="button" onClick={() => { setShowSupportedTier(true); setSupportedPrice(20); setSupportedPriceInput('20'); setSelections((prev) => ({ ...prev, supported: 1 })) }} className="carrd-mobile-pill-select shrink-0 self-center">Select</button>
                         )}
                       </div>
                     )}
                   </div>
                   <button type="button" onClick={() => setReservationStep(3)} disabled={!hasSelection} className="carrd-btn px-8 py-4 disabled:opacity-50 disabled:cursor-not-allowed">Continue</button>
                 </div>
-                <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-2 min-w-0 overflow-y-auto overflow-x-hidden">
+                <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-2 min-w-0 overflow-y-auto overflow-x-hidden max-w-[100vw]">
                   <h2 className="carrd-font-heading carrd-font-h2 text-2xl">3. Complete Your Reservation</h2>
                   {selectedDate && hasSelection ? (
                     <div className="carrd-font-body rounded-lg bg-[#FAEBD4]/20 px-4 py-4 text-left w-full max-w-full min-w-0">
@@ -609,17 +605,17 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         {/* Reservation: three sliding panels (evening → ticket → form) */}
         <section
           ref={joinRef}
-          className="carrd-reservation-section w-full min-w-0 overflow-x-hidden mt-1"
+          className="carrd-reservation-section w-full min-w-0 overflow-x-hidden max-w-[100vw] md:max-w-none mt-1"
         >
           <div
-            className="flex transition-transform duration-500 ease-in-out"
+            className="flex transition-transform duration-500 ease-in-out min-w-0"
             style={{
               width: '300%',
               transform: `translateX(-${(reservationStep - 1) * (100 / 3)}%)`,
             }}
           >
             {/* Panel 1: Choose your evening */}
-            <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-6 px-3 md:px-6">
+            <div className="flex-shrink-0 w-1/3 min-w-0 flex flex-col items-center gap-6 px-3 md:px-6 max-w-[100vw] md:max-w-none">
               <h2 className="carrd-font-heading carrd-font-h2">
                 1. Choose Your Evening
               </h2>
@@ -627,7 +623,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 The teahouse is open by reservation with limited seats. Reserve a spot to gift yourself a cozy evening.
               </p>
               {/* Mobile: date cards (2-line, succinct) */}
-              <div className="md:hidden w-full max-w-[650px] flex flex-col gap-5">
+              <div className="md:hidden w-full max-w-[min(650px,100vw)] flex flex-col gap-5 break-words">
                 {dates.map((d) => {
                   const [datePart, timePart] = d.dateTime.includes(', ') ? d.dateTime.split(', ') : [d.dateTime, '']
                   const headerRest = timePart ? `${datePart} ${timePart.toUpperCase()}` : datePart
@@ -672,7 +668,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                           <p className="text-[#D9D0BF]/90 text-[0.9375rem] italic mt-0.5">{musicianLine}</p>
                         )}
                       </div>
-                      <span className={`carrd-mobile-pill-select shrink-0 self-start ${isSelected ? 'carrd-mobile-pill-select--selected' : ''}`}>
+                      <span className={`carrd-mobile-pill-select shrink-0 self-center ${isSelected ? 'carrd-mobile-pill-select--selected' : ''}`}>
                         Select
                       </span>
                     </div>
@@ -769,12 +765,12 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
             </div>
 
             {/* Panel 2: Choose your ticket */}
-            <div ref={tierRef} className="flex-shrink-0 w-1/3 flex flex-col items-center gap-6 px-3 md:px-6">
+            <div ref={tierRef} className="flex-shrink-0 w-1/3 min-w-0 flex flex-col items-center gap-6 px-3 md:px-6 max-w-[100vw] md:max-w-none">
               <h2 className="carrd-font-heading carrd-font-h2">
                 2. Choose Your Ticket
               </h2>
               {/* Mobile: cards first, then dropdown for pricing note */}
-              <div className="md:hidden w-full max-w-[650px] flex flex-col gap-5">
+              <div className="md:hidden w-full max-w-[min(650px,100vw)] flex flex-col gap-5 break-words">
                 {tiers
                   .filter((t) => t.id === 'community' || t.id === 'patron')
                   .map((t) => {
@@ -785,51 +781,49 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         key={t.id}
                         className={`carrd-mobile-pill flex flex-col gap-3 text-left w-full ${isSelected ? 'carrd-mobile-pill--selected' : ''}`}
                       >
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="min-w-0 flex-1">
-                            <p className="leading-tight text-base">
-                              <span className="text-[#C4AF86] font-medium">{t.label}</span>
-                              <span className="text-[#FAEBD4]/90 font-normal">, ${t.price}</span>
-                            </p>
-                            <p className="text-[#D9D0BF]/90 text-[0.9375rem] leading-snug mt-0.5 line-clamp-2">
-                              {t.blurb}
-                            </p>
+                        <div className="min-w-0">
+                          <p className="leading-tight text-base">
+                            <span className="text-[#C4AF86] font-medium">{t.label}</span>
+                            <span className="text-[#FAEBD4]/90 font-normal">, ${t.price}</span>
+                          </p>
+                          <p className="text-[#D9D0BF]/90 text-[0.9375rem] leading-snug mt-0.5 line-clamp-2">
+                            {t.blurb}
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => setExpandedTierDetails((v) => !v)}
+                            className="text-[0.9375rem] text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit mt-1"
+                          >
+                            {expandedTierDetails ? 'Hide pricing details' : 'More on pricing'}
+                          </button>
+                        </div>
+                        {qty > 0 ? (
+                          <div className="flex items-center justify-center gap-2">
                             <button
                               type="button"
-                              onClick={() => setExpandedTierDetails((v) => !v)}
-                              className="text-[0.9375rem] text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit mt-1"
+                              onClick={() => handleQuantityChange(t.id, -1)}
+                              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg transition-colors hover:bg-[#FAE0B9]/25 active:bg-[#FAE0B9]/30"
+                              aria-label={`Decrease ${t.label} quantity`}
                             >
-                              {expandedTierDetails ? 'Hide pricing details' : 'More on pricing'}
+                              −
+                            </button>
+                            <span className="w-8 text-center text-lg tabular-nums text-[#FAEBD4]">{qty}</span>
+                            <button
+                              type="button"
+                              onClick={() => handleQuantityChange(t.id, 1)}
+                              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg transition-colors hover:bg-[#FAE0B9]/25 active:bg-[#FAE0B9]/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#D9D0BF]/20"
+                              disabled={totalQuantity >= 4}
+                              aria-label={`Increase ${t.label} quantity`}
+                            >
+                              +
                             </button>
                           </div>
-                          {qty > 0 ? (
-                            <div className="flex items-center gap-2 shrink-0">
-                              <button
-                                type="button"
-                                onClick={() => handleQuantityChange(t.id, -1)}
-                                className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg transition-colors hover:bg-[#FAE0B9]/25 active:bg-[#FAE0B9]/30"
-                                aria-label={`Decrease ${t.label} quantity`}
-                              >
-                                −
-                              </button>
-                              <span className="w-8 text-center text-lg tabular-nums text-[#FAEBD4]">{qty}</span>
-                              <button
-                                type="button"
-                                onClick={() => handleQuantityChange(t.id, 1)}
-                                className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg transition-colors hover:bg-[#FAE0B9]/25 active:bg-[#FAE0B9]/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#D9D0BF]/20"
-                                disabled={totalQuantity >= 4}
-                                aria-label={`Increase ${t.label} quantity`}
-                              >
-                                +
-                              </button>
-                            </div>
-                          ) : null}
-                        </div>
+                        ) : null}
                         {qty === 0 && (
                           <button
                             type="button"
                             onClick={() => handleTierClick(t.id)}
-                            className={`carrd-mobile-pill-select shrink-0 self-start ${isSelected ? 'carrd-mobile-pill-select--selected' : ''}`}
+                            className={`carrd-mobile-pill-select shrink-0 self-center ${isSelected ? 'carrd-mobile-pill-select--selected' : ''}`}
                           >
                             Select
                           </button>
@@ -867,64 +861,63 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   <div
                     className={`carrd-mobile-pill flex flex-col gap-3 text-left w-full ${(selections['supported'] ?? 0) > 0 ? 'carrd-mobile-pill--selected' : ''}`}
                   >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="min-w-0 flex-1">
-                        <p className="leading-tight text-base">
-                          <span className="text-[#C4AF86] font-medium">Supported</span>
-                          <span className="text-[#FAEBD4]/90 font-normal">, $20+</span>
-                        </p>
-                        <p className="text-[#D9D0BF]/90 text-[0.9375rem] leading-snug mt-0.5 line-clamp-2">
-                          {tiers.find((t) => t.id === 'supported')?.blurb}
-                        </p>
-                        <button
-                          type="button"
-                          onClick={() => setExpandedTierDetails((v) => !v)}
-                          className="text-[0.9375rem] text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit mt-1"
-                        >
-                          {expandedTierDetails ? 'Hide pricing details' : 'More on pricing'}
-                        </button>
-                      </div>
-                      {(selections['supported'] ?? 0) > 0 ? (
-                        <div className="flex flex-col items-end gap-2 shrink-0">
-                          <div className="flex items-center justify-end gap-0.5">
-                            <span className="text-[#D9D0BF] text-base">$</span>
-                            <input
-                              type="number"
-                              min={20}
-                              max={40}
-                              value={supportedPriceInput}
-                              placeholder="20–40"
-                              onChange={(e) => {
-                                const raw = e.target.value
-                                setSupportedPriceInput(raw)
-                                const v = parseInt(raw, 10)
-                                if (!isNaN(v) && v >= 20 && v <= 40) setSupportedPrice(v)
-                                else if (raw === '') {
-                                  setSelections((prev) => { const n = { ...prev }; delete n.supported; return n })
-                                }
-                              }}
-                              onBlur={() => {
-                                const v = parseInt(supportedPriceInput, 10)
-                                if (!isNaN(v) && v >= 20 && v <= 40) {
-                                  setSupportedPrice(v)
-                                  setSupportedPriceInput(String(v))
-                                } else if (supportedPriceInput === '') {
-                                  setSelections((prev) => { const n = { ...prev }; delete n.supported; return n })
-                                } else setSupportedPriceInput(String(supportedPrice))
-                              }}
-                              className="carrd-font-body w-14 bg-transparent text-right text-[#FAEBD4] text-base border-0 placeholder:text-[#D9D0BF]/50 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                            />
-                          </div>
-                          <div className="flex items-center justify-end gap-2">
-                            <button
-                              type="button"
-                              onClick={() => handleQuantityChange('supported', -1)}
-                              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg transition-colors hover:bg-[#FAE0B9]/25"
-                              aria-label="Decrease Supported quantity"
-                            >
-                              −
-                            </button>
-                            <span className="w-8 text-center text-lg tabular-nums text-[#FAEBD4]">
+                    <div className="min-w-0">
+                      <p className="leading-tight text-base">
+                        <span className="text-[#C4AF86] font-medium">Supported</span>
+                        <span className="text-[#FAEBD4]/90 font-normal">, $20+</span>
+                      </p>
+                      <p className="text-[#D9D0BF]/90 text-[0.9375rem] leading-snug mt-0.5 line-clamp-2">
+                        {tiers.find((t) => t.id === 'supported')?.blurb}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setExpandedTierDetails((v) => !v)}
+                        className="text-[0.9375rem] text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit mt-1"
+                      >
+                        {expandedTierDetails ? 'Hide pricing details' : 'More on pricing'}
+                      </button>
+                    </div>
+                    {(selections['supported'] ?? 0) > 0 ? (
+                      <div className="flex flex-col gap-3 items-center">
+                        <div className="flex items-center gap-2 w-full max-w-[8rem]">
+                          <span className="text-[#D9D0BF] text-lg">$</span>
+                          <input
+                            type="number"
+                            min={20}
+                            max={40}
+                            value={supportedPriceInput}
+                            placeholder="20–40"
+                            onChange={(e) => {
+                              const raw = e.target.value
+                              setSupportedPriceInput(raw)
+                              const v = parseInt(raw, 10)
+                              if (!isNaN(v) && v >= 20 && v <= 40) setSupportedPrice(v)
+                              else if (raw === '') {
+                                setSelections((prev) => { const n = { ...prev }; delete n.supported; return n })
+                              }
+                            }}
+                            onBlur={() => {
+                              const v = parseInt(supportedPriceInput, 10)
+                              if (!isNaN(v) && v >= 20 && v <= 40) {
+                                setSupportedPrice(v)
+                                setSupportedPriceInput(String(v))
+                              } else if (supportedPriceInput === '') {
+                                setSelections((prev) => { const n = { ...prev }; delete n.supported; return n })
+                              } else setSupportedPriceInput(String(supportedPrice))
+                            }}
+                            className="carrd-font-body flex-1 min-w-0 py-2.5 px-3 text-lg bg-[#2E0303]/40 rounded-lg border border-[#FAE0B9]/30 text-[#FAEBD4] placeholder:text-[#D9D0BF]/50 focus:outline-none focus:border-[#FAE0B9]/60 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          />
+                        </div>
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleQuantityChange('supported', -1)}
+                            className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg transition-colors hover:bg-[#FAE0B9]/25"
+                            aria-label="Decrease Supported quantity"
+                          >
+                            −
+                          </button>
+                          <span className="w-8 text-center text-lg tabular-nums text-[#FAEBD4]">
                               {selections['supported'] ?? 0}
                             </span>
                             <button
@@ -938,8 +931,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                             </button>
                           </div>
                         </div>
-                      ) : null}
-                    </div>
+                    ) : null}
                     {(selections['supported'] ?? 0) === 0 && (
                       <button
                         type="button"
@@ -949,7 +941,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                           setSupportedPriceInput('20')
                           setSelections((prev) => ({ ...prev, supported: 1 }))
                         }}
-                        className="carrd-mobile-pill-select shrink-0 self-start"
+                        className="carrd-mobile-pill-select shrink-0 self-center"
                       >
                         Select
                       </button>
@@ -1155,7 +1147,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
             </div>
 
             {/* Panel 3: Complete your reservation (summary + form + reserve) */}
-            <div ref={formRef} className="flex-shrink-0 w-1/3 flex flex-col items-center gap-6 px-3 md:px-6">
+            <div ref={formRef} className="flex-shrink-0 w-1/3 min-w-0 flex flex-col items-center gap-6 px-3 md:px-6 max-w-[100vw] md:max-w-none">
               <div className="inline-flex flex-col items-stretch gap-6">
                 <h2 className="carrd-font-heading carrd-font-h2">
                   3. Complete Your Reservation
