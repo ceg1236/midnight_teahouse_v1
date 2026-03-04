@@ -209,7 +209,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         <div className="relative w-full flex flex-col items-center gap-1">
           <Link
             href="/our-story"
-            className="absolute top-0 right-0 carrd-link text-sm whitespace-nowrap"
+            className="absolute top-0 right-0 carrd-link carrd-link--muted text-sm whitespace-nowrap"
           >
             Our Story
           </Link>

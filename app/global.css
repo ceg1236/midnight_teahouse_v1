@@ -791,6 +791,12 @@ html::-webkit-scrollbar {
 .carrd-link:hover {
   color: #FAE0B9;
 }
+.carrd-link--muted {
+  color: #8B7355;
+}
+.carrd-link--muted:hover {
+  color: #A68B6D;
+}
 .carrd-page h2 {
   font-variant: normal;
 }
