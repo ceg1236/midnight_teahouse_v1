@@ -309,7 +309,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 </button>
               )}
             </div>
-            <h2 className="carrd-font-heading carrd-font-heading-sm flex-1 text-center">
+            <h2 className="carrd-font-heading carrd-font-heading-sm flex-1 text-center italic">
               Reservation
             </h2>
             <div className="flex-1 min-w-0" aria-hidden />
