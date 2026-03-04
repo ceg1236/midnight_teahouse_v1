@@ -242,14 +242,14 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           <h2 className="carrd-font-heading text-2xl md:text-3xl italic" style={{ letterSpacing: '-2px' }}>
             Crossing into Spring
           </h2>
-          <div className="carrd-font-body text-left space-y-4 w-full max-w-[600px]">
+          <div className="carrd-font-body text-left space-y-4 w-full max-w-[650px]">
             {welcomeContent.split(/\n\n+/).map((para, i) => (
               <p key={i} className="whitespace-pre-line">
                 {para}
               </p>
             ))}
           </div>
-          <div className="w-full max-w-[600px] flex flex-col md:flex-row items-center md:items-start justify-center gap-10 md:gap-16 text-center pt-2">
+          <div className="w-full max-w-[650px] flex flex-col md:flex-row items-center md:items-start justify-center gap-10 md:gap-16 text-center pt-2">
             <div className="space-y-2">
               <p className="carrd-font-label text-[1.3125rem]">
                 Date
@@ -333,10 +333,10 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               <h2 className="carrd-font-heading carrd-font-h2">
                 1. Choose Your Evening
               </h2>
-              <p className="carrd-font-intro text-left w-full max-w-[600px]">
+              <p className="carrd-font-intro text-left w-full max-w-[650px]">
                 To keep our gatherings intimate, we are open by reservation and have limited seats. Reserve a seat to gift a cozy evening to yourself or someone you love.
               </p>
-              <div className="w-full max-w-[600px] space-y-4">
+              <div className="w-full max-w-[650px] space-y-4">
                 {dates.map((d) => (
                   <div
                     key={d.id}
@@ -412,10 +412,10 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               <h2 className="carrd-font-heading carrd-font-h2">
                 2. Choose Your Ticket
               </h2>
-              <p className="carrd-font-intro text-left w-full max-w-[600px]">
+              <p className="carrd-font-intro text-left w-full max-w-[650px]">
                 Our community spans a wide range of financial situations. Our tiered pricing helps us balance the financial sustainability and accessibility of the teahouse. We invite you to choose the level that feels right for you — one that honors your own capacity, while helping us keep this space open, welcoming and alive.
               </p>
-              <div className="w-full max-w-[600px] space-y-4">
+              <div className="w-full max-w-[650px] space-y-4">
                 {tiers
                   .filter((t) => t.id === 'community' || t.id === 'patron')
                   .map((t) => {
@@ -493,7 +493,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     )
                   })}
               </div>
-              <p className="carrd-font-intro text-left w-full max-w-[600px]">
+              <p className="carrd-font-intro text-left w-full max-w-[650px]">
                 If cost is a barrier, please consider our{' '}
                 <button
                   type="button"
@@ -507,7 +507,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               {showSupportedTier && tiers.filter((t) => t.id === 'supported').map((t) => (
                 <div
                   key={t.id}
-                  className="grid grid-cols-1 sm:grid-cols-[6rem_1fr_auto] gap-4 py-3 items-start w-full max-w-[600px]"
+                  className="grid grid-cols-1 sm:grid-cols-[6rem_1fr_auto] gap-4 py-3 items-start w-full max-w-[650px]"
                 >
                   <div className="carrd-font-body flex-shrink-0">
                     <p className="font-medium text-[#FAEBD4]">Supported</p>
@@ -599,7 +599,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   </div>
                 </div>
               ))}
-              <div className="flex flex-wrap items-center justify-center gap-4 w-full max-w-[600px]">
+              <div className="flex flex-wrap items-center justify-center gap-4 w-full max-w-[650px]">
                 <button
                   type="button"
                   onClick={() => setReservationStep(3)}
@@ -619,7 +619,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               {selectedDate && hasSelection ? (
                 <>
                   {/* Summary box: date/time + choices, directly under heading */}
-                  <div className="carrd-font-body rounded-lg bg-[#FAEBD4]/20 px-4 py-4 text-left w-full max-w-[600px]">
+                  <div className="carrd-font-body rounded-lg bg-[#FAEBD4]/20 px-4 py-4 text-left w-full max-w-[650px]">
                     <div className="space-y-3">
                       <div>
                         <p className="text-xs text-[#D9D0BF]/80 uppercase tracking-wider">Date</p>
@@ -669,7 +669,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 onSubmit={(e) => {
                   e.preventDefault()
                 }}
-                className="w-full max-w-[600px] flex flex-col gap-4 carrd-font-body"
+                className="w-full max-w-[650px] flex flex-col gap-4 carrd-font-body"
               >
                 <input type="hidden" name="device_type" value={deviceType} />
                 <input type="hidden" name="date" value={selectedDate ?? ''} />
@@ -714,7 +714,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   {checkoutError}
                 </p>
               )}
-              <div className="w-full max-w-[600px] text-left mt-6">
+              <div className="w-full max-w-[650px] text-left mt-6">
                 <p className="carrd-font-body text-sm font-medium mb-1.5">A few things to note before booking:</p>
                 <ul className="carrd-font-body text-[0.74375rem] space-y-1 list-none pl-0 leading-tight">
                   {BOOKING_NOTES.map((item, i) => (
