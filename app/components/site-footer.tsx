@@ -29,8 +29,8 @@ export function SiteFooter({ variant = 'default', className }: SiteFooterProps) 
             aria-label="Leave a note form"
           >
             <svg className="size-7 shrink-0 min-w-7 min-h-7" viewBox="0 0 40 40" fill="none" aria-hidden>
-              <rect x="7" y="9" width="26" height="22" rx="3" stroke="currentColor" strokeWidth="2" />
-              <path d="M12 16h16M12 21h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              <rect x="8" y="8" width="24" height="16" rx="2" stroke="currentColor" strokeWidth="2" />
+              <path d="M12 24l4-4h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </a>
           <a
