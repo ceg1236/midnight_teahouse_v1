@@ -6,11 +6,11 @@ export default function OurStoryPage() {
   return (
     <div className="carrd-page flex flex-col items-center min-h-screen overflow-x-hidden pt-8">
       <div className="w-full max-w-[60rem] flex flex-col items-center px-6 md:px-12 py-8 md:py-12 gap-8 flex-1">
-          {/* Hero photo with Invite link top-right, same position as Our Story on invite page */}
+          {/* Hero photo with Invite link in screen corner, same position as Our Story on invite page */}
           <div className="relative w-full flex flex-col items-center">
             <Link
               href="/"
-              className="absolute top-0 right-0 carrd-link carrd-link--muted text-sm whitespace-nowrap"
+              className="fixed top-4 right-4 md:top-6 md:right-6 z-10 carrd-link carrd-link--muted text-sm whitespace-nowrap"
             >
               Invite
             </Link>

@@ -202,11 +202,11 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
   return (
     <div className="carrd-page flex flex-col items-center min-h-screen overflow-x-hidden pt-8">
       <div className="w-full max-w-[60rem] flex flex-col items-center px-6 md:px-12 py-8 md:py-12 gap-[1.25em]">
-        {/* Hero: Title + Subtitle with Our Story top-right aligned */}
+        {/* Hero: Title + Subtitle with Our Story in screen corner */}
         <div className="relative w-full flex flex-col items-center gap-1">
           <Link
             href="/our-story"
-            className="absolute top-0 right-0 carrd-link carrd-link--muted text-sm whitespace-nowrap"
+            className="fixed top-4 right-4 md:top-6 md:right-6 z-10 carrd-link carrd-link--muted text-sm whitespace-nowrap"
           >
             Our Story
           </Link>
