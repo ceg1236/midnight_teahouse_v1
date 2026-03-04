@@ -602,13 +602,14 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
 
             {/* Panel 3: Complete your reservation (summary + form + reserve) */}
             <div ref={formRef} className="flex-shrink-0 w-1/3 flex flex-col items-center gap-6 px-3">
-              <h2 className="carrd-font-heading carrd-font-h2">
-                3. Complete Your Reservation
-              </h2>
+              <div className="inline-flex flex-col items-stretch gap-6">
+                <h2 className="carrd-font-heading carrd-font-h2">
+                  3. Complete Your Reservation
+                </h2>
               {selectedDate && hasSelection ? (
                 <>
-                  {/* Summary box */}
-                  <div className="carrd-font-body rounded-lg bg-[#FAEBD4]/20 px-4 py-4 text-left w-full max-w-[650px]">
+                  {/* Summary box: same width as heading */}
+                  <div className="carrd-font-body rounded-lg bg-[#FAEBD4]/20 px-4 py-4 text-left w-full">
                     <div className="space-y-3">
                       <div>
                         <p className="text-sm text-[#D9D0BF]/80 uppercase tracking-wider">Date</p>
@@ -663,6 +664,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   </button>
                 </div>
               )}
+              </div>
               <form
                 id="carrd-form"
                 onSubmit={(e) => {
@@ -713,7 +715,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   {checkoutError}
                 </p>
               )}
-              <div className="w-full text-left mt-6">
+              <div className="w-full max-w-[650px] text-left mt-6">
                 <p className="carrd-font-body text-sm font-medium mb-1.5">A few things to note before booking:</p>
                 <ul className="carrd-font-body text-base space-y-1 list-none pl-0 leading-tight">
                   {BOOKING_NOTES.map((item, i) => (
