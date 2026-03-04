@@ -337,7 +337,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               <h2 className="carrd-font-heading carrd-font-h2">
                 1. Choose Your Evening
               </h2>
-              <p className="carrd-font-intro text-left w-full max-w-[650px]">
+              <p className="carrd-font-body text-left w-full max-w-[650px]">
                 To keep our gatherings intimate, we are open by reservation and have limited seats. Reserve a seat to gift a cozy evening to yourself or someone you love.
               </p>
               <div className="w-full max-w-[650px] space-y-4">
@@ -416,7 +416,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               <h2 className="carrd-font-heading carrd-font-h2">
                 2. Choose Your Ticket
               </h2>
-              <p className="carrd-font-intro text-left w-full max-w-[650px]">
+              <p className="carrd-font-body text-left w-full max-w-[650px]">
                 Our community spans a wide range of financial situations. Our tiered pricing helps us balance the financial sustainability and accessibility of the teahouse. We invite you to choose the level that feels right for you — one that honors your own capacity, while helping us keep this space open, welcoming and alive.
               </p>
               <div className="w-full max-w-[650px] space-y-4">
@@ -497,7 +497,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     )
                   })}
               </div>
-              <p className="carrd-font-intro text-left w-full max-w-[650px]">
+              <p className="carrd-font-body text-left w-full max-w-[650px]">
                 If cost is a barrier, please consider our{' '}
                 <button
                   type="button"
