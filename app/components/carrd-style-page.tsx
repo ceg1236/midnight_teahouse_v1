@@ -362,7 +362,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                                   href={d.spotifyUrl}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="mt-2 inline-block italic text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline"
+                                  className="mt-2 inline-block italic text-[#D9D0BF] underline hover:text-[#FAEBD4] focus:outline-none focus:underline"
                                 >
                                   {d.spotifyLabel}
                                 </a>
