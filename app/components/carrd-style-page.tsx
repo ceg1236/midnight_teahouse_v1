@@ -323,7 +323,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         {/* Reservation: three sliding panels (evening → ticket → form) */}
         <section
           ref={joinRef}
-          className="w-full overflow-x-hidden mt-1"
+          className="carrd-reservation-section w-full min-w-0 overflow-x-hidden mt-1"
         >
           <div
             className="flex transition-transform duration-500 ease-in-out"

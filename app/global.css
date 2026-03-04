@@ -716,6 +716,15 @@ html::-webkit-scrollbar {
   display: none;
 }
 
+/* Hide scrollbar in reservation section (sliding panels) */
+.carrd-reservation-section {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.carrd-reservation-section::-webkit-scrollbar {
+  display: none;
+}
+
 /* Carrd-style page (Midnight Teahouse) */
 .carrd-page {
   position: relative;
