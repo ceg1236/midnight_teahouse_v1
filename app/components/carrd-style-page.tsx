@@ -346,7 +346,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       <p className="font-medium text-[#FAEBD4]">{d.day}</p>
                       <p className="text-[#D9D0BF] text-sm">{d.dateTime}</p>
                     </div>
-                    <div className="carrd-font-body flex-1 min-w-0 space-y-1 text-[#FAEBD4]">
+                    <div className="carrd-font-body flex-1 min-w-0 space-y-1 text-[#FAEBD4] ml-4">
                       {d.musicians.map((line, i) => (
                         <p key={i} className="font-medium italic">
                           {line}
@@ -429,7 +429,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                           <p className="font-medium text-[#FAEBD4]">{t.label}</p>
                           <p className="text-[#D9D0BF] text-sm">${t.price}</p>
                         </div>
-                        <div className="carrd-font-body min-w-0 space-y-1 text-[#FAEBD4]">
+                        <div className="carrd-font-body min-w-0 space-y-1 text-[#FAEBD4] ml-4">
                           <p className="font-medium italic">{t.mainLine}</p>
                           <div className="text-[#D9D0BF] text-sm">
                             {expandedTierBlurbId === t.id ? (
@@ -513,7 +513,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     <p className="font-medium text-[#FAEBD4]">Supported</p>
                     <p className="text-[#D9D0BF] text-sm">$20+</p>
                   </div>
-                  <div className="carrd-font-body min-w-0 space-y-1 text-[#FAEBD4]">
+                  <div className="carrd-font-body min-w-0 space-y-1 text-[#FAEBD4] ml-4">
                     <p className="font-medium italic">{t.blurb}</p>
                   </div>
                   <div className="flex items-start justify-end min-w-[4.5rem]">
