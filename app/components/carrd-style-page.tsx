@@ -696,7 +696,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 {dates.map((d) => (
                   <div
                     key={d.id}
-                    className="carrd-reservation-card flex flex-col gap-2 md:grid md:grid-cols-[6rem_1fr_auto] md:grid-rows-[auto_auto] md:gap-x-6 md:gap-y-2 md:py-1.5 md:items-start"
+                    className="carrd-reservation-card flex flex-col gap-2 md:grid md:grid-cols-[6rem_1fr_auto] md:grid-rows-[auto_auto] md:gap-x-6 md:gap-y-2 md:py-1.5 md:items-center"
                   >
                     <p className="carrd-font-body carrd-accent-color font-medium text-[1.625rem]">{d.day}</p>
                     <div className="carrd-font-body carrd-accent-color min-w-0 space-y-0 text-[1.625rem]">
@@ -986,7 +986,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     return (
                       <div
                         key={t.id}
-                        className="carrd-reservation-card flex flex-col gap-2 md:grid md:grid-cols-[6rem_1fr_auto] md:grid-rows-[auto_auto] md:gap-x-6 md:gap-y-2 md:py-1.5 md:items-start"
+                        className="carrd-reservation-card flex flex-col gap-2 md:grid md:grid-cols-[6rem_1fr_auto] md:grid-rows-[auto_auto] md:gap-x-6 md:gap-y-2 md:py-1.5 md:items-center"
                       >
                         <p className="carrd-font-body carrd-accent-color font-medium text-[1.625rem]">{t.label}</p>
                         <p className="carrd-font-body carrd-accent-color font-medium italic text-[1.625rem]">{t.mainLine}</p>
@@ -1061,7 +1061,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               {tiers.filter((t) => t.id === 'supported').map((t) => (
                 <div
                   key={t.id}
-                  className="carrd-reservation-card flex flex-col gap-2 md:grid md:grid-cols-[6rem_1fr_auto] md:grid-rows-[auto_auto] md:gap-x-6 md:gap-y-2 md:py-1.5 md:items-start w-full max-w-[650px]"
+                  className="carrd-reservation-card flex flex-col gap-2 md:grid md:grid-cols-[6rem_1fr_auto] md:grid-rows-[auto_auto] md:gap-x-6 md:gap-y-2 md:py-1.5 md:items-center w-full max-w-[650px]"
                 >
                   <p className="carrd-font-body carrd-accent-color font-medium text-[1.625rem]">Supported</p>
                   <p className="carrd-font-body carrd-accent-color font-medium italic text-[1.625rem]">{t.blurb}</p>
