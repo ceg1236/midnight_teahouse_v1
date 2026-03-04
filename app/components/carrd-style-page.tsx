@@ -385,7 +385,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     {expandedPricingNote && (
                       <div className="carrd-font-body text-left text-[0.8125rem] text-[#D9D0BF]/95 space-y-3">
                         <p>
-                          Our community spans a wide range of financial situations. Our tiered pricing helps us balance the financial sustainability and accessibility of the teahouse. We invite you to choose the level that feels right for you — one that honors your own capacity, while helping us keep this space open, welcoming and alive.
+                          Our city and community span a wide range of financial situations. Our tiered pricing helps us balance the financial sustainability and accessibility of the teahouse. We invite you to choose the level that feels right for you — one that honors your own capacity while helping us keep this space open, welcoming and alive.
                         </p>
                         <p>
                           If cost is a barrier, please consider our{' '}
@@ -843,7 +843,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 {expandedPricingNote && (
                   <div className="carrd-font-body text-left text-[0.8125rem] text-[#D9D0BF]/95 space-y-3">
                     <p>
-                      Our community spans a wide range of financial situations. Our tiered pricing helps us balance the financial sustainability and accessibility of the teahouse. We invite you to choose the level that feels right for you — one that honors your own capacity, while helping us keep this space open, welcoming and alive.
+                      Our city and community span a wide range of financial situations. Our tiered pricing helps us balance the financial sustainability and accessibility of the teahouse. We invite you to choose the level that feels right for you — one that honors your own capacity while helping us keep this space open, welcoming and alive.
                     </p>
                     <p>
                       If cost is a barrier, please consider our{' '}
@@ -1025,7 +1025,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 {expandedPricingNote && (
                   <div className="carrd-font-body text-left w-full max-w-[650px] space-y-3">
                     <p>
-                      Our community spans a wide range of financial situations. Our tiered pricing helps us balance the financial sustainability and accessibility of the teahouse. We invite you to choose the level that feels right for you — one that honors your own capacity, while helping us keep this space open, welcoming and alive.
+                      Our city and community span a wide range of financial situations. Our tiered pricing helps us balance the financial sustainability and accessibility of the teahouse. We invite you to choose the level that feels right for you — one that honors your own capacity while helping us keep this space open, welcoming and alive.
                     </p>
                     <p>
                       If cost is a barrier, please consider our{' '}
