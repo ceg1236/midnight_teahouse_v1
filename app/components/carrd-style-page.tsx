@@ -415,9 +415,9 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                           </div>
                           {(selections['supported'] ?? 0) > 0 ? (
                             <div className="flex flex-col items-end gap-2 shrink-0">
-                              <div className="flex items-center justify-end gap-0.5 rounded border border-[#D9D0BF]/40 px-2 py-1">
-                                <span className="text-[#D9D0BF] text-sm">$</span>
-                                <input type="number" min={20} max={40} value={supportedPriceInput} placeholder="20–40" onChange={(e) => { const raw = e.target.value; setSupportedPriceInput(raw); const v = parseInt(raw, 10); if (!isNaN(v) && v >= 20 && v <= 40) setSupportedPrice(v); else if (raw === '') setSelections((prev) => { const n = { ...prev }; delete n.supported; return n }); }} onBlur={() => { const v = parseInt(supportedPriceInput, 10); if (!isNaN(v) && v >= 20 && v <= 40) { setSupportedPrice(v); setSupportedPriceInput(String(v)) } else if (supportedPriceInput === '') setSelections((prev) => { const n = { ...prev }; delete n.supported; return n }); else setSupportedPriceInput(String(supportedPrice)) }} className="carrd-font-body w-12 bg-transparent text-right text-[#FAEBD4] text-sm border-0 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                              <div className="flex items-center justify-center gap-0.5 rounded border border-[#D9D0BF]/40 px-1.5 py-0.5 w-[5.5rem]">
+                                <span className="text-[#D9D0BF] text-xs">$</span>
+                                <input type="number" min={20} max={40} value={supportedPriceInput} placeholder="20–40" onChange={(e) => { const raw = e.target.value; setSupportedPriceInput(raw); const v = parseInt(raw, 10); if (!isNaN(v) && v >= 20 && v <= 40) setSupportedPrice(v); else if (raw === '') setSelections((prev) => { const n = { ...prev }; delete n.supported; return n }); }} onBlur={() => { const v = parseInt(supportedPriceInput, 10); if (!isNaN(v) && v >= 20 && v <= 40) { setSupportedPrice(v); setSupportedPriceInput(String(v)) } else if (supportedPriceInput === '') setSelections((prev) => { const n = { ...prev }; delete n.supported; return n }); else setSupportedPriceInput(String(supportedPrice)) }} className="carrd-font-body w-9 bg-transparent text-right text-[#FAEBD4] text-xs border-0 focus:outline-none [&:placeholder-shown]:text-center placeholder:text-[#D9D0BF]/40 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
                               </div>
                               <div className="flex items-center justify-end gap-1">
                                 <button type="button" onClick={() => handleQuantityChange('supported', -1)} className="flex h-8 w-8 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-sm" aria-label="Decrease Supported">−</button>
@@ -897,8 +897,8 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       </div>
                       {(selections['supported'] ?? 0) > 0 ? (
                         <div className="flex flex-col items-end gap-2 shrink-0">
-                          <div className="flex items-center justify-end gap-0.5 rounded border border-[#D9D0BF]/40 px-2 py-1">
-                            <span className="text-[#D9D0BF] text-sm">$</span>
+                          <div className="flex items-center justify-center gap-0.5 rounded border border-[#D9D0BF]/40 px-1.5 py-0.5 w-[5.5rem]">
+                            <span className="text-[#D9D0BF] text-xs">$</span>
                             <input
                               type="number"
                               min={20}
@@ -923,7 +923,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                                   setSelections((prev) => { const n = { ...prev }; delete n.supported; return n })
                                 } else setSupportedPriceInput(String(supportedPrice))
                               }}
-                              className="carrd-font-body w-12 bg-transparent text-right text-[#FAEBD4] text-sm border-0 placeholder:text-[#D9D0BF]/50 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              className="carrd-font-body w-9 bg-transparent text-right text-[#FAEBD4] text-xs border-0 focus:outline-none [&:placeholder-shown]:text-center placeholder:text-[#D9D0BF]/40 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
                           </div>
                           <div className="flex items-center justify-end gap-1">
