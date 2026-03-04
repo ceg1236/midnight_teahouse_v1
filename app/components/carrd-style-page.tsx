@@ -343,9 +343,9 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 {dates.map((d) => (
                   <div
                     key={d.id}
-                    className="grid grid-cols-[6rem_1fr_auto] grid-rows-[auto_auto] gap-x-4 gap-y-1 items-start py-3 border-b border-[#D9D0BF]/30 last:border-b-0"
+                    className="carrd-reservation-card flex flex-col gap-2 md:grid md:grid-cols-[6rem_1fr_auto] md:grid-rows-[auto_auto] md:gap-x-4 md:gap-y-1 md:py-3 md:items-start last:border-b-0"
                   >
-                        <p className="carrd-font-body carrd-accent-color font-medium text-[1.625rem]">{d.day}</p>
+                    <p className="carrd-font-body carrd-accent-color font-medium text-[1.625rem]">{d.day}</p>
                     <div className="carrd-font-body carrd-accent-color min-w-0 space-y-0 text-[1.625rem]">
                       {d.musicians.map((line, i) => (
                         <p key={i} className="font-medium italic">
@@ -359,7 +359,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         setSelectedDate(d.id)
                         setReservationStep(2)
                       }}
-                      className={`carrd-btn px-6 py-3 flex-shrink-0 row-span-2 self-start ml-4 ${
+                      className={`carrd-btn px-6 py-3 flex-shrink-0 row-span-2 self-start order-last md:order-none md:ml-4 ${
                         selectedDate === d.id ? 'bg-[#FAE0B9]/20' : ''
                       }`}
                     >
@@ -443,11 +443,11 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     return (
                       <div
                         key={t.id}
-                        className="grid grid-cols-[6rem_1fr_auto] grid-rows-[auto_auto] gap-x-4 gap-y-1 py-3 border-b border-[#D9D0BF]/30 last:border-b-0 items-start"
+                        className="carrd-reservation-card flex flex-col gap-2 md:grid md:grid-cols-[6rem_1fr_auto] md:grid-rows-[auto_auto] md:gap-x-4 md:gap-y-1 md:py-3 md:items-start last:border-b-0"
                       >
                         <p className="carrd-font-body carrd-accent-color font-medium text-[1.625rem]">{t.label}</p>
                         <p className="carrd-font-body carrd-accent-color font-medium italic text-[1.625rem]">{t.mainLine}</p>
-                        <div className="flex items-start justify-end min-w-[4.5rem] row-span-2 self-start">
+                        <div className="flex items-start justify-end min-w-[4.5rem] row-span-2 self-start order-last md:order-none">
                           {qty > 0 ? (
                             <div className="flex items-center gap-1">
                               <button
@@ -473,7 +473,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                             <button
                               type="button"
                               onClick={() => handleTierClick(t.id)}
-                              className="carrd-btn px-6 py-3 ml-4"
+                              className="carrd-btn px-6 py-3 md:ml-4"
                             >
                               Select
                             </button>
@@ -499,11 +499,11 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               {showSupportedTier && tiers.filter((t) => t.id === 'supported').map((t) => (
                 <div
                   key={t.id}
-                  className="grid grid-cols-[6rem_1fr_auto] grid-rows-[auto_auto] gap-x-4 gap-y-1 py-3 items-start w-full max-w-[650px]"
+                  className="carrd-reservation-card flex flex-col gap-2 md:grid md:grid-cols-[6rem_1fr_auto] md:grid-rows-[auto_auto] md:gap-x-4 md:gap-y-1 md:py-3 md:items-start w-full max-w-[650px] last:border-b-0"
                 >
                   <p className="carrd-font-body carrd-accent-color font-medium text-[1.625rem]">Supported</p>
                   <p className="carrd-font-body carrd-accent-color font-medium italic text-[1.625rem]">{t.blurb}</p>
-                  <div className="flex items-start justify-end min-w-[4.5rem] row-span-2 self-start">
+                  <div className="flex items-start justify-end min-w-[4.5rem] row-span-2 self-start order-last md:order-none">
                     {(selections['supported'] ?? 0) > 0 ? (
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-0.5 rounded-lg bg-[#FAEBD4]/5 px-1.5 py-1">
@@ -578,14 +578,14 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                           setSupportedPriceInput('20')
                           setSelections({ supported: 1 })
                         }}
-                        className="carrd-btn px-6 py-3 ml-4"
+                        className="carrd-btn px-6 py-3 md:ml-4"
                       >
                         Select
                       </button>
                     )}
                   </div>
                   <p className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0">$20+</p>
-                  <div />
+                  <div className="hidden md:block" />
                 </div>
               ))}
               <div className="flex flex-wrap items-center justify-center gap-4 w-full max-w-[650px]">
