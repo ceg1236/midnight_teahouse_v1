@@ -36,38 +36,42 @@ export default function InviteSuccessPage() {
 
   return (
     <div className="carrd-page flex min-h-[100dvh] flex-col items-center justify-center px-6 md:min-h-screen">
-      <div className="mx-auto flex max-w-md flex-col items-center gap-6 text-center">
-        <h1 className="carrd-font-heading text-3xl md:text-4xl [font-variant:small-caps] text-[#FAEBD4]">
+      <div className="mx-auto flex max-w-md flex-col items-center gap-8 text-center">
+        <h1 className="carrd-font-heading text-[2rem] md:text-[2.5rem] font-semibold [font-variant:small-caps] tracking-wide text-[#FAEBD4]">
           See you at the Teahouse
         </h1>
-        <div className="carrd-font-body flex flex-col items-center gap-3 text-center w-full max-w-md text-[16px]">
+        <div className="carrd-font-body flex flex-col items-center gap-6 text-center w-full max-w-md">
           {firstName ? (
-            <p className="text-[#FAEBD4]">
+            <p className="text-[18px] italic text-[#D9D0BF]">
               {firstName},
             </p>
           ) : null}
-          <p className="text-[#FAEBD4]">
-            Thank you for reserving your spot.
-          </p>
-          <p className="text-[#FAEBD4]">
-            We are excited to share an evening with you.
-          </p>
-          <p className="text-[#D9D0BF] text-xs uppercase tracking-wider">
-            Date
-          </p>
-          <p className="text-[#FAEBD4]">
-            {dateLabel}
-          </p>
-          <p className="text-[#D9D0BF] text-xs uppercase tracking-wider">
-            Location
-          </p>
-          <p className="text-[#FAEBD4]">
-            {ADDRESS}
-          </p>
-          <p className="text-[#FAEBD4]">
+          <div className="flex flex-col gap-2">
+            <p className="text-[16px] leading-[1.55] text-[#FAEBD4]">
+              Thank you for reserving your spot.
+            </p>
+            <p className="text-[16px] leading-[1.55] text-[#FAEBD4]">
+              We are excited to share an evening with you.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 w-full pt-4 border-t border-[#D9D0BF]/30">
+            <p className="text-[11px] uppercase tracking-[0.05em] text-[#D9D0BF]">
+              Date
+            </p>
+            <p className="text-[17px] font-medium text-[#FAE0B9]">
+              {dateLabel}
+            </p>
+            <p className="text-[11px] uppercase tracking-[0.05em] text-[#D9D0BF] mt-3">
+              Location
+            </p>
+            <p className="text-[17px] font-medium text-[#FAE0B9]">
+              {ADDRESS}
+            </p>
+          </div>
+          <p className="text-[16px] leading-[1.55] text-[#FAEBD4]">
             Please look out for our confirmation email.
           </p>
-          <p className="text-[#FAEBD4]">
+          <p className="italic text-[15px] text-[#FAEBD4]">
             Warmly,
           </p>
         </div>
