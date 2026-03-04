@@ -843,9 +843,9 @@ html::-webkit-scrollbar {
   line-height: 1.2;
 }
 
-/* Row 2 date table: date/time and musician blurb at 0.9× body size */
+/* Row 2 date table: date/time and musician blurb at 0.9× current (0.81× body) */
 .carrd-table-row-2-sm {
-  font-size: 1.125rem; /* 0.9 × 1.25rem */
+  font-size: 1.0125rem; /* 0.9 × 1.125rem */
 }
 
 /* Form autofill override - avoid white background on suggested entries */
