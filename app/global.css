@@ -833,6 +833,10 @@ html::-webkit-scrollbar {
   line-height: 1.6;
   color: #FAE9D8;
 }
+/* Override body color when accent is used (Wednesday, Music by..., etc.) */
+.carrd-font-body.carrd-accent-color {
+  color: #C4AF86;
+}
 
 /* Row 2 in reservation tables: tighter line spacing */
 .carrd-table-row-2 {
