@@ -112,7 +112,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
   const [selections, setSelections] = useState<TierSelections>({})
   const [supportedPrice, setSupportedPrice] = useState(20)
   const [supportedPriceInput, setSupportedPriceInput] = useState('')
-  const [showSupportedTier, setShowSupportedTier] = useState(false)
+  const [showSupportedTier, setShowSupportedTier] = useState(true)
   const [formData, setFormData] = useState({ name: '', email: '', notes: '' })
   const [deviceType, setDeviceType] = useState<'mobile' | 'tablet' | 'desktop'>('desktop')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -204,7 +204,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
 
   return (
     <div className="carrd-page flex flex-col items-center min-h-screen overflow-x-hidden pt-8">
-      <div className="w-full max-w-[60rem] flex flex-col items-center px-6 md:px-12 py-8 md:py-12 gap-8">
+      <div className="w-full max-w-[60rem] flex flex-col items-center px-6 md:px-12 py-8 md:py-12 gap-[0.5em]">
         {/* Hero: Title + Subtitle with Our Story top-right aligned */}
         <div className="relative w-full flex flex-col items-center gap-1">
           <Link
@@ -242,10 +242,10 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
 
         {/* March Gatherings */}
         <section className="w-full flex flex-col items-center gap-8 text-center">
-          <h2 className="carrd-font-heading text-2xl md:text-3xl">
+          <h2 className="carrd-font-heading text-2xl md:text-3xl italic" style={{ letterSpacing: '-2px' }}>
             Crossing into Spring
           </h2>
-          <div className="carrd-font-body text-left space-y-4 w-full max-w-[56rem]">
+          <div className="carrd-font-body text-left space-y-4 w-full max-w-[600px]">
             {welcomeContent.split(/\n\n+/).map((para, i) => (
               <p key={i} className="whitespace-pre-line">
                 {para}
@@ -432,8 +432,8 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       <p className="font-medium italic">{t.blurb}</p>
                     </div>
                     <div className="flex items-start justify-end gap-2">
-                      <div className="flex items-center gap-1 rounded-lg bg-[#FAEBD4]/5 px-2 py-1">
-                        <span className="carrd-font-body text-[#D9D0BF] text-sm">$</span>
+                      <div className="flex items-center gap-0.5 rounded-lg bg-[#FAEBD4]/5 px-1.5 py-1">
+                        <span className="carrd-font-body text-[#D9D0BF] text-xs">$</span>
                         <input
                           type="number"
                           min={20}
@@ -469,36 +469,32 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                               setSupportedPriceInput(String(supportedPrice))
                             }
                           }}
-                          className="carrd-font-body w-11 bg-transparent text-center text-[#FAEBD4] text-sm placeholder:text-[#D9D0BF]/50 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          className="carrd-font-body w-12 bg-transparent text-center text-[#FAEBD4] text-xs placeholder:text-[#D9D0BF]/50 placeholder:text-[0.65rem] focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                         />
                       </div>
-                      {hasValidSupportedPrice ? (
-                        <>
-                          <span className="text-[#D9D0BF]/60 text-sm">×</span>
-                          <div className="flex items-center gap-1">
-                            <button
-                              type="button"
-                              onClick={() => handleQuantityChange('supported', -1)}
-                              className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-xs transition-colors hover:bg-[#FAE0B9]/30"
-                              aria-label="Decrease Supported quantity"
-                            >
-                              −
-                            </button>
-                            <span className="carrd-font-body w-5 text-center text-sm tabular-nums text-[#FAEBD4]">
-                              {selections['supported'] ?? 0}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => handleQuantityChange('supported', 1)}
-className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-xs transition-colors hover:bg-[#FAE0B9]/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                              disabled={totalQuantity >= 4}
-                                aria-label="Increase Supported quantity"
-                            >
-                              +
-                            </button>
-                          </div>
-                        </>
-                      ) : null}
+                      <span className="text-[#D9D0BF]/60 text-sm">×</span>
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => handleQuantityChange('supported', -1)}
+                          className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-xs transition-colors hover:bg-[#FAE0B9]/30"
+                          aria-label="Decrease Supported quantity"
+                        >
+                          −
+                        </button>
+                        <span className="carrd-font-body w-5 text-center text-sm tabular-nums text-[#FAEBD4]">
+                          {selections['supported'] ?? 0}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleQuantityChange('supported', 1)}
+                          className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-xs transition-colors hover:bg-[#FAE0B9]/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                          disabled={totalQuantity >= 4}
+                          aria-label="Increase Supported quantity"
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -579,17 +575,19 @@ className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D9D0BF]/25
                     )
                   })}
               </div>
-              <p className="carrd-font-intro text-left w-full max-w-[56rem]">
-                If cost is a barrier please consider our{' '}
-                <button
-                  type="button"
-                  onClick={() => setShowSupportedTier(true)}
-                  className="underline hover:no-underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline"
-                >
-                  supported ticket option
-                </button>
-                .
-              </p>
+              {!showSupportedTier && (
+                <p className="carrd-font-intro text-left w-full max-w-[56rem]">
+                  If cost is a barrier please consider our{' '}
+                  <button
+                    type="button"
+                    onClick={() => setShowSupportedTier(true)}
+                    className="underline hover:no-underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline"
+                  >
+                    supported ticket option
+                  </button>
+                  .
+                </p>
+              )}
               <div className="flex flex-wrap items-center justify-center gap-4 w-full max-w-[56rem]">
                 <button
                   type="button"
