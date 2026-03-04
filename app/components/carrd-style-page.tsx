@@ -336,9 +336,19 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                               <span className="text-[#FAEBD4]/90 font-normal">, {headerRest}</span>
                             </p>
                             {d.spotifyUrl ? (
-                              <a href={d.spotifyUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[0.8125rem] text-[#D9D0BF]/90 italic underline hover:text-[#FAEBD4] focus:outline-none focus:underline mt-0.5 block">
-                                {musicianLine}
-                              </a>
+                              <p className="text-[#D9D0BF]/90 text-[0.8125rem] italic mt-0.5">
+                                {musicianLine.startsWith('Music by ') ? (
+                                  <>Music by{' '}
+                                    <a href={d.spotifyUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="underline hover:text-[#FAEBD4] focus:outline-none focus:underline">
+                                      {musicianLine.slice(9)}
+                                    </a>
+                                  </>
+                                ) : (
+                                  <a href={d.spotifyUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="underline hover:text-[#FAEBD4] focus:outline-none focus:underline">
+                                    {musicianLine}
+                                  </a>
+                                )}
+                              </p>
                             ) : (
                               <p className="text-[#D9D0BF]/90 text-[0.8125rem] italic mt-0.5">{musicianLine}</p>
                             )}
@@ -405,7 +415,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                           </div>
                           {(selections['supported'] ?? 0) > 0 ? (
                             <div className="flex flex-col items-end gap-2 shrink-0">
-                              <div className="flex items-center justify-end gap-0.5">
+                              <div className="flex items-center justify-end gap-0.5 rounded border border-[#D9D0BF]/40 px-2 py-1">
                                 <span className="text-[#D9D0BF] text-sm">$</span>
                                 <input type="number" min={20} max={40} value={supportedPriceInput} placeholder="20–40" onChange={(e) => { const raw = e.target.value; setSupportedPriceInput(raw); const v = parseInt(raw, 10); if (!isNaN(v) && v >= 20 && v <= 40) setSupportedPrice(v); else if (raw === '') setSelections((prev) => { const n = { ...prev }; delete n.supported; return n }); }} onBlur={() => { const v = parseInt(supportedPriceInput, 10); if (!isNaN(v) && v >= 20 && v <= 40) { setSupportedPrice(v); setSupportedPriceInput(String(v)) } else if (supportedPriceInput === '') setSelections((prev) => { const n = { ...prev }; delete n.supported; return n }); else setSupportedPriceInput(String(supportedPrice)) }} className="carrd-font-body w-12 bg-transparent text-right text-[#FAEBD4] text-sm border-0 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
                               </div>
@@ -657,15 +667,19 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                           <span className="text-[#FAEBD4]/90 font-normal">, {headerRest}</span>
                         </p>
                         {d.spotifyUrl ? (
-                          <a
-                            href={d.spotifyUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
-                            className="text-[0.8125rem] text-[#D9D0BF]/90 italic underline hover:text-[#FAEBD4] focus:outline-none focus:underline mt-0.5 block"
-                          >
-                            {musicianLine}
-                          </a>
+                          <p className="text-[#D9D0BF]/90 text-[0.8125rem] italic mt-0.5">
+                            {musicianLine.startsWith('Music by ') ? (
+                              <>Music by{' '}
+                                <a href={d.spotifyUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="underline hover:text-[#FAEBD4] focus:outline-none focus:underline">
+                                  {musicianLine.slice(9)}
+                                </a>
+                              </>
+                            ) : (
+                              <a href={d.spotifyUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="underline hover:text-[#FAEBD4] focus:outline-none focus:underline">
+                                {musicianLine}
+                              </a>
+                            )}
+                          </p>
                         ) : (
                           <p className="text-[#D9D0BF]/90 text-[0.8125rem] italic mt-0.5">{musicianLine}</p>
                         )}
@@ -883,7 +897,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       </div>
                       {(selections['supported'] ?? 0) > 0 ? (
                         <div className="flex flex-col items-end gap-2 shrink-0">
-                          <div className="flex items-center justify-end gap-0.5">
+                          <div className="flex items-center justify-end gap-0.5 rounded border border-[#D9D0BF]/40 px-2 py-1">
                             <span className="text-[#D9D0BF] text-sm">$</span>
                             <input
                               type="number"
