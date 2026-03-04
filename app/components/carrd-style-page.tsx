@@ -396,7 +396,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         setSelectedDate(d.id)
                         setReservationStep(2)
                       }}
-                      className={`carrd-btn px-6 py-3 flex-shrink-0 self-start ${
+                      className={`carrd-btn px-6 py-3 flex-shrink-0 self-start ml-4 ${
                         selectedDate === d.id ? 'bg-[#FAE0B9]/20' : ''
                       }`}
                     >
@@ -483,7 +483,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                             <button
                               type="button"
                               onClick={() => handleTierClick(t.id)}
-                              className="carrd-btn px-6 py-3"
+                              className="carrd-btn px-6 py-3 ml-4"
                             >
                               Select
                             </button>
@@ -591,7 +591,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                           setSupportedPriceInput('20')
                           setSelections({ supported: 1 })
                         }}
-                        className="carrd-btn px-6 py-3"
+                        className="carrd-btn px-6 py-3 ml-4"
                       >
                         Select
                       </button>
