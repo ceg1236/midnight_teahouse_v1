@@ -733,7 +733,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       <div className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0">
                         {expandedBlurbId === d.id ? (
                           <>
-                            <p className="carrd-table-row-2">{d.blurb}</p>
+                            <p className="carrd-table-row-2 whitespace-pre-line">{d.blurb}</p>
                             {d.spotifyUrl ? (
                               <a
                                 href={d.spotifyUrl}
