@@ -862,7 +862,7 @@ html::-webkit-scrollbar {
   font-size: 1.0125rem; /* 0.9 × 1.125rem */
 }
 
-/* Form autofill override - avoid white background on suggested entries */
+/* Form autofill override - avoid white background on suggested entries, keep text light */
 .carrd-page input:-webkit-autofill,
 .carrd-page input:-webkit-autofill:hover,
 .carrd-page input:-webkit-autofill:focus,
@@ -870,6 +870,8 @@ html::-webkit-scrollbar {
   -webkit-box-shadow: inset 0 0 0 1000px rgba(46, 3, 3, 0.5);
   box-shadow: inset 0 0 0 1000px rgba(46, 3, 3, 0.5);
   transition: background-color 5000s ease-in-out 0s;
+  -webkit-text-fill-color: #FAEBD4;
+  color: #FAEBD4;
 }
 .carrd-font-body-light {
   font-family: 'Amiri', serif;
