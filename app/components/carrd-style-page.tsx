@@ -24,7 +24,7 @@ const BOOKING_NOTES: Array<string | React.ReactNode> = [
   'Reservation includes unlimited tea and all other amenities.',
   'We are a phone and laptop-free space.',
   "Unfortunately, we don't offer refunds or exchanges for future events.",
-  <>If you have any questions about the reservation, please <a href="mailto:midnight.teahouse.sf@gmail.com" className="text-[#FAE0B9] hover:underline focus:outline-none focus:underline">send us an email</a>.</>,
+  <>If you have any questions about the reservation, please <a href="mailto:midnight.teahouse.sf@gmail.com" className="text-[#FAE0B9] underline hover:underline focus:outline-none focus:underline">send us an email</a>.</>,
 ]
 
 function scrollToSection(ref: React.RefObject<HTMLElement | null>) {
