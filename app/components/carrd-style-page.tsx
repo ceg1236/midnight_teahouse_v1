@@ -240,7 +240,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         </div>
 
         {/* March Gatherings */}
-        <section className="w-full flex flex-col items-center gap-8 text-center">
+        <section className="w-full flex flex-col items-center gap-10 text-center">
           <div className="flex flex-col items-center gap-[0.5em] w-full">
             <h2 className="carrd-font-heading text-2xl md:text-3xl italic" style={{ letterSpacing: '-2px' }}>
               Crossing into Spring
@@ -253,7 +253,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
             ))}
             </div>
           </div>
-          <div className="w-full max-w-[650px] flex flex-col md:flex-row items-center md:items-start justify-center gap-16 md:gap-28 text-center pt-2">
+          <div className="w-full max-w-[650px] flex flex-col md:flex-row items-center md:items-start justify-center gap-16 md:gap-28 text-center pt-4">
             <div className="space-y-2">
               <p className="carrd-font-label text-[1.3125rem]">
                 Date
@@ -281,13 +281,13 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           <button
             type="button"
             onClick={() => scrollToSection(joinRef)}
-            className="carrd-btn px-8 py-3"
+            className="carrd-btn px-8 py-3 mt-2"
           >
             Reserve Your Seat
           </button>
         </section>
 
-        <hr className="carrd-divider-solid border-0 my-4" />
+        <hr className="carrd-divider-solid border-0 my-8" />
 
         <div className="w-full flex flex-col items-center gap-1">
           {/* Step indicator */}
