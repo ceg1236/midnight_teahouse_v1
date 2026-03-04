@@ -11,7 +11,7 @@ export default function OurStoryPage() {
       >
         Join Our Gatherings
       </Link>
-      <div className="w-full max-w-[700px] flex flex-col items-center px-6 md:px-12 py-8 md:py-12 gap-8 flex-1">
+      <div className="w-full max-w-[750px] flex flex-col items-center px-6 md:px-12 py-8 md:py-12 gap-8 flex-1">
           {/* Hero photo */}
           <div className="relative w-full flex flex-col items-center">
             <div className="w-full flex justify-center">
@@ -29,7 +29,7 @@ export default function OurStoryPage() {
           </div>
 
           {/* Story copy: text blocks in rectangle, photos between */}
-          <div className="carrd-font-body-light our-story-body w-full max-w-[700px] flex flex-col gap-8">
+          <div className="carrd-font-body-light our-story-body w-full max-w-[750px] flex flex-col gap-8">
             {/* Text block 1 */}
             <div className="text-left">
               <h1 className="carrd-font-heading text-3xl md:text-4xl mb-6">
