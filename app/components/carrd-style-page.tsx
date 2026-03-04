@@ -219,21 +219,23 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         </div>
 
         {/* Video */}
-        <div className="carrd-video-fade w-full -mx-6 md:-mx-12 aspect-video overflow-hidden">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover"
-          >
-            <source src="/images/midnight_site_vid_hi_res.mp4" type="video/mp4" />
-            <source src="/images/midnight_site_vid_hi_res.mov" type="video/quicktime" />
-          </video>
+        <div className="carrd-video-fade w-full -mx-6 md:-mx-12 py-6">
+          <div className="aspect-video overflow-hidden">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            >
+              <source src="/images/midnight_site_vid_hi_res.mp4" type="video/mp4" />
+              <source src="/images/midnight_site_vid_hi_res.mov" type="video/quicktime" />
+            </video>
+          </div>
         </div>
 
         {/* Countdown */}
-        <div className="flex justify-center py-6">
+        <div className="flex justify-center py-6" style={{ transform: 'scale(1.3)' }}>
           <CountdownTimer targetTimestamp={countdownTarget} length={3} />
         </div>
 
