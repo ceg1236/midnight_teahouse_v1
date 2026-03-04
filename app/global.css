@@ -824,6 +824,15 @@ html::-webkit-scrollbar {
   color: #FAE9D8;
 }
 
+/* Row 1 in reservation tables: header-like prominence */
+.carrd-table-header {
+  font-family: 'Playfair Display', 'Times New Roman', serif;
+  font-weight: 600;
+  font-size: 1.75rem;
+  line-height: 1.25;
+  color: #C4AF86;
+}
+
 /* Row 2 in reservation tables: tighter line spacing */
 .carrd-table-row-2 {
   line-height: 1.2;
