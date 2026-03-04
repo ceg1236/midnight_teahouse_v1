@@ -9,7 +9,7 @@ export default function OurStoryPage() {
         href="/"
         className="carrd-corner-link top-2 right-4 md:top-4 md:right-8 carrd-link carrd-link--muted text-sm whitespace-nowrap"
       >
-        Home
+        Join Our Gatherings
       </Link>
       <div className="w-full max-w-[60rem] flex flex-col items-center px-6 md:px-12 py-8 md:py-12 gap-8 flex-1">
           {/* Hero photo */}
@@ -92,7 +92,7 @@ export default function OurStoryPage() {
             href="/"
             className="carrd-btn px-8 py-3 mt-4 inline-block"
           >
-            Join our upcoming pop-up
+            Join Our Gatherings
           </Link>
         </div>
       <SiteFooter />
