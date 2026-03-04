@@ -390,7 +390,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                             </button>
                           </>
                         ) : (
-                          <p className="line-clamp-2 carrd-table-row-2 min-w-0">
+                          <p className="carrd-table-row-2 min-w-0">
                             {d.blurb.length > 130 ? (
                               <>
                                 {d.blurb.slice(0, 130)}
