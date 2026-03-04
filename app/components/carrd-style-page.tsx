@@ -391,15 +391,21 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                           </>
                         ) : (
                           <p className="line-clamp-2 carrd-table-row-2 min-w-0">
-                            {d.blurb}
-                            {' '}
-                            <button
-                              type="button"
-                              onClick={() => setExpandedBlurbId(d.id)}
-                              className="inline italic text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer p-0 m-0 align-baseline"
-                            >
-                              ...more
-                            </button>
+                            {d.blurb.length > 130 ? (
+                              <>
+                                {d.blurb.slice(0, 130)}
+                                {' '}
+                                <button
+                                  type="button"
+                                  onClick={() => setExpandedBlurbId(d.id)}
+                                  className="inline italic text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer p-0 m-0 align-baseline"
+                                >
+                                  ...more
+                                </button>
+                              </>
+                            ) : (
+                              d.blurb
+                            )}
                           </p>
                         )}
                       </div>
