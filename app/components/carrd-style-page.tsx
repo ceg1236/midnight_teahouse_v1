@@ -390,8 +390,8 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                             </button>
                           </>
                         ) : (
-                          <p className="leading-relaxed flex items-baseline gap-1 min-w-0">
-                            <span className="truncate min-w-0">{d.blurb}</span>
+                          <p className="leading-relaxed flex items-start gap-1 min-w-0">
+                            <span className="line-clamp-2 min-w-0 flex-1">{d.blurb}</span>
                             <button
                               type="button"
                               onClick={() => setExpandedBlurbId(d.id)}
