@@ -54,8 +54,30 @@ export default function InviteSuccessPage() {
               We are excited to share an evening with you.
             </p>
           </div>
-          <div className="flex flex-col gap-2 w-full pt-4 border-t border-[#D9D0BF]/30">
-            <p className="text-[11px] uppercase tracking-[0.05em] text-[#D9D0BF]">
+          <div className="flex flex-col gap-2 w-full pt-6">
+            <svg
+              viewBox="0 0 160 32"
+              className="w-full max-w-[200px] mx-auto opacity-70"
+              aria-hidden
+            >
+              <path
+                d="M0 16 C40 4, 80 28, 120 16 C140 10, 150 14, 160 16"
+                fill="none"
+                stroke="#D9D0BF"
+                strokeWidth="0.8"
+                strokeLinecap="round"
+              />
+              <path
+                d="M0 18 C40 10, 80 30, 120 18 C140 14, 150 16, 160 18"
+                fill="none"
+                stroke="#D9D0BF"
+                strokeWidth="0.4"
+                strokeLinecap="round"
+                opacity="0.7"
+              />
+              <circle cx="80" cy="16" r="1.5" fill="#D9D0BF" opacity="0.8" />
+            </svg>
+          <p className="text-[11px] uppercase tracking-[0.05em] text-[#D9D0BF]">
               Date
             </p>
             <p className="text-[17px] font-medium text-[#FAE0B9]">
