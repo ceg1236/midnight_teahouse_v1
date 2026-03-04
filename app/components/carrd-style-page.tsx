@@ -253,7 +253,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
             ))}
             </div>
           </div>
-          <div className="w-full max-w-[650px] flex flex-col md:flex-row items-center md:items-start justify-center gap-14 md:gap-24 text-center pt-2">
+          <div className="w-full max-w-[650px] flex flex-col md:flex-row items-center md:items-start justify-center gap-16 md:gap-28 text-center pt-2">
             <div className="space-y-2">
               <p className="carrd-font-label text-[1.3125rem]">
                 Date
