@@ -249,7 +249,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               </p>
             ))}
           </div>
-          <div className="w-full max-w-[56rem] flex flex-col md:flex-row items-center md:items-start justify-center gap-10 md:gap-16 text-center pt-2">
+          <div className="w-full max-w-[600px] flex flex-col md:flex-row items-center md:items-start justify-center gap-10 md:gap-16 text-center pt-2">
             <div className="space-y-2">
               <p className="carrd-font-label text-[1.3125rem]">
                 Date
@@ -333,10 +333,10 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               <h2 className="carrd-font-heading carrd-font-h2">
                 1. Choose Your Evening
               </h2>
-              <p className="carrd-font-intro text-left w-full max-w-[56rem]">
+              <p className="carrd-font-intro text-left w-full max-w-[600px]">
                 To keep our gatherings intimate, we are open by reservation and have limited seats. Reserve a seat to gift a cozy evening to yourself or someone you love.
               </p>
-              <div className="w-full max-w-[56rem] space-y-4">
+              <div className="w-full max-w-[600px] space-y-4">
                 {dates.map((d) => (
                   <div
                     key={d.id}
@@ -412,10 +412,10 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               <h2 className="carrd-font-heading carrd-font-h2">
                 2. Choose Your Ticket
               </h2>
-              <p className="carrd-font-intro text-left w-full max-w-[56rem]">
+              <p className="carrd-font-intro text-left w-full max-w-[600px]">
                 Our community spans a wide range of financial situations. Our tiered pricing helps us balance the financial sustainability and accessibility of the teahouse. We invite you to choose the level that feels right for you — one that honors your own capacity, while helping us keep this space open, welcoming and alive.
               </p>
-              <div className="w-full max-w-[56rem] space-y-4">
+              <div className="w-full max-w-[600px] space-y-4">
                 {tiers
                   .filter((t) => t.id === 'community' || t.id === 'patron')
                   .map((t) => {
@@ -493,7 +493,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     )
                   })}
               </div>
-              <p className="carrd-font-intro text-left w-full max-w-[56rem]">
+              <p className="carrd-font-intro text-left w-full max-w-[600px]">
                 If cost is a barrier, please consider our{' '}
                 <button
                   type="button"
@@ -507,7 +507,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               {showSupportedTier && tiers.filter((t) => t.id === 'supported').map((t) => (
                 <div
                   key={t.id}
-                  className="grid grid-cols-1 sm:grid-cols-[minmax(10rem,auto)_1fr_auto] gap-3 sm:gap-6 py-3 items-start w-full max-w-[56rem]"
+                  className="grid grid-cols-1 sm:grid-cols-[minmax(10rem,auto)_1fr_auto] gap-3 sm:gap-6 py-3 items-start w-full max-w-[600px]"
                 >
                   <div className="carrd-font-body flex-shrink-0 min-w-[10rem]">
                     <p className="font-medium text-[#FAEBD4]">Supported</p>
@@ -599,7 +599,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   </div>
                 </div>
               ))}
-              <div className="flex flex-wrap items-center justify-center gap-4 w-full max-w-[56rem]">
+              <div className="flex flex-wrap items-center justify-center gap-4 w-full max-w-[600px]">
                 <button
                   type="button"
                   onClick={() => setReservationStep(3)}
