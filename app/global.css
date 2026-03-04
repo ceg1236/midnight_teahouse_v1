@@ -865,7 +865,7 @@ html::-webkit-scrollbar {
   color: #F7EFE2;
 }
 .our-story-body {
-  line-height: 1.6;
+  line-height: 1.44; /* 0.9 × 1.6 */
 }
 .our-story-frame {
   border-radius: 42% 58% 61% 39% / 55% 41% 59% 45%;
