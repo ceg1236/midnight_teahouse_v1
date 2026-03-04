@@ -36,13 +36,14 @@ export default function OurStoryPage() {
                 Our Story
               </h1>
               <p>
-                Welcome to the Midnight Teahouse — a dreamy little world created by friends for friends, with support from our talented and loving community.
+                Welcome to the Midnight Teahouse —{' '}
+                a dreamy little world created by friends for friends, with support from our talented and loving community.
               </p>
             </div>
 
-            {/* What is the Midnight Teahouse? + Photo 1: text 60%, photo right */}
+            {/* What is the Midnight Teahouse? + Photo 1: photo above text on mobile, text left photo right on desktop */}
             <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center">
-              <div className="text-left w-full sm:w-[60%] min-w-0">
+              <div className="text-left w-full sm:w-[60%] min-w-0 order-2 sm:order-1">
                 <p className="our-story-subheading mt-6">What is the Midnight Teahouse?</p>
                 <p>
                   We are cultivating a beloved gathering spot for ourselves, our community, and the beautiful strangers we meet along the way. This is a space to savor: where body and mind can be softened, senses delighted, imaginations set loose.
@@ -51,7 +52,7 @@ export default function OurStoryPage() {
                   For now, our teahouse is offered as a monthly pop-up: a curated evening of gongfu tea service, live music and cozy corners. It is a time and space carved out for rest, unfurling and gentle play.
                 </p>
               </div>
-              <div className="our-story-frame w-full sm:w-[40%] max-w-[20rem] sm:max-w-none shrink-0">
+              <div className="our-story-frame w-full sm:w-[40%] max-w-[20rem] sm:max-w-none shrink-0 order-1 sm:order-2">
                 <Image
                   src="/images/our-story-tea-ceremony-1.png"
                   alt="Tea ceremony with vibrant pink and purple lighting, a person pouring tea"
@@ -62,9 +63,9 @@ export default function OurStoryPage() {
               </div>
             </div>
 
-            {/* What's next? + Photo 2: photo left, text 60% */}
+            {/* What's next? + Photo 2: photo above text on mobile, photo left text right on desktop */}
             <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center">
-              <div className="our-story-frame our-story-frame--alt w-full sm:w-[40%] max-w-[20rem] sm:max-w-none shrink-0 order-2 sm:order-1">
+              <div className="our-story-frame our-story-frame--alt w-full sm:w-[40%] max-w-[20rem] sm:max-w-none shrink-0 order-1 sm:order-1">
                 <Image
                   src="/images/our-story-tea-ceremony-2.png"
                   alt="Two people smiling during a tea ceremony with purple and pink lighting"
@@ -73,7 +74,7 @@ export default function OurStoryPage() {
                   className="w-full h-auto object-cover"
                 />
               </div>
-              <div className="text-left w-full sm:w-[60%] min-w-0 order-1 sm:order-2">
+              <div className="text-left w-full sm:w-[60%] min-w-0 order-2 sm:order-2">
                 <p className="our-story-subheading">What&apos;s next?</p>
                 <p>
                   Soon we hope to find a permanent home. A place where artists and musicians gather to play, where regulars come to unwind and new friends are always wandering in, hoping to be surprised.
