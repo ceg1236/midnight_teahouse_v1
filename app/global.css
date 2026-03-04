@@ -951,11 +951,12 @@ html::-webkit-scrollbar {
   font-size: 1.125rem;
   color: #FAE0B9;
   padding: 0.75rem 1.75rem;
-  border-radius: 9999px;
-  border: 1px solid rgba(250, 224, 185, 0.5);
+  border-radius: 0.5rem;
+  border: 1px solid #FAE0B9;
   background: transparent;
   flex-shrink: 0;
   -webkit-tap-highlight-color: transparent;
+  transition: color 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
 }
 .carrd-mobile-pill-select:hover {
   background: rgba(250, 224, 185, 0.08);

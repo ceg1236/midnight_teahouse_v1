@@ -393,10 +393,8 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                           If cost is a barrier, please consider our{' '}
                           <button type="button" onClick={() => setShowSupportedTier(true)} className="underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline">supported ticket option</button>.
                         </p>
-                      </div>
-                    )}
-                    {(showSupportedTier || (selections['supported'] ?? 0) > 0) && (
-                      <div className={`carrd-mobile-pill flex flex-col gap-3 text-left w-full ${(selections['supported'] ?? 0) > 0 ? 'carrd-mobile-pill--selected' : ''}`}>
+                        {(showSupportedTier || (selections['supported'] ?? 0) > 0) && (
+                      <div className={`carrd-mobile-pill flex flex-col gap-3 text-left w-full mt-3 ${(selections['supported'] ?? 0) > 0 ? 'carrd-mobile-pill--selected' : ''}`}>
                         <div className="min-w-0">
                           <p className="leading-tight text-xl"><span className="text-[#C4AF86] font-medium">Supported</span><span className="text-[#FAEBD4]/90 font-normal">, $20+</span></p>
                           <p className="text-[#D9D0BF]/90 text-lg leading-snug mt-0.5 line-clamp-2">{tiers.find((t) => t.id === 'supported')?.blurb}</p>
@@ -416,6 +414,8 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         ) : null}
                         {(selections['supported'] ?? 0) === 0 && (
                           <button type="button" onClick={() => { setShowSupportedTier(true); setSupportedPrice(20); setSupportedPriceInput('20'); setSelections((prev) => ({ ...prev, supported: 1 })) }} className="carrd-mobile-pill-select shrink-0 self-center">Select</button>
+                        )}
+                      </div>
                         )}
                       </div>
                     )}
@@ -440,11 +440,11 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     <label className="flex flex-col gap-1.5">Email *<input type="email" name="email" required value={formData.email} onChange={(e) => setFormData((d) => ({ ...d, email: e.target.value }))} className="mt-1 w-full rounded-lg border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] placeholder:text-[#D9D0BF]/60 focus:border-[#FAE0B9] focus:outline-none focus:ring-2 focus:ring-[#FAE0B9]/30" placeholder="you@example.com" /></label>
                     <label className="flex flex-col gap-1.5">Notes<textarea name="notes" value={formData.notes} onChange={(e) => setFormData((d) => ({ ...d, notes: e.target.value }))} rows={2} className="mt-1 w-full resize-none rounded-lg border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] placeholder:text-[#D9D0BF]/60 focus:border-[#FAE0B9] focus:outline-none focus:ring-2 focus:ring-[#FAE0B9]/30" placeholder="Anything else we should know?" /></label>
                   </form>
-                  <div className="w-full max-w-full min-w-0 text-left">
+                  <div className="w-full max-w-full min-w-0 text-left px-4 md:px-0">
                     <p className="carrd-font-body text-base font-medium mb-1.5">A few things to note before booking:</p>
                     <ul className="carrd-font-body text-base space-y-1.5 list-none pl-0 leading-snug">
                       {BOOKING_NOTES.map((item, i) => (
-                        <li key={i} className="flex items-center gap-2"><span className="text-[#D9D0BF] w-1.5 h-1.5 rounded-full bg-[#D9D0BF] shrink-0" aria-hidden /><span className="flex-1 text-[#D9D0BF]/95">{item}</span></li>
+                        <li key={i} className="flex items-start gap-2"><span className="text-[#D9D0BF] w-1.5 h-1.5 rounded-full bg-[#D9D0BF] shrink-0 mt-1.5" aria-hidden /><span className="flex-1 min-w-0 text-[#D9D0BF]/95">{item}</span></li>
                       ))}
                     </ul>
                   </div>
@@ -855,11 +855,9 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       </button>
                       .
                     </p>
-                  </div>
-                )}
-                {(showSupportedTier || (selections['supported'] ?? 0) > 0) && (
+                    {(showSupportedTier || (selections['supported'] ?? 0) > 0) && (
                   <div
-                    className={`carrd-mobile-pill flex flex-col gap-3 text-left w-full ${(selections['supported'] ?? 0) > 0 ? 'carrd-mobile-pill--selected' : ''}`}
+                    className={`carrd-mobile-pill flex flex-col gap-3 text-left w-full mt-3 ${(selections['supported'] ?? 0) > 0 ? 'carrd-mobile-pill--selected' : ''}`}
                   >
                     <div className="min-w-0">
                       <p className="leading-tight text-base">
@@ -945,6 +943,8 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       >
                         Select
                       </button>
+                    )}
+                  </div>
                     )}
                   </div>
                 )}
@@ -1261,13 +1261,13 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   {checkoutError}
                 </p>
               )}
-              <div className="w-full max-w-[650px] text-left mt-6">
+              <div className="w-full max-w-[650px] text-left mt-6 px-4 md:px-0">
                 <p className="carrd-font-body text-sm font-medium mb-1.5">A few things to note before booking:</p>
                 <ul className="carrd-font-body text-base space-y-1 list-none pl-0 leading-tight">
                   {BOOKING_NOTES.map((item, i) => (
-                    <li key={i} className="flex items-center gap-2">
-                      <span className="text-[#D9D0BF] w-1.5 h-1.5 rounded-full bg-[#D9D0BF] shrink-0 flex-shrink-0" aria-hidden />
-                      <span className="flex-1 text-[#D9D0BF]/95">{item}</span>
+                    <li key={i} className="flex items-start gap-2">
+                      <span className="text-[#D9D0BF] w-1.5 h-1.5 rounded-full bg-[#D9D0BF] shrink-0 flex-shrink-0 mt-1.5" aria-hidden />
+                      <span className="flex-1 min-w-0 text-[#D9D0BF]/95">{item}</span>
                     </li>
                   ))}
                 </ul>
