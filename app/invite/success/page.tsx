@@ -90,7 +90,7 @@ export default function InviteSuccessPage() {
               We are excited to share an evening with you.
             </p>
             <p className="text-[16px] leading-[1.55] text-[#FAEBD4]">
-              We&apos;ll send you a confirmation email shortly.
+              We&apos;ll send you an email with more details shortly.
             </p>
           </div>
         </div>
