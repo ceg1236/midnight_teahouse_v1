@@ -516,70 +516,86 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   <div className="carrd-font-body min-w-0 space-y-1 text-[#FAEBD4] mr-4 sm:mr-6">
                     <p className="font-medium italic">{t.blurb}</p>
                   </div>
-                  <div className="flex items-start justify-end gap-2">
-                    <div className="flex items-center gap-0.5 rounded-lg bg-[#FAEBD4]/5 px-1.5 py-1">
-                      <span className="carrd-font-body text-[#D9D0BF] text-xs">$</span>
-                      <input
-                        type="number"
-                        min={20}
-                        max={40}
-                        value={supportedPriceInput}
-                        placeholder="20–40"
-                        onChange={(e) => {
-                          const raw = e.target.value
-                          setSupportedPriceInput(raw)
-                          const v = parseInt(raw, 10)
-                          if (!isNaN(v) && v >= 20 && v <= 40) {
-                            setSupportedPrice(v)
-                          } else if (raw === '') {
-                            setSelections((prev) => {
-                              const next = { ...prev }
-                              delete next.supported
-                              return next
-                            })
-                          }
-                        }}
-                        onBlur={() => {
-                          const v = parseInt(supportedPriceInput, 10)
-                          if (!isNaN(v) && v >= 20 && v <= 40) {
-                            setSupportedPrice(v)
-                            setSupportedPriceInput(String(v))
-                          } else if (supportedPriceInput === '') {
-                            setSelections((prev) => {
-                              const next = { ...prev }
-                              delete next.supported
-                              return next
-                            })
-                          } else {
-                            setSupportedPriceInput(String(supportedPrice))
-                          }
-                        }}
-                        className="carrd-font-body w-12 bg-transparent text-center text-[#FAEBD4] text-xs placeholder:text-[#D9D0BF]/50 placeholder:text-[0.65rem] focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      />
-                    </div>
-                    <span className="text-[#D9D0BF]/60 text-sm">×</span>
-                    <div className="flex items-center gap-1">
+                  <div className="flex items-start justify-end min-w-[4.5rem]">
+                    {(selections['supported'] ?? 0) > 0 ? (
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-0.5 rounded-lg bg-[#FAEBD4]/5 px-1.5 py-1">
+                          <span className="carrd-font-body text-[#D9D0BF] text-xs">$</span>
+                          <input
+                            type="number"
+                            min={20}
+                            max={40}
+                            value={supportedPriceInput}
+                            placeholder="20–40"
+                            onChange={(e) => {
+                              const raw = e.target.value
+                              setSupportedPriceInput(raw)
+                              const v = parseInt(raw, 10)
+                              if (!isNaN(v) && v >= 20 && v <= 40) {
+                                setSupportedPrice(v)
+                              } else if (raw === '') {
+                                setSelections((prev) => {
+                                  const next = { ...prev }
+                                  delete next.supported
+                                  return next
+                                })
+                              }
+                            }}
+                            onBlur={() => {
+                              const v = parseInt(supportedPriceInput, 10)
+                              if (!isNaN(v) && v >= 20 && v <= 40) {
+                                setSupportedPrice(v)
+                                setSupportedPriceInput(String(v))
+                              } else if (supportedPriceInput === '') {
+                                setSelections((prev) => {
+                                  const next = { ...prev }
+                                  delete next.supported
+                                  return next
+                                })
+                              } else {
+                                setSupportedPriceInput(String(supportedPrice))
+                              }
+                            }}
+                            className="carrd-font-body w-12 bg-transparent text-center text-[#FAEBD4] text-xs placeholder:text-[#D9D0BF]/50 placeholder:text-[0.65rem] focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          />
+                        </div>
+                        <span className="text-[#D9D0BF]/60 text-sm">×</span>
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => handleQuantityChange('supported', -1)}
+                            className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-xs transition-colors hover:bg-[#FAE0B9]/30"
+                            aria-label="Decrease Supported quantity"
+                          >
+                            −
+                          </button>
+                          <span className="carrd-font-body w-5 text-center text-sm tabular-nums text-[#FAEBD4]">
+                            {selections['supported'] ?? 0}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleQuantityChange('supported', 1)}
+                            className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-xs transition-colors hover:bg-[#FAE0B9]/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                            disabled={totalQuantity >= 4}
+                            aria-label="Increase Supported quantity"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
                       <button
                         type="button"
-                        onClick={() => handleQuantityChange('supported', -1)}
-                        className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-xs transition-colors hover:bg-[#FAE0B9]/30"
-                        aria-label="Decrease Supported quantity"
+                        onClick={() => {
+                          setSupportedPrice(20)
+                          setSupportedPriceInput('20')
+                          setSelections({ supported: 1 })
+                        }}
+                        className="carrd-btn px-6 py-3"
                       >
-                        −
+                        Select
                       </button>
-                      <span className="carrd-font-body w-5 text-center text-sm tabular-nums text-[#FAEBD4]">
-                        {selections['supported'] ?? 0}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => handleQuantityChange('supported', 1)}
-                        className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-xs transition-colors hover:bg-[#FAE0B9]/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                        disabled={totalQuantity >= 4}
-                        aria-label="Increase Supported quantity"
-                      >
-                        +
-                      </button>
-                    </div>
+                    )}
                   </div>
                 </div>
               ))}
