@@ -1,10 +1,11 @@
 'use client'
 
 import Link from 'next/link'
+import { Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { eventDates } from '../../../content/event-invite.config'
 
-export default function GatheringsPage() {
+function GatheringsContent() {
   const searchParams = useSearchParams()
   const dateId = searchParams.get('date')
   const event = dateId
@@ -40,5 +41,17 @@ export default function GatheringsPage() {
         </Link>
       </div>
     </div>
+  )
+}
+
+export default function GatheringsPage() {
+  return (
+    <Suspense fallback={
+      <div className="carrd-page flex min-h-[100dvh] flex-col items-center justify-center px-6 md:min-h-screen">
+        <div className="carrd-font-body text-[#FAEBD4]">Loading...</div>
+      </div>
+    }>
+      <GatheringsContent />
+    </Suspense>
   )
 }

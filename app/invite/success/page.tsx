@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { eventDates } from '../../../content/event-invite.config'
 
@@ -22,7 +22,7 @@ function getFirstName(name: string): string {
 
 const ADDRESS = '54 Washburn st, San Francisco'
 
-export default function InviteSuccessPage() {
+function InviteSuccessContent() {
   const searchParams = useSearchParams()
   const name = searchParams.get('name') ?? ''
   const dateId = searchParams.get('date_id') ?? ''
@@ -112,5 +112,17 @@ export default function InviteSuccessPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function InviteSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="carrd-page flex min-h-[100dvh] flex-col items-center justify-center px-6 md:min-h-screen">
+        <div className="carrd-font-body text-[#FAEBD4]">Loading...</div>
+      </div>
+    }>
+      <InviteSuccessContent />
+    </Suspense>
   )
 }
