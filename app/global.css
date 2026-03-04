@@ -871,6 +871,8 @@ html::-webkit-scrollbar {
   border-radius: 42% 58% 61% 39% / 55% 41% 59% 45%;
   overflow: hidden;
   box-shadow: 0 0 0 1px rgba(217, 208, 191, 0.2);
+  -webkit-mask-image: radial-gradient(ellipse 92% 92% at 50% 50%, black, transparent 100%);
+  mask-image: radial-gradient(ellipse 92% 92% at 50% 50%, black, transparent 100%);
 }
 .our-story-frame--alt {
   border-radius: 58% 42% 39% 61% / 41% 59% 45% 55%;
