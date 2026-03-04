@@ -824,6 +824,11 @@ html::-webkit-scrollbar {
   color: #FAE9D8;
 }
 
+/* Row 2 in reservation tables: tighter line spacing */
+.carrd-table-row-2 {
+  line-height: 1.2;
+}
+
 /* Form autofill override - avoid white background on suggested entries */
 .carrd-page input:-webkit-autofill,
 .carrd-page input:-webkit-autofill:hover,
