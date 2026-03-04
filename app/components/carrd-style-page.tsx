@@ -365,9 +365,9 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     >
                       Select
                     </button>
-                    <p className="carrd-font-body carrd-table-row-2 min-w-0">{d.dateTime}</p>
+                    <p className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0">{d.dateTime}</p>
                     {d.blurb ? (
-                      <div className="carrd-font-body carrd-table-row-2 min-w-0">
+                      <div className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0">
                         {expandedBlurbId === d.id ? (
                           <>
                             <p className="carrd-table-row-2">{d.blurb}</p>
