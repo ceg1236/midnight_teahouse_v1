@@ -603,7 +603,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               {selectedDate && hasSelection ? (
                 <>
                   {/* Summary box: date/time + choices, directly under heading */}
-                  <div className="carrd-font-body rounded-lg bg-[#FAEBD4]/20 px-4 py-4 text-left w-full max-w-[28rem]">
+                  <div className="carrd-font-body rounded-lg bg-[#FAEBD4]/20 px-4 py-4 text-left w-full max-w-[600px]">
                     <div className="space-y-3">
                       <div>
                         <p className="text-xs text-[#D9D0BF]/80 uppercase tracking-wider">Date</p>
@@ -653,7 +653,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 onSubmit={(e) => {
                   e.preventDefault()
                 }}
-                className="w-full max-w-md flex flex-col gap-4 carrd-font-body"
+                className="w-full max-w-[600px] flex flex-col gap-4 carrd-font-body"
               >
                 <input type="hidden" name="device_type" value={deviceType} />
                 <input type="hidden" name="date" value={selectedDate ?? ''} />
@@ -698,7 +698,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   {checkoutError}
                 </p>
               )}
-              <div className="w-full max-w-md text-left mt-6">
+              <div className="w-full max-w-[600px] text-left mt-6">
                 <p className="carrd-font-body text-sm font-medium mb-1.5">A few things to note before booking:</p>
                 <ul className="carrd-font-body text-[0.74375rem] space-y-1 list-none pl-0 leading-tight">
                   {BOOKING_NOTES.map((item, i) => (
