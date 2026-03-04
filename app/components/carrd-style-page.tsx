@@ -224,14 +224,14 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         </Link>
       </div>
       {/* Mobile: single container, swaps invite ↔ reservation (no fixed height, no empty space) */}
-      <div className="md:hidden w-full flex-1 min-w-0 overflow-x-hidden">
+      <div className="md:hidden w-full flex-1 min-w-0 overflow-x-hidden max-w-full">
         {!showReservationView ? (
-          <div className="flex flex-col items-center px-6 py-8 gap-[1.25em]">
+          <div className="flex flex-col items-center px-6 py-8 gap-[1.25em] overflow-x-hidden w-full max-w-full">
             <div className="relative w-full flex flex-col items-center gap-1">
               <h1 className="carrd-font-heading carrd-font-title text-center">Midnight Teahouse</h1>
               <p className="carrd-font-subtitle text-center italic">an enchanted world hidden in San Francisco</p>
             </div>
-            <div className="carrd-video-fade w-full -mx-6 py-6">
+            <div className="carrd-video-fade w-full py-6 overflow-hidden">
               <div className="aspect-video overflow-hidden">
                 <video autoPlay loop muted playsInline className="w-full h-full object-cover">
                   <source src="/images/midnight_site_vid_hi_res.mp4" type="video/mp4" />
@@ -280,7 +280,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
             <SiteFooter variant="main" />
           </div>
         ) : (
-          <div ref={mobileReservationPanelRef} className="flex flex-col items-center px-4 py-4 gap-3 min-w-0 w-full max-w-[100vw] overflow-x-hidden">
+          <div ref={mobileReservationPanelRef} className="flex flex-col items-center px-4 py-4 gap-3 min-w-0 w-full max-w-full overflow-x-hidden">
             <div className="w-full flex flex-col items-center gap-1 shrink-0">
               <div className="flex justify-center gap-2" aria-hidden>
                 {([1, 2, 3] as const).map((step) => (
@@ -304,7 +304,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 <div className="flex-1 min-w-0" aria-hidden />
               </div>
             </div>
-            <section className="carrd-reservation-section w-full min-w-0 overflow-x-hidden max-w-[100vw]">
+            <section className="carrd-reservation-section w-full min-w-0 overflow-x-hidden max-w-full">
               <div
                 className="flex transition-transform duration-500 ease-in-out min-w-0"
                 style={{
@@ -313,7 +313,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 }}
               >
                 {/* Mobile reservation reuses same panel structure - content is in desktop flow below, we need inline copy */}
-                <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-2 min-w-0 overflow-y-auto overflow-x-hidden max-w-[100vw]">
+                <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full">
                   <h2 className="carrd-font-heading carrd-font-h2 text-2xl">1. Choose Your Evening</h2>
                   <p className="carrd-font-body text-left w-full max-w-full min-w-0 text-xl">The teahouse is open by reservation with limited seats. Reserve a spot to gift yourself a cozy evening.</p>
                   <div className="w-full max-w-full min-w-0 flex flex-col gap-3 break-words">
@@ -350,7 +350,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     })}
                   </div>
                 </div>
-                <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-2 min-w-0 overflow-y-auto overflow-x-hidden max-w-[100vw]">
+                <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full">
                   <h2 className="carrd-font-heading carrd-font-h2 text-2xl">2. Choose Your Ticket</h2>
                   <div className="w-full max-w-full min-w-0 flex flex-col gap-3 break-words">
                     {tiers.filter((t) => t.id === 'community' || t.id === 'patron').map((t) => {
@@ -439,7 +439,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   </div>
                   <button type="button" onClick={() => setReservationStep(3)} disabled={!hasSelection} className="carrd-btn px-8 py-4 disabled:opacity-50 disabled:cursor-not-allowed">Continue</button>
                 </div>
-                <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-2 min-w-0 overflow-y-auto overflow-x-hidden max-w-[100vw]">
+                <div className="flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full">
                   <h2 className="carrd-font-heading carrd-font-h2 text-2xl">3. Complete Your Reservation</h2>
                   {selectedDate && hasSelection ? (
                     <div className="carrd-font-body rounded-lg bg-[#FAEBD4]/20 px-4 py-4 text-left w-full max-w-full min-w-0">
@@ -493,7 +493,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         )}
       </div>
       {/* Desktop: single column */}
-      <div className="hidden md:flex w-full max-w-[60rem] flex-col items-center px-12 py-12 gap-[1.25em]">
+      <div className="hidden md:flex w-full max-w-[60rem] flex-col items-center px-12 py-12 gap-[1.25em] overflow-x-hidden min-w-0">
         {/* Hero: Title + Subtitle */}
         <div className="relative w-full flex flex-col items-center gap-1">
           <h1 className="carrd-font-heading carrd-font-title text-center">
@@ -505,7 +505,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         </div>
 
         {/* Video */}
-        <div className="carrd-video-fade w-full -mx-6 md:-mx-12 py-6">
+        <div className="carrd-video-fade w-full py-6 overflow-hidden">
           <div className="aspect-video overflow-hidden">
             <video
               autoPlay
@@ -622,7 +622,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
         {/* Reservation: three sliding panels (evening → ticket → form) */}
         <section
           ref={joinRef}
-          className="carrd-reservation-section w-full min-w-0 overflow-x-hidden max-w-[100vw] md:max-w-none mt-1"
+          className="carrd-reservation-section w-full min-w-0 overflow-x-hidden max-w-full mt-1"
         >
           <div
             className="flex transition-transform duration-500 ease-in-out min-w-0"
@@ -632,7 +632,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
             }}
           >
             {/* Panel 1: Choose your evening */}
-            <div className="flex-shrink-0 w-1/3 min-w-0 flex flex-col items-center gap-6 px-3 md:px-6 max-w-[100vw] md:max-w-none">
+            <div className="flex-shrink-0 w-1/3 min-w-0 flex flex-col items-center gap-6 px-4 md:px-6 max-w-full">
               <h2 className="carrd-font-heading carrd-font-h2">
                 1. Choose Your Evening
               </h2>
@@ -640,7 +640,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 The teahouse is open by reservation with limited seats. Reserve a spot to gift yourself a cozy evening.
               </p>
               {/* Mobile: date cards (2-line, succinct) */}
-              <div className="md:hidden w-full max-w-[min(650px,100vw)] flex flex-col gap-5 break-words">
+              <div className="md:hidden w-full max-w-full flex flex-col gap-5 break-words">
                 {dates.map((d) => {
                   const [datePart, timePart] = d.dateTime.includes(', ') ? d.dateTime.split(', ') : [d.dateTime, '']
                   const headerRest = timePart ? `${datePart} ${timePart.toUpperCase()}` : datePart
@@ -782,12 +782,12 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
             </div>
 
             {/* Panel 2: Choose your ticket */}
-            <div ref={tierRef} className="flex-shrink-0 w-1/3 min-w-0 flex flex-col items-center gap-6 px-3 md:px-6 max-w-[100vw] md:max-w-none">
+            <div ref={tierRef} className="flex-shrink-0 w-1/3 min-w-0 flex flex-col items-center gap-6 px-4 md:px-6 max-w-full">
               <h2 className="carrd-font-heading carrd-font-h2">
                 2. Choose Your Ticket
               </h2>
               {/* Mobile: cards first, then dropdown for pricing note */}
-              <div className="md:hidden w-full max-w-[min(650px,100vw)] flex flex-col gap-5 break-words">
+              <div className="md:hidden w-full max-w-full flex flex-col gap-5 break-words">
                 {tiers
                   .filter((t) => t.id === 'community' || t.id === 'patron')
                   .map((t) => {
@@ -1165,7 +1165,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
             </div>
 
             {/* Panel 3: Complete your reservation (summary + form + reserve) */}
-            <div ref={formRef} className="flex-shrink-0 w-1/3 min-w-0 flex flex-col items-center gap-6 px-3 md:px-6 max-w-[100vw] md:max-w-none">
+            <div ref={formRef} className="flex-shrink-0 w-1/3 min-w-0 flex flex-col items-center gap-6 px-4 md:px-6 max-w-full">
               <div className="inline-flex flex-col items-stretch gap-6">
                 <h2 className="carrd-font-heading carrd-font-h2">
                   3. Complete Your Reservation
