@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { CountdownTimer } from './countdown-timer'
 import type { eventDates, eventTiers } from '../../content/event-invite.config'
 import { SiteFooter } from './site-footer'
@@ -19,12 +19,12 @@ type CarrdStylePageProps = {
 const SCROLL_DURATION = 1200
 const SCROLL_OFFSET_TOP = 48
 
-const BOOKING_NOTES = [
-  'Doors open at 7pm and close at 11pm. Feel free to join us anytime in this window.',
+const BOOKING_NOTES: Array<string | React.ReactNode> = [
+  'Doors open at 7pm and close at 11pm. Join us anytime in this window.',
   'Reservation includes unlimited tea and all other amenities.',
   'We are a phone and laptop-free space.',
-  "Unfortunately, we aren't able to offer refunds or exchanges for future events.",
-  "We'll share the location once you make the reservation. If you don't hear from us within a few days, please send us an email.",
+  "Unfortunately, we don't offer refunds or exchanges for future events.",
+  <>If you have any questions about the reservation, please <a href="mailto:midnight.teahouse.sf@gmail.com" className="text-[#FAE0B9] hover:underline focus:outline-none focus:underline">send us an email</a>.</>,
 ]
 
 function scrollToSection(ref: React.RefObject<HTMLElement | null>) {
