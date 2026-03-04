@@ -38,46 +38,50 @@ export default function OurStoryPage() {
               <p>
                 Welcome to the Midnight Teahouse — a dreamy little world created by friends for friends, with support from our talented and loving community.
               </p>
-              <p className="our-story-subheading mt-6">What is the Midnight Teahouse?</p>
-              <p>
-                We are cultivating a beloved gathering spot for ourselves, our community, and the beautiful strangers we meet along the way. This is a space to savor: where body and mind can be softened, senses delighted, imaginations set loose.
-              </p>
-              <p>
-                For now, our teahouse is offered as a monthly pop-up: a curated evening of gongfu tea service, live music and cozy corners. It is a time and space carved out for rest, unfurling and gentle play.
-              </p>
             </div>
 
-            {/* Photo 1 */}
-            <div className="our-story-frame w-full max-w-[20rem] mx-auto">
-              <Image
-                src="/images/our-story-tea-ceremony-1.png"
-                alt="Tea ceremony with vibrant pink and purple lighting, a person pouring tea"
-                width={600}
-                height={400}
-                className="w-full h-auto object-cover"
-              />
+            {/* What is the Midnight Teahouse? + Photo 1: text 60%, photo right */}
+            <div className="flex flex-col sm:flex-row gap-6 items-start">
+              <div className="text-left w-full sm:w-[60%] min-w-0">
+                <p className="our-story-subheading mt-6">What is the Midnight Teahouse?</p>
+                <p>
+                  We are cultivating a beloved gathering spot for ourselves, our community, and the beautiful strangers we meet along the way. This is a space to savor: where body and mind can be softened, senses delighted, imaginations set loose.
+                </p>
+                <p>
+                  For now, our teahouse is offered as a monthly pop-up: a curated evening of gongfu tea service, live music and cozy corners. It is a time and space carved out for rest, unfurling and gentle play.
+                </p>
+              </div>
+              <div className="our-story-frame w-full sm:w-[40%] max-w-[20rem] sm:max-w-none shrink-0">
+                <Image
+                  src="/images/our-story-tea-ceremony-1.png"
+                  alt="Tea ceremony with vibrant pink and purple lighting, a person pouring tea"
+                  width={600}
+                  height={400}
+                  className="w-full h-auto object-cover"
+                />
+              </div>
             </div>
 
-            {/* Text block 2 */}
-            <div className="text-left">
-              <p className="our-story-subheading">What&apos;s next?</p>
-              <p>
-                Soon we hope to find a permanent home. A place where artists and musicians gather to play, where regulars come to unwind and new friends are always wandering in, hoping to be surprised.
-              </p>
-              <p>
-                Thank you for being part of our unfolding. We are grateful to be building it with you.
-              </p>
-            </div>
-
-            {/* Photo 2 */}
-            <div className="our-story-frame our-story-frame--alt w-full max-w-[20rem] mx-auto">
-              <Image
-                src="/images/our-story-tea-ceremony-2.png"
-                alt="Two people smiling during a tea ceremony with purple and pink lighting"
-                width={600}
-                height={400}
-                className="w-full h-auto object-cover"
-              />
+            {/* What's next? + Photo 2: photo left, text 60% */}
+            <div className="flex flex-col sm:flex-row gap-6 items-start">
+              <div className="our-story-frame our-story-frame--alt w-full sm:w-[40%] max-w-[20rem] sm:max-w-none shrink-0 order-2 sm:order-1">
+                <Image
+                  src="/images/our-story-tea-ceremony-2.png"
+                  alt="Two people smiling during a tea ceremony with purple and pink lighting"
+                  width={600}
+                  height={400}
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+              <div className="text-left w-full sm:w-[60%] min-w-0 order-1 sm:order-2">
+                <p className="our-story-subheading">What&apos;s next?</p>
+                <p>
+                  Soon we hope to find a permanent home. A place where artists and musicians gather to play, where regulars come to unwind and new friends are always wandering in, hoping to be surprised.
+                </p>
+                <p>
+                  Thank you for being part of our unfolding. We are grateful to be building it with you.
+                </p>
+              </div>
             </div>
 
             {/* Signature: right-aligned with text block above */}
