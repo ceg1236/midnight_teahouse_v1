@@ -41,7 +41,7 @@ export default function OurStoryPage() {
             </div>
 
             {/* What is the Midnight Teahouse? + Photo 1: text 60%, photo right */}
-            <div className="flex flex-col sm:flex-row gap-6 items-start">
+            <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center">
               <div className="text-left w-full sm:w-[60%] min-w-0">
                 <p className="our-story-subheading mt-6">What is the Midnight Teahouse?</p>
                 <p>
@@ -63,7 +63,7 @@ export default function OurStoryPage() {
             </div>
 
             {/* What's next? + Photo 2: photo left, text 60% */}
-            <div className="flex flex-col sm:flex-row gap-6 items-start">
+            <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center">
               <div className="our-story-frame our-story-frame--alt w-full sm:w-[40%] max-w-[20rem] sm:max-w-none shrink-0 order-2 sm:order-1">
                 <Image
                   src="/images/our-story-tea-ceremony-2.png"
