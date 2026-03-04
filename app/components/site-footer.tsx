@@ -22,6 +22,19 @@ export function SiteFooter({ variant = 'default', className }: SiteFooterProps) 
             </svg>
           </a>
           <a
+            href="https://instagram.com/midnightteahouse"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#D9D0BF] hover:text-[#FAE0B9] transition-colors shrink-0"
+            aria-label="Instagram"
+          >
+            <svg className="size-7 shrink-0 min-w-7 min-h-7" viewBox="0 0 28 28" fill="none" aria-hidden>
+              <rect x="4" y="4" width="20" height="20" rx="4" stroke="currentColor" strokeWidth="1.8" />
+              <circle cx="14" cy="14" r="4" stroke="currentColor" strokeWidth="1.8" />
+              <circle cx="17.5" cy="10.5" r="1" stroke="currentColor" strokeWidth="1.5" />
+            </svg>
+          </a>
+          <a
             href="https://forms.gle/fC6RsHUwzndXRb6L9"
             target="_blank"
             rel="noopener noreferrer"
@@ -29,21 +42,9 @@ export function SiteFooter({ variant = 'default', className }: SiteFooterProps) 
             aria-label="Leave a note form"
           >
             <svg className="size-7 shrink-0 min-w-7 min-h-7" viewBox="0 0 40 40" fill="none" aria-hidden>
-              <rect x="8" y="8" width="24" height="16" rx="2" stroke="currentColor" strokeWidth="2" />
-              <path d="M12 24l4-4h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </a>
-          <a
-            href="https://instagram.com/midnightteahouse"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#D9D0BF] hover:text-[#FAE0B9] transition-colors shrink-0"
-            aria-label="Instagram"
-          >
-            <svg className="size-7 shrink-0 min-w-7 min-h-7" viewBox="0 0 40 40" fill="none" aria-hidden>
-              <rect x="11" y="11" width="18" height="18" rx="5" stroke="currentColor" strokeWidth="2" />
-              <circle cx="20" cy="20" r="5" stroke="currentColor" strokeWidth="2" />
-              <circle cx="24.5" cy="15.5" r="1.3" stroke="currentColor" strokeWidth="1.8" />
+              <rect x="10" y="10" width="18" height="22" rx="2" stroke="currentColor" strokeWidth="2" />
+              <path d="M14 16h10M14 20h8M14 24h6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              <path d="M26 8l5 5-9 9h-2l9-9-5-5h2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </a>
         </div>
