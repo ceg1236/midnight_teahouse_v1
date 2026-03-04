@@ -30,14 +30,6 @@ export default function InviteSuccessPage() {
   const dateLabel = event?.dateTime ?? 'March 18–20, 2026'
   const firstName = getFirstName(name)
 
-  const handleForwardViaText = () => {
-    const gatheringsUrl = `${window.location.origin}/invite/gatherings${dateId ? `?date=${dateId}` : ''}`
-    const smsBody =
-      (firstName ? `${firstName} invited you to join them at the Midnight Teahouse on ${dateLabel}. ` : '') +
-      `Here are some details about our gatherings. ${gatheringsUrl}`
-    window.location.href = `sms:?body=${encodeURIComponent(smsBody)}`
-  }
-
   useEffect(() => {
     sessionStorage.removeItem(STORAGE_KEY)
   }, [])
@@ -48,35 +40,34 @@ export default function InviteSuccessPage() {
         <h1 className="carrd-font-heading text-3xl md:text-4xl [font-variant:small-caps] text-[#FAEBD4]">
           See you at the Teahouse
         </h1>
-        <div className="carrd-font-body flex flex-col items-center gap-4 text-left w-full max-w-md">
+        <div className="carrd-font-body flex flex-col items-center gap-3 text-center w-full max-w-md text-[16px]">
           {firstName ? (
-            <p className="text-lg text-[#FAEBD4] w-full">
+            <p className="text-[#FAEBD4]">
               {firstName},
             </p>
           ) : null}
-          <p className="text-base leading-relaxed text-[#FAEBD4] w-full">
-            Thank you for reserving your spot. We are excited to share an evening with you.
+          <p className="text-[#FAEBD4]">
+            Thank you for reserving your spot.
           </p>
-          <div className="space-y-1 w-full">
-            <p className="text-xs uppercase tracking-wider text-[#D9D0BF]">
-              Date
-            </p>
-            <p className="text-base text-[#FAEBD4]">
-              {dateLabel}
-            </p>
-          </div>
-          <div className="space-y-1 w-full">
-            <p className="text-xs uppercase tracking-wider text-[#D9D0BF]">
-              Location
-            </p>
-            <p className="text-base text-[#FAEBD4]">
-              {ADDRESS}
-            </p>
-          </div>
-          <p className="text-sm leading-relaxed text-[#FAEBD4] w-full">
+          <p className="text-[#FAEBD4]">
+            We are excited to share an evening with you.
+          </p>
+          <p className="text-[#D9D0BF] text-xs uppercase tracking-wider">
+            Date
+          </p>
+          <p className="text-[#FAEBD4]">
+            {dateLabel}
+          </p>
+          <p className="text-[#D9D0BF] text-xs uppercase tracking-wider">
+            Location
+          </p>
+          <p className="text-[#FAEBD4]">
+            {ADDRESS}
+          </p>
+          <p className="text-[#FAEBD4]">
             Please look out for our confirmation email.
           </p>
-          <p className="text-base text-[#FAEBD4] w-full">
+          <p className="text-[#FAEBD4]">
             Warmly,
           </p>
         </div>
@@ -85,17 +76,10 @@ export default function InviteSuccessPage() {
             href={GOOGLE_CALENDAR_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="carrd-link text-sm underline hover:no-underline text-[#D9D0BF] hover:text-[#FAE0B9]"
+            className="carrd-link text-[16px] underline hover:no-underline text-[#D9D0BF] hover:text-[#FAE0B9]"
           >
             Add to Google Calendar
           </a>
-          <button
-            type="button"
-            onClick={handleForwardViaText}
-            className="carrd-link text-sm underline hover:no-underline bg-transparent border-none cursor-pointer p-0 font-inherit text-[#D9D0BF] hover:text-[#FAE0B9]"
-          >
-            Forward invite via text
-          </button>
           <Link
             href="/"
             className="carrd-btn px-10 py-4 font-inherit text-xl"
