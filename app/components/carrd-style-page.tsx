@@ -214,6 +214,15 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
 
   return (
     <div className="carrd-page flex flex-col items-center min-h-screen overflow-x-hidden pt-8">
+      {/* Top-right link block (scrolls with page, not sticky) */}
+      <div className="w-full flex justify-end px-6 md:px-12 pt-2 md:pt-4">
+        <Link
+          href="/our-story"
+          className="carrd-link carrd-link--muted text-sm whitespace-nowrap hidden md:inline"
+        >
+          Our Story
+        </Link>
+      </div>
       {/* Mobile: two-panel slide (invite | reservation) */}
       <div className="md:hidden w-full flex-1 min-h-0 overflow-x-hidden">
         <div
@@ -475,12 +484,6 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
       <div className="hidden md:flex w-full max-w-[60rem] flex-col items-center px-12 py-12 gap-[1.25em]">
         {/* Hero: Title + Subtitle */}
         <div className="relative w-full flex flex-col items-center gap-1">
-          <Link
-            href="/our-story"
-            className="absolute top-2 right-4 carrd-link carrd-link--muted text-sm whitespace-nowrap"
-          >
-            Our Story
-          </Link>
           <h1 className="carrd-font-heading carrd-font-title text-center">
             Midnight Teahouse
           </h1>
