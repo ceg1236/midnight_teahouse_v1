@@ -344,55 +344,15 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                 {dates.map((d) => (
                   <div
                     key={d.id}
-                    className="flex flex-col sm:flex-row sm:items-start gap-4 py-3 border-b border-[#D9D0BF]/30 last:border-b-0"
+                    className="grid grid-cols-[6rem_1fr_auto] grid-rows-[auto_auto] gap-x-4 gap-y-1 items-start py-3 border-b border-[#D9D0BF]/30 last:border-b-0"
                   >
-                    <div className="carrd-font-body flex-shrink-0 w-24 sm:w-28">
-                      <p className="font-medium text-[#FAEBD4]">{d.day}</p>
-                      <p className="text-[#D9D0BF] text-[1.125rem]">{d.dateTime}</p>
-                    </div>
-                    <div className="carrd-font-body flex-1 min-w-0 space-y-1 text-[#FAEBD4] ml-4">
+                    <p className="carrd-font-body font-medium text-[#FAEBD4]">{d.day}</p>
+                    <div className="carrd-font-body min-w-0 space-y-0 text-[#FAEBD4]">
                       {d.musicians.map((line, i) => (
                         <p key={i} className="font-medium italic">
                           {line}
                         </p>
                       ))}
-                      {d.blurb ? (
-                        <div className="text-[#D9D0BF] text-[1.125rem]">
-                          {expandedBlurbId === d.id ? (
-                            <>
-                              <p className="leading-relaxed">{d.blurb}</p>
-                              {d.spotifyUrl ? (
-                                <a
-                                  href={d.spotifyUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="mt-2 inline-block italic text-[#D9D0BF] underline hover:text-[#FAEBD4] focus:outline-none focus:underline"
-                                >
-                                  {d.spotifyLabel}
-                                </a>
-                              ) : null}
-                              <button
-                                type="button"
-                                onClick={() => setExpandedBlurbId(null)}
-                                className="mt-1 block italic text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
-                              >
-                                ...less
-                              </button>
-                            </>
-                          ) : (
-                            <p className="leading-relaxed flex items-baseline gap-1 min-w-0">
-                              <span className="truncate min-w-0">{d.blurb}</span>
-                              <button
-                                type="button"
-                                onClick={() => setExpandedBlurbId(d.id)}
-                                className="italic flex-shrink-0 text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
-                              >
-                                ...more
-                              </button>
-                            </p>
-                          )}
-                        </div>
-                      ) : null}
                     </div>
                     <button
                       type="button"
@@ -400,12 +360,52 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         setSelectedDate(d.id)
                         setReservationStep(2)
                       }}
-                      className={`carrd-btn px-6 py-3 flex-shrink-0 self-start ml-4 ${
+                      className={`carrd-btn px-6 py-3 flex-shrink-0 row-span-2 self-center ml-4 ${
                         selectedDate === d.id ? 'bg-[#FAE0B9]/20' : ''
                       }`}
                     >
                       Select
                     </button>
+                    <p className="carrd-font-body text-[#D9D0BF] text-[1.125rem]">{d.dateTime}</p>
+                    {d.blurb ? (
+                      <div className="text-[#D9D0BF] text-[1.125rem] min-w-0">
+                        {expandedBlurbId === d.id ? (
+                          <>
+                            <p className="leading-relaxed">{d.blurb}</p>
+                            {d.spotifyUrl ? (
+                              <a
+                                href={d.spotifyUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="mt-2 inline-block italic text-[#D9D0BF] underline hover:text-[#FAEBD4] focus:outline-none focus:underline"
+                              >
+                                {d.spotifyLabel}
+                              </a>
+                            ) : null}
+                            <button
+                              type="button"
+                              onClick={() => setExpandedBlurbId(null)}
+                              className="mt-1 block italic text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
+                            >
+                              ...less
+                            </button>
+                          </>
+                        ) : (
+                          <p className="leading-relaxed flex items-baseline gap-1 min-w-0">
+                            <span className="truncate min-w-0">{d.blurb}</span>
+                            <button
+                              type="button"
+                              onClick={() => setExpandedBlurbId(d.id)}
+                              className="italic flex-shrink-0 text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
+                            >
+                              ...more
+                            </button>
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <div />
+                    )}
                   </div>
                 ))}
               </div>
@@ -427,41 +427,11 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     return (
                       <div
                         key={t.id}
-                        className="grid grid-cols-[6rem_1fr_auto] gap-4 py-3 border-b border-[#D9D0BF]/30 last:border-b-0 items-start"
+                        className="grid grid-cols-[6rem_1fr_auto] grid-rows-[auto_auto] gap-x-4 gap-y-1 py-3 border-b border-[#D9D0BF]/30 last:border-b-0 items-start"
                       >
-                        <div className="carrd-font-body flex-shrink-0">
-                          <p className="font-medium text-[#FAEBD4]">{t.label}</p>
-                          <p className="text-[#D9D0BF] text-[1.125rem]">${t.price}</p>
-                        </div>
-                        <div className="carrd-font-body min-w-0 space-y-1 text-[#FAEBD4] ml-4">
-                          <p className="font-medium italic">{t.mainLine}</p>
-                          <div className="text-[#D9D0BF] text-[1.125rem]">
-                            {expandedTierBlurbId === t.id ? (
-                              <>
-                                <p className="leading-relaxed">{t.blurb}</p>
-                                <button
-                                  type="button"
-                                  onClick={() => setExpandedTierBlurbId(null)}
-                                  className="mt-1 block italic text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
-                                >
-                                  ...less
-                                </button>
-                              </>
-                            ) : (
-                              <p className="leading-relaxed flex items-baseline gap-1 min-w-0">
-                                <span className="truncate min-w-0">{t.blurb}</span>
-                                <button
-                                  type="button"
-                                  onClick={() => setExpandedTierBlurbId(t.id)}
-                                  className="italic flex-shrink-0 text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
-                                >
-                                  ...more
-                                </button>
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex items-start justify-end min-w-[4.5rem]">
+                        <p className="carrd-font-body font-medium text-[#FAEBD4]">{t.label}</p>
+                        <p className="carrd-font-body font-medium italic text-[#FAEBD4]">{t.mainLine}</p>
+                        <div className="flex items-start justify-end min-w-[4.5rem] row-span-2 self-center">
                           {qty > 0 ? (
                             <div className="flex items-center gap-1">
                               <button
@@ -493,6 +463,32 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                             </button>
                           )}
                         </div>
+                        <p className="carrd-font-body text-[#D9D0BF] text-[1.125rem]">${t.price}</p>
+                        <div className="text-[#D9D0BF] text-[1.125rem] min-w-0">
+                          {expandedTierBlurbId === t.id ? (
+                            <>
+                              <p className="leading-relaxed">{t.blurb}</p>
+                              <button
+                                type="button"
+                                onClick={() => setExpandedTierBlurbId(null)}
+                                className="mt-1 block italic text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
+                              >
+                                ...less
+                              </button>
+                            </>
+                          ) : (
+                            <p className="leading-relaxed flex items-baseline gap-1 min-w-0">
+                              <span className="truncate min-w-0">{t.blurb}</span>
+                              <button
+                                type="button"
+                                onClick={() => setExpandedTierBlurbId(t.id)}
+                                className="italic flex-shrink-0 text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
+                              >
+                                ...more
+                              </button>
+                            </p>
+                          )}
+                        </div>
                       </div>
                     )
                   })}
@@ -511,16 +507,11 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               {showSupportedTier && tiers.filter((t) => t.id === 'supported').map((t) => (
                 <div
                   key={t.id}
-                  className="grid grid-cols-1 sm:grid-cols-[6rem_1fr_auto] gap-4 py-3 items-start w-full max-w-[650px]"
+                  className="grid grid-cols-[6rem_1fr_auto] grid-rows-[auto_auto] gap-x-4 gap-y-1 py-3 items-start w-full max-w-[650px]"
                 >
-                  <div className="carrd-font-body flex-shrink-0">
-                    <p className="font-medium text-[#FAEBD4]">Supported</p>
-                    <p className="text-[#D9D0BF] text-[1.125rem]">$20+</p>
-                  </div>
-                  <div className="carrd-font-body min-w-0 space-y-1 text-[#FAEBD4] ml-4">
-                    <p className="font-medium italic">{t.blurb}</p>
-                  </div>
-                  <div className="flex items-start justify-end min-w-[4.5rem]">
+                  <p className="carrd-font-body font-medium text-[#FAEBD4]">Supported</p>
+                  <p className="carrd-font-body font-medium italic text-[#FAEBD4]">{t.blurb}</p>
+                  <div className="flex items-start justify-end min-w-[4.5rem] row-span-2 self-center">
                     {(selections['supported'] ?? 0) > 0 ? (
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-0.5 rounded-lg bg-[#FAEBD4]/5 px-1.5 py-1">
@@ -601,6 +592,8 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       </button>
                     )}
                   </div>
+                  <p className="carrd-font-body text-[#D9D0BF] text-[1.125rem]">$20+</p>
+                  <div />
                 </div>
               ))}
               <div className="flex flex-wrap items-center justify-center gap-4 w-full max-w-[650px]">
