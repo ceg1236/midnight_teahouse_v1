@@ -22,7 +22,7 @@ export function SiteFooter({ variant = 'default', className }: SiteFooterProps) 
             </svg>
           </a>
           <a
-            href="https://instagram.com/midnightteahouse"
+            href="https://www.instagram.com/midnight_teahouse/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-[#D9D0BF] hover:text-[#FAE0B9] transition-colors shrink-0"
