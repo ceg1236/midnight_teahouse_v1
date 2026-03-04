@@ -1003,20 +1003,20 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         <p className="carrd-font-body carrd-accent-color font-medium italic text-[1.625rem]">{t.mainLine}</p>
                         <div className="flex items-start justify-end min-w-[8rem] w-[8rem] row-span-2 self-start order-last md:order-none">
                           {qty > 0 ? (
-                            <div className="flex items-center justify-end gap-1 w-full">
+                            <div className="flex items-center justify-end gap-2 w-full">
                               <button
                                 type="button"
                                 onClick={() => handleQuantityChange(t.id, -1)}
-                                className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-xs transition-colors hover:bg-[#FAE0B9]/30"
+                                className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-sm transition-colors hover:bg-[#FAE0B9]/30"
                                 aria-label={`Decrease ${t.label} quantity`}
                               >
                                 −
                               </button>
-                              <span className="carrd-font-body w-5 text-center text-sm tabular-nums text-[#FAEBD4]">{qty}</span>
+                              <span className="carrd-font-body w-7 text-center text-base tabular-nums text-[#FAEBD4]">{qty}</span>
                               <button
                                 type="button"
                                 onClick={() => handleQuantityChange(t.id, 1)}
-                                className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-xs transition-colors hover:bg-[#FAE0B9]/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                                className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-sm transition-colors hover:bg-[#FAE0B9]/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                                 disabled={totalQuantity >= 4}
                                 aria-label={`Increase ${t.label} quantity`}
                               >
@@ -1104,22 +1104,22 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                           />
                         </div>
                         <span className="text-[#D9D0BF]/60 text-sm">×</span>
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-2">
                           <button
                             type="button"
                             onClick={() => handleQuantityChange('supported', -1)}
-                            className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-xs transition-colors hover:bg-[#FAE0B9]/30"
+                            className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-sm transition-colors hover:bg-[#FAE0B9]/30"
                             aria-label="Decrease Supported quantity"
                           >
                             −
                           </button>
-                          <span className="carrd-font-body w-5 text-center text-sm tabular-nums text-[#FAEBD4]">
+                          <span className="carrd-font-body w-7 text-center text-base tabular-nums text-[#FAEBD4]">
                             {selections['supported'] ?? 0}
                           </span>
                           <button
                             type="button"
                             onClick={() => handleQuantityChange('supported', 1)}
-                            className="flex h-5 w-5 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-xs transition-colors hover:bg-[#FAE0B9]/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                            className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-sm transition-colors hover:bg-[#FAE0B9]/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                             disabled={totalQuantity >= 4}
                             aria-label="Increase Supported quantity"
                           >
