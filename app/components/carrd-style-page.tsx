@@ -254,10 +254,10 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
           </div>
           <div className="w-full max-w-[56rem] flex flex-col md:flex-row items-center md:items-start justify-center gap-10 md:gap-16 text-center pt-2">
             <div className="space-y-2">
-              <p className="carrd-font-label">
+              <p className="carrd-font-label text-[1.3125rem]">
                 Date
               </p>
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 <p className="carrd-font-body">
                   March 18-20, 2026
                 </p>
@@ -267,10 +267,10 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               </div>
             </div>
             <div className="space-y-2">
-              <p className="carrd-font-label">
+              <p className="carrd-font-label text-[1.3125rem]">
                 Location
               </p>
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 <p className="carrd-font-body">
                   SoMA, SF
                 </p>
