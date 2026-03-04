@@ -383,20 +383,22 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         </div>
                       )
                     })}
+                    <p className="carrd-font-body text-left text-base text-[#D9D0BF]/95">
+                      If cost is a barrier, please consider our{' '}
+                      <button type="button" onClick={() => setShowSupportedTier(true)} className="underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline">supported ticket option</button>.
+                    </p>
                     <button type="button" onClick={() => setExpandedPricingNote((v) => !v)} className="carrd-font-body text-lg text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit flex items-center gap-1">
                       {expandedPricingNote ? 'Hide' : 'About our pricing'}
                       <span className="text-lg transition-transform" style={{ transform: expandedPricingNote ? 'rotate(180deg)' : 'none' }}>▾</span>
                     </button>
                     {expandedPricingNote && (
-                      <div className="carrd-font-body text-left text-base text-[#D9D0BF]/95 space-y-2">
+                      <div className="carrd-font-body text-left text-base text-[#D9D0BF]/95">
                         <p>
                           Our city and community span a wide range of financial situations. Our tiered pricing helps us balance the financial sustainability and accessibility of the teahouse. We invite you to choose the level that feels right for you — one that honors your own capacity while helping us keep this space open, welcoming and alive.
                         </p>
-                        <p>
-                          If cost is a barrier, please consider our{' '}
-                          <button type="button" onClick={() => setShowSupportedTier(true)} className="underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline">supported ticket option</button>.
-                        </p>
-                        {(showSupportedTier || (selections['supported'] ?? 0) > 0) && (
+                      </div>
+                    )}
+                    {(showSupportedTier || (selections['supported'] ?? 0) > 0) && (
                       <div className={`carrd-mobile-pill flex flex-col gap-3 text-left w-full mt-3 ${(selections['supported'] ?? 0) > 0 ? 'carrd-mobile-pill--selected' : ''}`}>
                         <div className="min-w-0">
                           <p className="leading-tight text-xl"><span className="text-[#C4AF86] font-medium">Supported</span><span className="text-[#FAEBD4]/90 font-normal">, $20+</span></p>
@@ -431,8 +433,6 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         ) : null}
                         {(selections['supported'] ?? 0) === 0 && (
                           <button type="button" onClick={() => { setShowSupportedTier(true); setSupportedPrice(20); setSupportedPriceInput('20'); setSelections((prev) => ({ ...prev, supported: 1 })) }} className="carrd-mobile-pill-select shrink-0 self-center">Select</button>
-                        )}
-                      </div>
                         )}
                       </div>
                     )}
@@ -850,6 +850,17 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       </div>
                     )
                   })}
+                <p className="carrd-font-body text-left text-base text-[#D9D0BF]/95">
+                  If cost is a barrier, please consider our{' '}
+                  <button
+                    type="button"
+                    onClick={() => setShowSupportedTier(true)}
+                    className="underline hover:no-underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline"
+                  >
+                    supported ticket option
+                  </button>
+                  .
+                </p>
                 <button
                   type="button"
                   onClick={() => setExpandedPricingNote((v) => !v)}
@@ -859,22 +870,13 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   <span className="text-lg transition-transform" style={{ transform: expandedPricingNote ? 'rotate(180deg)' : 'none' }}>▾</span>
                 </button>
                 {expandedPricingNote && (
-                  <div className="carrd-font-body text-left text-base text-[#D9D0BF]/95 space-y-3">
+                  <div className="carrd-font-body text-left text-base text-[#D9D0BF]/95">
                     <p>
                       Our city and community span a wide range of financial situations. Our tiered pricing helps us balance the financial sustainability and accessibility of the teahouse. We invite you to choose the level that feels right for you — one that honors your own capacity while helping us keep this space open, welcoming and alive.
                     </p>
-                    <p>
-                      If cost is a barrier, please consider our{' '}
-                      <button
-                        type="button"
-                        onClick={() => setShowSupportedTier(true)}
-                        className="underline hover:no-underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline"
-                      >
-                        supported ticket option
-                      </button>
-                      .
-                    </p>
-                    {(showSupportedTier || (selections['supported'] ?? 0) > 0) && (
+                  </div>
+                )}
+                {(showSupportedTier || (selections['supported'] ?? 0) > 0) && (
                   <div
                     className={`carrd-mobile-pill flex flex-col gap-3 text-left w-full mt-3 ${(selections['supported'] ?? 0) > 0 ? 'carrd-mobile-pill--selected' : ''}`}
                   >
@@ -973,8 +975,6 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       </button>
                     )}
                   </div>
-                    )}
-                  </div>
                 )}
               </div>
               {/* Desktop: tier cards first, then About our pricing */}
@@ -1029,6 +1029,17 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   })}
               </div>
               <div className="hidden md:block w-full max-w-[650px] space-y-4">
+                <p className="carrd-font-body text-left text-[#D9D0BF]/95">
+                  If cost is a barrier, please consider our{' '}
+                  <button
+                    type="button"
+                    onClick={() => setShowSupportedTier(true)}
+                    className="underline hover:no-underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline"
+                  >
+                    supported ticket option
+                  </button>
+                  .
+                </p>
                 <button
                   type="button"
                   onClick={() => setExpandedPricingNote((v) => !v)}
@@ -1038,20 +1049,9 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   <span className="text-base transition-transform" style={{ transform: expandedPricingNote ? 'rotate(180deg)' : 'none' }}>▾</span>
                 </button>
                 {expandedPricingNote && (
-                  <div className="carrd-font-body text-left w-full max-w-[650px] space-y-3">
+                  <div className="carrd-font-body text-left w-full max-w-[650px]">
                     <p>
                       Our city and community span a wide range of financial situations. Our tiered pricing helps us balance the financial sustainability and accessibility of the teahouse. We invite you to choose the level that feels right for you — one that honors your own capacity while helping us keep this space open, welcoming and alive.
-                    </p>
-                    <p>
-                      If cost is a barrier, please consider our{' '}
-                      <button
-                        type="button"
-                        onClick={() => setShowSupportedTier(true)}
-                        className="underline hover:no-underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline"
-                      >
-                        supported ticket option
-                      </button>
-                      .
                     </p>
                   </div>
                 )}
