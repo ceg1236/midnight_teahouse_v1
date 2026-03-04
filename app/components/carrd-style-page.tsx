@@ -345,8 +345,8 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     key={d.id}
                     className="grid grid-cols-[6rem_1fr_auto] grid-rows-[auto_auto] gap-x-4 gap-y-1 items-start py-3 border-b border-[#D9D0BF]/30 last:border-b-0"
                   >
-                        <p className="carrd-font-body font-medium text-[#C4AF86] text-[1.625rem]">{d.day}</p>
-                    <div className="carrd-font-body min-w-0 space-y-0 text-[#C4AF86] text-[1.625rem]">
+                        <p className="carrd-font-body carrd-accent-color font-medium text-[1.625rem]">{d.day}</p>
+                    <div className="carrd-font-body carrd-accent-color min-w-0 space-y-0 text-[1.625rem]">
                       {d.musicians.map((line, i) => (
                         <p key={i} className="font-medium italic">
                           {line}
@@ -428,8 +428,8 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         key={t.id}
                         className="grid grid-cols-[6rem_1fr_auto] grid-rows-[auto_auto] gap-x-4 gap-y-1 py-3 border-b border-[#D9D0BF]/30 last:border-b-0 items-start"
                       >
-                        <p className="carrd-font-body font-medium text-[#C4AF86] text-[1.625rem]">{t.label}</p>
-                        <p className="carrd-font-body font-medium italic text-[#C4AF86] text-[1.625rem]">{t.mainLine}</p>
+                        <p className="carrd-font-body carrd-accent-color font-medium text-[1.625rem]">{t.label}</p>
+                        <p className="carrd-font-body carrd-accent-color font-medium italic text-[1.625rem]">{t.mainLine}</p>
                         <div className="flex items-start justify-end min-w-[4.5rem] row-span-2 self-start">
                           {qty > 0 ? (
                             <div className="flex items-center gap-1">
@@ -484,8 +484,8 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   key={t.id}
                   className="grid grid-cols-[6rem_1fr_auto] grid-rows-[auto_auto] gap-x-4 gap-y-1 py-3 items-start w-full max-w-[650px]"
                 >
-                  <p className="carrd-font-body font-medium text-[#C4AF86] text-[1.625rem]">Supported</p>
-                  <p className="carrd-font-body font-medium italic text-[#C4AF86] text-[1.625rem]">{t.blurb}</p>
+                  <p className="carrd-font-body carrd-accent-color font-medium text-[1.625rem]">Supported</p>
+                  <p className="carrd-font-body carrd-accent-color font-medium italic text-[1.625rem]">{t.blurb}</p>
                   <div className="flex items-start justify-end min-w-[4.5rem] row-span-2 self-start">
                     {(selections['supported'] ?? 0) > 0 ? (
                       <div className="flex items-center gap-2">
