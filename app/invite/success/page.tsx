@@ -80,13 +80,13 @@ export default function InviteSuccessPage() {
           <p className="text-[11px] uppercase tracking-[0.05em] text-[#D9D0BF]">
               Date
             </p>
-            <p className="text-[17px] font-medium text-[#FAE0B9] font-cursive">
+            <p className="text-[25.5px] font-medium text-[#FAE0B9] font-cursive">
               {dateLabel}
             </p>
             <p className="text-[11px] uppercase tracking-[0.05em] text-[#D9D0BF] mt-3">
               Location
             </p>
-            <p className="text-[17px] font-medium text-[#FAE0B9] font-cursive">
+            <p className="text-[25.5px] font-medium text-[#FAE0B9] font-cursive">
               {ADDRESS}
             </p>
           </div>
