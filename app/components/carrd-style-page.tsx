@@ -119,6 +119,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
   const [hydrated, setHydrated] = useState(false)
   const [expandedBlurbId, setExpandedBlurbId] = useState<string | null>(null)
+  const [expandedTierBlurbId, setExpandedTierBlurbId] = useState<string | null>(null)
   /** 1 = Choose evening, 2 = Choose ticket, 3 = Complete reservation */
   const [reservationStep, setReservationStep] = useState<1 | 2 | 3>(1)
 
@@ -345,8 +346,8 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     key={d.id}
                     className="grid grid-cols-[6rem_1fr_auto] grid-rows-[auto_auto] gap-x-4 gap-y-1 items-start py-3 border-b border-[#D9D0BF]/30 last:border-b-0"
                   >
-                    <p className="carrd-font-body font-medium text-[#C4AF86]">{d.day}</p>
-                    <div className="carrd-font-body min-w-0 space-y-0 text-[#C4AF86]">
+                    <p className="carrd-font-body font-medium text-[#FAEBD4]">{d.day}</p>
+                    <div className="carrd-font-body min-w-0 space-y-0 text-[#FAEBD4]">
                       {d.musicians.map((line, i) => (
                         <p key={i} className="font-medium italic">
                           {line}
@@ -359,15 +360,15 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         setSelectedDate(d.id)
                         setReservationStep(2)
                       }}
-                      className={`carrd-btn px-6 py-3 flex-shrink-0 row-start-2 col-start-3 ml-4 ${
+                      className={`carrd-btn px-6 py-3 flex-shrink-0 row-span-2 self-center ml-4 ${
                         selectedDate === d.id ? 'bg-[#FAE0B9]/20' : ''
                       }`}
                     >
                       Select
                     </button>
-                    <p className="carrd-font-body min-w-0">{d.dateTime}</p>
+                    <p className="carrd-font-body text-[#D9D0BF] text-[1.125rem]">{d.dateTime}</p>
                     {d.blurb ? (
-                      <div className="carrd-font-body min-w-0">
+                      <div className="text-[#D9D0BF] text-[1.125rem] min-w-0">
                         {expandedBlurbId === d.id ? (
                           <>
                             <p className="leading-relaxed">{d.blurb}</p>
@@ -428,9 +429,9 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                         key={t.id}
                         className="grid grid-cols-[6rem_1fr_auto] grid-rows-[auto_auto] gap-x-4 gap-y-1 py-3 border-b border-[#D9D0BF]/30 last:border-b-0 items-start"
                       >
-                        <p className="carrd-font-body font-medium text-[#C4AF86]">{t.label}</p>
-                        <p className="carrd-font-body font-medium italic text-[#C4AF86]">{t.mainLine}</p>
-                        <div className="flex items-start justify-end min-w-[4.5rem] row-start-2 col-start-3">
+                        <p className="carrd-font-body font-medium text-[#FAEBD4]">{t.label}</p>
+                        <p className="carrd-font-body font-medium italic text-[#FAEBD4]">{t.mainLine}</p>
+                        <div className="flex items-start justify-end min-w-[4.5rem] row-span-2 self-center">
                           {qty > 0 ? (
                             <div className="flex items-center gap-1">
                               <button
@@ -462,8 +463,32 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                             </button>
                           )}
                         </div>
-                        <p className="carrd-font-body min-w-0">${t.price}</p>
-                        <p className="carrd-font-body leading-relaxed min-w-0">{t.blurb}</p>
+                        <p className="carrd-font-body text-[#D9D0BF] text-[1.125rem]">${t.price}</p>
+                        <div className="text-[#D9D0BF] text-[1.125rem] min-w-0">
+                          {expandedTierBlurbId === t.id ? (
+                            <>
+                              <p className="leading-relaxed">{t.blurb}</p>
+                              <button
+                                type="button"
+                                onClick={() => setExpandedTierBlurbId(null)}
+                                className="mt-1 block italic text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
+                              >
+                                ...less
+                              </button>
+                            </>
+                          ) : (
+                            <p className="leading-relaxed flex items-baseline gap-1 min-w-0">
+                              <span className="truncate min-w-0">{t.blurb}</span>
+                              <button
+                                type="button"
+                                onClick={() => setExpandedTierBlurbId(t.id)}
+                                className="italic flex-shrink-0 text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
+                              >
+                                ...more
+                              </button>
+                            </p>
+                          )}
+                        </div>
                       </div>
                     )
                   })}
@@ -484,9 +509,9 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   key={t.id}
                   className="grid grid-cols-[6rem_1fr_auto] grid-rows-[auto_auto] gap-x-4 gap-y-1 py-3 items-start w-full max-w-[650px]"
                 >
-                  <p className="carrd-font-body font-medium text-[#C4AF86]">Supported</p>
-                  <p className="carrd-font-body font-medium italic text-[#C4AF86]">{t.blurb}</p>
-                  <div className="flex items-start justify-end min-w-[4.5rem] row-start-2 col-start-3">
+                  <p className="carrd-font-body font-medium text-[#FAEBD4]">Supported</p>
+                  <p className="carrd-font-body font-medium italic text-[#FAEBD4]">{t.blurb}</p>
+                  <div className="flex items-start justify-end min-w-[4.5rem] row-span-2 self-center">
                     {(selections['supported'] ?? 0) > 0 ? (
                       <div className="flex items-center gap-2">
                         <div className="flex items-center gap-0.5 rounded-lg bg-[#FAEBD4]/5 px-1.5 py-1">
@@ -567,7 +592,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       </button>
                     )}
                   </div>
-                  <p className="carrd-font-body min-w-0">$20+</p>
+                  <p className="carrd-font-body text-[#D9D0BF] text-[1.125rem]">$20+</p>
                   <div />
                 </div>
               ))}
