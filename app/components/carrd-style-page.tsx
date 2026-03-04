@@ -608,7 +608,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               {selectedDate && hasSelection ? (
                 <>
                   {/* Summary box: date/time + choices, directly under heading */}
-                  <div className="carrd-font-body rounded-lg bg-[#FAEBD4]/20 px-4 py-4 text-left w-full max-w-[650px]">
+                  <div className="carrd-font-body rounded-lg bg-[#FAEBD4]/20 px-4 py-4 text-left w-full max-w-[28rem]">
                     <div className="space-y-3">
                       <div>
                         <p className="text-sm text-[#D9D0BF]/80 uppercase tracking-wider">Date</p>
