@@ -15,8 +15,10 @@ Before merging any PR when the site is live and accepting payments:
 ## Running Tests
 
 ```bash
-pnpm test          # Run all tests once
-pnpm test:watch    # Run tests in watch mode
+pnpm test          # Unit + API tests (Vitest)
+pnpm test:watch    # Vitest watch mode
+pnpm test:e2e      # E2E tests (Playwright) - run `pnpm dev` in another terminal first
+pnpm test:e2e:ui   # Playwright UI mode
 ```
 
 ---
@@ -27,8 +29,8 @@ pnpm test:watch    # Run tests in watch mode
 |-------|------|--------|
 | **Checkout API** | Validation, rate limit, Stripe mock | ✅ |
 | **Rate limiter** | Under limit, over limit | ✅ |
-| **Webhook** | (Phase 4) | Pending |
-| **E2E** | (Phase 5) | Pending |
+| **Webhook** | Signature, metadata, Sheets mock | ✅ |
+| **E2E** | Smoke, reservation flow | ✅ |
 
 ---
 
@@ -44,3 +46,12 @@ pnpm test:watch    # Run tests in watch mode
 ### Rate Limiter (`lib/rate-limit`)
 - Allows requests under limit
 - Blocks after 5 requests per IP per minute
+
+### Webhook (`/api/webhooks/stripe`)
+- 500 when not configured, 400 for invalid signature
+- 200 for valid checkout.session.completed (mocked Sheets/Resend)
+- Idempotency: skips duplicate payment IDs
+
+### E2E (Playwright)
+- Homepage loads, Reserve button visible, Our Story link
+- Reservation flow: date → ticket → form (no Stripe)
