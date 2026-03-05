@@ -16,7 +16,7 @@ function formatTicketType(orderStr: string): string {
     const label = TIER_LABELS[tierId] ?? tierId
     parts.push(label)
   }
-  return [...new Set(parts)].join(', ') || ''
+  return Array.from(new Set(parts)).join(', ') || ''
 }
 
 export async function POST(req: NextRequest) {
