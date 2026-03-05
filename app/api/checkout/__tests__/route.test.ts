@@ -1,0 +1,130 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { NextRequest } from 'next/server'
+
+vi.mock('stripe', () => {
+  const mockCreate = vi.fn().mockResolvedValue({ url: 'https://checkout.stripe.com/test' })
+  return {
+    default: class MockStripe {
+      checkout = { sessions: { create: mockCreate } }
+    },
+  }
+})
+
+import { POST } from '../route'
+
+const validBody = {
+  dateId: 'mar-18',
+  items: [{ tierId: 'community', quantity: 1 }],
+  name: 'Test User',
+  email: 'test@example.com',
+}
+
+let requestCount = 0
+function req(body: object, overrides?: { headers?: Record<string, string> }) {
+  requestCount++
+  return new NextRequest('http://localhost/api/checkout', {
+    method: 'POST',
+    body: JSON.stringify(body),
+    headers: {
+      'Content-Type': 'application/json',
+      'x-forwarded-for': `127.0.0.${requestCount}`,
+      ...overrides?.headers,
+    },
+  })
+}
+
+describe('POST /api/checkout', () => {
+  const env = process.env
+
+  beforeEach(() => {
+    vi.resetModules()
+    process.env = { ...env, STRIPE_SECRET_KEY: 'sk_test_xxx' }
+  })
+
+  it('returns 500 when STRIPE_SECRET_KEY is not set', async () => {
+    delete process.env.STRIPE_SECRET_KEY
+    const res = await POST(req(validBody))
+    expect(res.status).toBe(500)
+    const json = await res.json()
+    expect(json.error).toBe('Stripe is not configured')
+  })
+
+  it('returns 400 for invalid dateId', async () => {
+    process.env.STRIPE_SECRET_KEY = 'sk_test_xxx'
+    const res = await POST(req({ ...validBody, dateId: 'invalid' }))
+    expect(res.status).toBe(400)
+    const json = await res.json()
+    expect(json.error).toBe('Invalid date')
+  })
+
+  it('returns 400 for missing name', async () => {
+    const res = await POST(req({ ...validBody, name: '' }))
+    expect(res.status).toBe(400)
+    const json = await res.json()
+    expect(json.error).toBe('Name is required')
+  })
+
+  it('returns 400 for missing email', async () => {
+    const res = await POST(req({ ...validBody, email: '' }))
+    expect(res.status).toBe(400)
+    const json = await res.json()
+    expect(json.error).toBe('Email is required')
+  })
+
+  it('returns 400 for invalid email format', async () => {
+    const res = await POST(req({ ...validBody, email: 'not-an-email' }))
+    expect(res.status).toBe(400)
+    const json = await res.json()
+    expect(json.error).toBe('Invalid email format')
+  })
+
+  it('returns 400 for empty items', async () => {
+    const res = await POST(req({ ...validBody, items: [] }))
+    expect(res.status).toBe(400)
+    const json = await res.json()
+    expect(json.error).toBe('Select at least one ticket')
+  })
+
+  it('returns 400 for invalid tier', async () => {
+    const res = await POST(req({ ...validBody, items: [{ tierId: 'invalid', quantity: 1 }] }))
+    expect(res.status).toBe(400)
+    const json = await res.json()
+    expect(json.error).toBe('Select at least one ticket')
+  })
+
+  it('returns 400 when total quantity exceeds 4', async () => {
+    const res = await POST(
+      req({
+        ...validBody,
+        items: [
+          { tierId: 'community', quantity: 2 },
+          { tierId: 'patron', quantity: 3 },
+        ],
+      })
+    )
+    expect(res.status).toBe(400)
+    const json = await res.json()
+    expect(json.error).toBe('Maximum 4 tickets per order')
+  })
+
+  it('returns 400 for invalid JSON body', async () => {
+    const badReq = new NextRequest('http://localhost/api/checkout', {
+      method: 'POST',
+      body: 'not json',
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const res = await POST(badReq)
+    expect(res.status).toBe(400)
+    const json = await res.json()
+    expect(json.error).toBe('Invalid JSON body')
+  })
+
+  it('returns 200 with Stripe URL for valid request', async () => {
+    const res = await POST(req(validBody))
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    expect(json.url).toBeDefined()
+    expect(json.url).toContain('checkout.stripe.com')
+    expect(res.ok).toBe(true)
+  })
+})
