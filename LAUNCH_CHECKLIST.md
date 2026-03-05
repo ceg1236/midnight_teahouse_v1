@@ -96,6 +96,13 @@ Your tiers are Supported ($20–40), Community ($40), Supporter ($60). The cheap
 
 ---
 
+## Troubleshooting
+
+**Stripe still shows "TEST" link**  
+The Stripe dashboard's Test/Live toggle does not control your app. Your app uses whatever key is in **Vercel** → Settings → Environment Variables. If checkout goes to a test session, `STRIPE_SECRET_KEY` is still `sk_test_...`. Change it to your **live** secret key (`sk_live_...`). Redeploy after changing env vars.
+
+---
+
 ## Important Notes
 
 | Topic | Note |
