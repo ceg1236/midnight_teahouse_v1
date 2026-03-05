@@ -108,7 +108,7 @@ Reference this list as we build. Check off items as they're completed.
 
 - [x] **Remove vertical images** – Remove flanking flower/plant images from welcome step (desktop and mobile thumbnails)
 - [x] **Hero video** – Add `midnight_site_vid_hi_res.mp4` / `.mov` as full-viewport hero (Option A), mp4 for Chrome/Firefox/Edge, mov fallback for Safari
-- [x] **Typography** – Spring Fling title → Source Sans 3, paragraph → Roboto
+- [x] **Typography** – Crossing into Spring title → Source Sans 3, paragraph → Roboto
 - [x] **Scrolling flow** – Single-page scroll; Reserve scrolls to date → tier → form → payment
 
 ---

@@ -107,7 +107,7 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
         </div>
         <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center gap-4 md:gap-5">
           <h1 className="font-invite-title text-center text-3xl text-inherit md:text-3xl lg:text-4xl">
-            Spring Fling at the Teahouse
+            Crossing into Spring
           </h1>
           <div className="font-invite-body space-y-3 text-center text-lg leading-relaxed md:text-xl">
             {welcomeContent.split(/\n\n+/).map((para, i) => (
