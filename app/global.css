@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+
 @import url('https://fonts.googleapis.com/css2?family=Allison&display=swap');
 
 /* Prevent horizontal scroll on any screen size */
@@ -744,6 +745,7 @@ html::-webkit-scrollbar {
   width: 100%;
   overflow-wrap: break-word;
   word-wrap: break-word;
+  font-family: 'Amiri', serif;
 }
 .carrd-page::before {
   content: '';
@@ -862,6 +864,15 @@ html::-webkit-scrollbar {
   font-size: 1.0125rem; /* 0.9 × 1.125rem */
 }
 
+/* Ensure form elements inherit Amiri (mobile browsers often use system font otherwise) */
+.carrd-page input,
+.carrd-page textarea,
+.carrd-page button,
+.carrd-page select,
+.carrd-page label {
+  font-family: inherit;
+}
+
 /* Form autofill override - avoid white background on suggested entries, keep text light */
 .carrd-page input:-webkit-autofill,
 .carrd-page input:-webkit-autofill:hover,
@@ -918,6 +929,11 @@ html::-webkit-scrollbar {
   padding: 0.875rem 2rem;
   transition: color 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
+@media (min-width: 768px) {
+  .carrd-page .carrd-btn {
+    padding: 0.5rem 1rem !important;
+  }
+}
 .carrd-btn:hover:not(:disabled) {
   background-color: rgba(250, 224, 185, 0.2);
   transform: scale(1.02);
@@ -946,14 +962,37 @@ html::-webkit-scrollbar {
   }
 }
 
+/* Mobile reservation: ensure Amiri font throughout (form controls often override on mobile) */
+.carrd-mobile-reservation {
+  font-family: 'Amiri', serif !important;
+}
+.carrd-mobile-reservation input,
+.carrd-mobile-reservation textarea,
+.carrd-mobile-reservation button,
+.carrd-mobile-reservation select,
+.carrd-mobile-reservation label {
+  font-family: 'Amiri', serif !important;
+}
+
 /* Mobile pill/minimal cards (Option 2) */
 .carrd-mobile-pill {
-  border: none;
+  font-family: 'Amiri', serif !important;
+  border: 1px solid rgba(217, 208, 191, 0.35);
   border-radius: 1rem;
-  background: rgba(250, 235, 212, 0.04);
+  background: rgba(250, 235, 212, 0.12);
   padding: 1rem 1rem;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease;
   -webkit-tap-highlight-color: rgba(250, 224, 185, 0.1);
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  align-items: center;
+}
+.carrd-mobile-pill p,
+.carrd-mobile-pill span,
+.carrd-mobile-pill a,
+.carrd-mobile-pill button {
+  font-family: 'Amiri', serif !important;
 }
 @media (min-width: 768px) {
   .carrd-mobile-pill {
@@ -962,10 +1001,11 @@ html::-webkit-scrollbar {
 }
 .carrd-mobile-pill:active,
 .carrd-mobile-pill.carrd-mobile-pill--selected {
-  background: rgba(250, 224, 185, 0.08);
+  background: rgba(250, 224, 185, 0.15);
+  border-color: rgba(250, 224, 185, 0.4);
 }
 .carrd-mobile-pill-select {
-  font-family: 'Amiri', serif;
+  font-family: 'Amiri', serif !important;
   font-size: 1.125rem;
   color: #FAE0B9;
   padding: 0.5rem 1.25rem;

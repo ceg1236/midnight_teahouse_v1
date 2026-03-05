@@ -1,8 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { google } from 'googleapis'
-import { eventDates } from '../../../../content/event-invite.config'
+import { eventDates, eventTiers } from '../../../../content/event-invite.config'
 import { sendConfirmationEmail } from '../../../../lib/confirmation-email'
+
+const TIER_LABELS: Record<string, string> = Object.fromEntries(
+  eventTiers.map((t) => [t.id, t.label])
+)
+
+function formatTicketType(orderStr: string): string {
+  const parts: string[] = []
+  for (const pair of orderStr.split(',')) {
+    const [tierId] = pair.split(':')
+    if (!tierId) continue
+    const label = TIER_LABELS[tierId] ?? tierId
+    parts.push(label)
+  }
+  return Array.from(new Set(parts)).join(', ') || ''
+}
 
 export async function POST(req: NextRequest) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
@@ -64,11 +79,16 @@ export async function POST(req: NextRequest) {
       : session.payment_intent?.id ?? session.id
 
   const qty = String(totalQty)
+  const ticketType =
+    metadata.order && typeof metadata.order === 'string'
+      ? formatTicketType(metadata.order)
+      : ''
   const row = [
     new Date().toISOString(),
     String(metadata.name),
     String(metadata.email),
     String(ticketDate),
+    String(ticketType),
     String(amountPaid),
     String(qty),
     String(metadata.notes ?? ''),
@@ -109,11 +129,11 @@ export async function POST(req: NextRequest) {
   )
   const sheets = google.sheets({ version: 'v4', auth })
 
-  // Idempotency: skip if we've already processed this payment (payment ID in column I)
+  // Idempotency: skip if we've already processed this payment (payment ID in column J)
   try {
     const existing = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!I2:I`,
+      range: `${sheetName}!J2:J`,
     })
     const paymentIds = (existing.data.values ?? []).flat()
     if (paymentIds.includes(paymentId)) {
@@ -143,8 +163,8 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // Append to data rows (A2:I) - Timestamp|Name|Email|Ticket date|Amount paid|Quantity|Notes|Device|Payment ID
-  const range = `${sheetName}!A2:I`
+  // Append to data rows (A2:J) - Timestamp|Name|Email|Ticket date|Ticket type|Amount paid|Quantity|Notes|Device|Stripe Payment ID
+  const range = `${sheetName}!A2:J`
   try {
     await sheets.spreadsheets.values.append({
       spreadsheetId,
