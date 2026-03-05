@@ -7,13 +7,24 @@ import { eventDates } from '../../../content/event-invite.config'
 
 const STORAGE_KEY = 'teahouse_reservation'
 
-/** Google Calendar add-event URL for March 18, 2026 7–11pm Pacific */
-const GOOGLE_CALENDAR_URL =
-  'https://calendar.google.com/calendar/render?action=TEMPLATE' +
-  '&text=Midnight+Teahouse+-+Crossing+into+Spring' +
-  '&dates=20260319T030000Z/20260319T070000Z' +
-  '&details=An+enchanted+world+hidden+in+San+Francisco' +
-  '&location=SoMA%2C+San+Francisco'
+/** Build Google Calendar add-event URL for 7–11pm Pacific on the given date */
+function getGoogleCalendarUrl(dateValue: string): string {
+  // dateValue = "2026-03-18"; 7pm–11pm Pacific = 02:00–06:00 UTC next day
+  const [y, m, d] = dateValue.split('-').map(Number)
+  const next = new Date(Date.UTC(y, m - 1, d + 1))
+  const y2 = next.getUTCFullYear()
+  const m2 = String(next.getUTCMonth() + 1).padStart(2, '0')
+  const d2 = String(next.getUTCDate()).padStart(2, '0')
+  const start = `${y2}${m2}${d2}T020000Z`
+  const end = `${y2}${m2}${d2}T060000Z`
+  return (
+    'https://calendar.google.com/calendar/render?action=TEMPLATE' +
+    '&text=Midnight+Teahouse+-+Crossing+into+Spring' +
+    `&dates=${start}/${end}` +
+    '&details=An+enchanted+world+hidden+in+San+Francisco' +
+    '&location=SoMA%2C+San+Francisco'
+  )
+}
 
 function getFirstName(name: string): string {
   const trimmed = name.trim()
@@ -96,7 +107,7 @@ function InviteSuccessContent() {
         </div>
         <div className="flex flex-col items-center gap-4">
           <a
-            href={GOOGLE_CALENDAR_URL}
+            href={getGoogleCalendarUrl(event?.value ?? '2026-03-18')}
             target="_blank"
             rel="noopener noreferrer"
             className="carrd-link text-[16px] underline hover:no-underline text-[#D9D0BF] hover:text-[#FAE0B9]"
