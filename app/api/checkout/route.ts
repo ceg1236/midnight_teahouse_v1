@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
           currency: 'usd',
           product_data: {
             name: `${date.label} · ${li.tier.label}`,
-            description: `Spring Fling at the Teahouse – ${li.tier.label} tier`,
+            description: `Crossing into Spring – ${li.tier.label} tier`,
           },
           unit_amount: li.unitAmount * 100, // cents
         },
