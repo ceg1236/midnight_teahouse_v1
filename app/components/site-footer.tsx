@@ -13,7 +13,7 @@ export function SiteFooter({ variant = 'default', className }: SiteFooterProps) 
       <div className="w-full max-w-[60rem] px-4 md:px-12 py-4 md:py-6 flex items-center justify-center gap-8 md:gap-10">
         <div className="flex items-center justify-center gap-8">
           <a
-            href="mailto:hello@midnightteahouse.com"
+            href="mailto:midnight.teahouse.sf@gmail.com"
             className="text-[#D9D0BF] hover:text-[#FAE0B9] transition-colors shrink-0"
             aria-label="Email"
           >
