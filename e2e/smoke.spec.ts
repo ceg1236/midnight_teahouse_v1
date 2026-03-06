@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test'
 test.describe('smoke', () => {
   test('homepage loads', async ({ page }) => {
     await page.goto('/')
-    await expect(page.locator('h1')).toContainText('Midnight Teahouse')
+    await expect(page.getByRole('heading', { name: 'Midnight Teahouse' }).first()).toBeVisible()
   })
 
   test('Reserve Your Seat button is visible', async ({ page }) => {

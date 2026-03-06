@@ -5,20 +5,20 @@ test.describe('reservation flow', () => {
     await page.goto('/')
     await page.getByRole('button', { name: /Reserve Your Seat/i }).click()
 
-    await expect(page.getByRole('heading', { name: /Reservation/i })).toBeVisible({ timeout: 5000 })
+    await expect(page.getByRole('heading', { name: 'Reservation', exact: true })).toBeVisible({ timeout: 5000 })
 
-    // Click first date card (Wednesday)
-    await page.getByRole('button', { name: /Wednesday/i }).first().click()
+    // Click Select on first date (desktop has button; mobile has clickable card)
+    await page.getByRole('button', { name: 'Select' }).first().click()
     await expect(page.getByText(/Choose Your Ticket|2\. Choose Your Ticket/i)).toBeVisible({ timeout: 3000 })
   })
 
   test('can select ticket and reach form', async ({ page }) => {
     await page.goto('/')
     await page.getByRole('button', { name: /Reserve Your Seat/i }).click()
-    await page.getByRole('button', { name: /Wednesday/i }).first().click()
-
-    // Click Select on Community tier (first non-supported)
     await page.getByRole('button', { name: 'Select' }).first().click()
+
+    // Click Select on Community tier (4th Select = first ticket tier after 3 date Selects)
+    await page.getByRole('button', { name: 'Select' }).nth(3).click()
 
     // Click Continue
     await page.getByRole('button', { name: /Continue/i }).click()

@@ -18,6 +18,7 @@ Before merging any PR when the site is live and accepting payments:
 pnpm test          # Unit + API tests (Vitest)
 pnpm test:watch    # Vitest watch mode
 pnpm test:e2e      # E2E tests (Playwright) - run `pnpm dev` in another terminal first
+pnpm test:e2e:install  # First-time: install Chromium browser for Playwright
 pnpm test:e2e:ui   # Playwright UI mode
 ```
 
