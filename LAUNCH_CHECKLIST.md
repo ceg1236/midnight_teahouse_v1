@@ -60,6 +60,7 @@ Pre-launch checklist and monitoring guide before announcing ticket sales to gues
 
 ### 5. Content
 - [ ] **Dates** – `content/event-invite.config.ts` has correct dates and labels.
+- [ ] **Capacity** – Each date has `capacity: N` (e.g. 45). Sold count is read from the Google Sheet; dates show "Sold Out" when full.
 - [ ] **Tiers & prices** – Supported ($20–40), Community ($40), Supporter ($60) are correct.
 - [ ] **Success page** – Address (54 Washburn st) and event details are correct.
 
@@ -111,7 +112,7 @@ The Stripe dashboard's Test/Live toggle does not control your app. Your app uses
 | **Webhook reliability** | Stripe retries failed webhooks. If Sheets or Resend fail, Stripe will retry; check Stripe Dashboard → Developers → Webhooks for failures. |
 | **Email failures** | Confirmation email failures do not fail the webhook; payment and sheet write still succeed. Check Vercel logs for `webhook_confirmation_email_failed`. |
 | **Refunds** | Refunds are handled in Stripe Dashboard; the sheet is not updated automatically. |
-| **Capacity** | There is no built-in capacity limit per date; you manage that manually (e.g. by closing dates in config). |
+| **Capacity** | Per-date limits in `content/event-invite.config.ts`; sold count from Google Sheet. Dates show "Sold Out" when full; checkout returns 409 if over capacity. |
 
 ---
 

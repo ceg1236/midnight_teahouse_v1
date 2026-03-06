@@ -67,3 +67,13 @@ Preview and test the confirmation email without going through checkout:
 |--------|-----|
 | **Preview layout** | Open `http://localhost:3000/api/email-preview` in browser. Add `?name=Jordan&orderSummary=2+×+Community+$40` to customize. |
 | **Send test email** | `curl -X POST http://localhost:3000/api/email-test -H "Content-Type: application/json" -d '{"to":"you@example.com"}'` (dev only; requires `RESEND_API_KEY` in `.env`) |
+
+### Sold-Out UI (Dev)
+
+Preview sold-out date cards without hitting real capacity:
+
+| URL | What you see |
+|-----|--------------|
+| `http://localhost:3000/?mock=soldOut:mar-18` | Wednesday sold out |
+| `http://localhost:3000/?mock=soldOut:mar-18,mar-19` | Wednesday and Thursday sold out |
+| `http://localhost:3000/?mock=soldOut:mar-18,mar-19,mar-20` | All dates sold out |

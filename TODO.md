@@ -45,11 +45,11 @@ Reference this list as we build. Check off items as they're completed.
 
 ## 4. Capacity & Sold-Out
 
-- [ ] **Capacity limits** – via spreadsheet:
-  - Count rows per date/tier (API call) or maintain a counts range
+- [x] **Capacity limits** – via spreadsheet:
+  - Count rows per date (sum Quantity by Ticket date); capacity per date in config
   - Note: small oversell risk with concurrent payments; acceptable for low volume
-- [ ] **Sold-out UI** – disable or hide unavailable dates/tiers and show "sold out" state
-- [ ] **Re-check availability** before creating checkout session
+- [x] **Sold-out UI** – disable unavailable dates and show "Sold Out" state
+- [x] **Re-check availability** before creating checkout session (returns 409 if over capacity)
 
 ---
 

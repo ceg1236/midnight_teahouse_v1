@@ -14,6 +14,8 @@ type CarrdStylePageProps = {
   tiers: readonly (typeof eventTiers)[number][]
   /** Unix timestamp for countdown (first event at 7pm) */
   countdownTarget: number
+  /** dateId -> soldOut; used to disable and style sold-out dates */
+  soldOutByDateId?: Record<string, boolean>
 }
 
 const SCROLL_DURATION = 1200
@@ -149,7 +151,7 @@ function savePersisted(
   }
 }
 
-export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }: CarrdStylePageProps) {
+export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, soldOutByDateId = {} }: CarrdStylePageProps) {
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [selections, setSelections] = useState<TierSelections>({})
   const [supportedPrice, setSupportedPrice] = useState(20)
@@ -380,14 +382,15 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       const headerRest = timePart ? `${datePart} ${timePart.toUpperCase()}` : datePart
                       const musicianLine = d.musicians[0] ?? ''
                       const isSelected = selectedDate === d.id
+                      const soldOut = soldOutByDateId[d.id]
                       return (
                         <div
                           key={d.id}
-                          role="button"
-                          tabIndex={0}
-                          onClick={() => { setSelectedDate(d.id); setReservationStep(2) }}
-                          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedDate(d.id); setReservationStep(2) } }}
-                          className={`carrd-mobile-pill flex flex-col gap-3 text-left w-full cursor-pointer ${isSelected ? 'carrd-mobile-pill--selected' : ''}`}
+                          role={soldOut ? undefined : 'button'}
+                          tabIndex={soldOut ? undefined : 0}
+                          onClick={soldOut ? undefined : () => { setSelectedDate(d.id); setReservationStep(2) }}
+                          onKeyDown={soldOut ? undefined : (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedDate(d.id); setReservationStep(2) } }}
+                          className={`carrd-mobile-pill flex flex-col gap-3 text-left w-full ${soldOut ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'} ${isSelected ? 'carrd-mobile-pill--selected' : ''}`}
                         >
                           <div className="min-w-0">
                             <p className="leading-tight text-xl">
@@ -402,7 +405,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                               <p className="text-[#D9D0BF]/90 text-lg italic mt-0.5">{musicianLine}</p>
                             )}
                           </div>
-                          <span className={`carrd-mobile-pill-select shrink-0 self-center ${isSelected ? 'carrd-mobile-pill-select--selected' : ''}`}>Select</span>
+                          <span className={`shrink-0 self-center ${soldOut ? 'text-[#D9D0BF]/70 italic' : isSelected ? 'carrd-mobile-pill-select carrd-mobile-pill-select--selected' : 'carrd-mobile-pill-select'}`}>{soldOut ? 'Sold Out' : 'Select'}</span>
                         </div>
                       )
                     })}
@@ -675,23 +678,24 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                   const headerRest = timePart ? `${datePart} ${timePart.toUpperCase()}` : datePart
                   const musicianLine = d.musicians[0] ?? ''
                   const isSelected = selectedDate === d.id
+                  const soldOut = soldOutByDateId[d.id]
                   return (
                     <div
                       key={d.id}
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => {
+                      role={soldOut ? undefined : 'button'}
+                      tabIndex={soldOut ? undefined : 0}
+                      onClick={soldOut ? undefined : () => {
                         setSelectedDate(d.id)
                         setReservationStep(2)
                       }}
-                      onKeyDown={(e) => {
+                      onKeyDown={soldOut ? undefined : (e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault()
                           setSelectedDate(d.id)
                           setReservationStep(2)
                         }
                       }}
-                      className={`carrd-mobile-pill flex flex-col gap-3 text-left w-full cursor-pointer ${
+                      className={`carrd-mobile-pill flex flex-col gap-3 text-left w-full ${soldOut ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'} ${
                         isSelected ? 'carrd-mobile-pill--selected' : ''
                       }`}
                     >
@@ -714,8 +718,8 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                           <p className="text-[#D9D0BF]/90 text-[0.9375rem] italic mt-0.5">{musicianLine}</p>
                         )}
                       </div>
-                      <span className={`carrd-mobile-pill-select shrink-0 self-center ${isSelected ? 'carrd-mobile-pill-select--selected' : ''}`}>
-                        Select
+                      <span className={`shrink-0 self-center ${soldOut ? 'text-[#D9D0BF]/70 italic' : isSelected ? 'carrd-mobile-pill-select carrd-mobile-pill-select--selected' : 'carrd-mobile-pill-select'}`}>
+                        {soldOut ? 'Sold Out' : 'Select'}
                       </span>
                     </div>
                   )
@@ -723,10 +727,12 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
               </div>
               {/* Desktop: date cards */}
               <div className="hidden md:block w-full max-w-[650px] space-y-6">
-                {dates.map((d) => (
+                {dates.map((d) => {
+                  const soldOut = soldOutByDateId[d.id]
+                  return (
                   <div
                     key={d.id}
-                    className="carrd-reservation-card flex flex-col gap-2 md:grid md:grid-cols-[6rem_1fr_auto] md:grid-rows-[auto_auto] md:gap-x-6 md:gap-y-1 md:items-start"
+                    className={`carrd-reservation-card flex flex-col gap-2 md:grid md:grid-cols-[6rem_1fr_auto] md:grid-rows-[auto_auto] md:gap-x-6 md:gap-y-1 md:items-start ${soldOut ? 'opacity-60' : ''}`}
                   >
                     <p className="carrd-font-body carrd-accent-color font-medium text-[1.625rem]">{d.day}</p>
                     <div className="carrd-font-body carrd-accent-color min-w-0 space-y-0 text-[1.625rem]">
@@ -738,15 +744,16 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                     </div>
                     <button
                       type="button"
-                      onClick={() => {
+                      disabled={soldOut}
+                      onClick={soldOut ? undefined : () => {
                         setSelectedDate(d.id)
                         setReservationStep(2)
                       }}
-                      className={`carrd-btn px-8 py-4 flex-shrink-0 row-span-2 self-start order-last md:order-none md:ml-4 ${
+                      className={`carrd-btn px-8 py-4 flex-shrink-0 row-span-2 self-start order-last md:order-none md:ml-4 disabled:opacity-70 disabled:cursor-not-allowed ${
                         selectedDate === d.id ? 'bg-[#FAE0B9]/20' : ''
                       }`}
                     >
-                      Select
+                      {soldOut ? 'Sold Out' : 'Select'}
                     </button>
                     <p className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0">
                       {d.dateTime.includes(', ') ? (
@@ -806,7 +813,8 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget }
                       <div />
                     )}
                   </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
 
