@@ -1,7 +1,7 @@
 import { Resend } from 'resend'
 import { eventDates, eventTiers } from '../content/event-invite.config'
 
-type SendConfirmationParams = {
+export type SendConfirmationParams = {
   to: string
   name: string
   ticketDate: string
@@ -43,19 +43,42 @@ function buildHtml(params: SendConfirmationParams): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body style="font-family: Georgia, serif; line-height: 1.6; color: #333; max-width: 560px; margin: 0 auto; padding: 24px;">
-  <h1 style="font-size: 1.5rem; color: #2E0303; margin-bottom: 16px;">You're in!</h1>
   <p>Hi ${name},</p>
-  <p>Thank you for reserving your spot at Midnight Teahouse. We're so looking forward to seeing you.</p>
+  <p>Thank you for reserving a seat at our tea house! We're very excited to share this evening with you – to slow down together, enjoy tea and music, settle into the night.</p>
   <div style="background: #f8f6f2; padding: 16px; border-radius: 8px; margin: 24px 0;">
     <p style="margin: 0 0 8px 0;"><strong>${ticketDate}</strong></p>
     <p style="margin: 0 0 8px 0;">${orderSummary}</p>
     <p style="margin: 0 0 8px 0;">Total: ${amountPaid} (${quantity} ticket${parseInt(quantity, 10) > 1 ? 's' : ''})</p>
   </div>
-  <p>Doors open at 7pm and close at 11pm. Feel free to join us anytime in this window. We'll share the location once we're closer to the date.</p>
-  <p style="margin-top: 24px;">See you in the teahouse,<br>The Midnight Teahouse Team</p>
+  <p>A few practical notes for your visit:</p>
+  <ul style="margin: 16px 0; padding-left: 20px;">
+    <li><strong>When:</strong> Doors open at 7pm, and the teahouse will remain open until 11pm.</li>
+    <li><strong>Where:</strong> <a href="https://www.google.com/maps/search/?api=1&query=54+Washburn+St,+San+Francisco" style="color: #2E0303; text-decoration: underline;">54 Washburn St, San Francisco</a>.</li>
+    <li><strong>Reservation:</strong> One reservation is for one person. If you made a reservation for someone else, please share this email with them.</li>
+    <li><strong>Phones:</strong> We invite you to keep phones and laptops tucked away for the evening.</li>
+    <li><strong>Shoes:</strong> The teahouse is a shoes-free space. Bring cozy socks.</li>
+    <li><strong>Rooftop:</strong> There is a beautiful rooftop. If you're interested, bring a warm jacket or blanket!</li>
+    <li><strong>Tea & food:</strong> We will be serving caffeinated and non-caffeinated teas, and some light snacks.</li>
+  </ul>
+  <p>Thanks again for joining us in this experiment. See you soon.</p>
+  <p style="margin-top: 24px;">The Midnight Teahouse Team</p>
 </body>
 </html>
 `.trim()
+}
+
+/** Build HTML for preview or test. Use with GET /api/email-preview or POST /api/email-test. */
+export function getPreviewHtml(overrides?: Partial<SendConfirmationParams>): string {
+  const params: SendConfirmationParams = {
+    to: 'test@example.com',
+    name: 'Alex',
+    ticketDate: 'Wednesday, March 18',
+    amountPaid: '$40',
+    quantity: '1',
+    orderSummary: '1 × Community $40',
+    ...overrides,
+  }
+  return buildHtml(params)
 }
 
 export async function sendConfirmationEmail(
@@ -93,7 +116,7 @@ export async function sendConfirmationEmail(
     from,
     to: [to],
     ...(replyTo && { replyTo }),
-    subject: 'Your Midnight Teahouse reservation is confirmed',
+    subject: 'Confirmation: Crossing into Spring at Midnight Teahouse ✨',
     html: buildHtml({
       to,
       name,
