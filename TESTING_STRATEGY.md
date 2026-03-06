@@ -56,3 +56,14 @@ pnpm test:e2e:ui   # Playwright UI mode
 ### E2E (Playwright)
 - Homepage loads, Reserve button visible, Our Story link
 - Reservation flow: date → ticket → form (no Stripe)
+
+---
+
+## Confirmation Email (Dev)
+
+Preview and test the confirmation email without going through checkout:
+
+| Action | How |
+|--------|-----|
+| **Preview layout** | Open `http://localhost:3000/api/email-preview` in browser. Add `?name=Jordan&orderSummary=2+×+Community+$40` to customize. |
+| **Send test email** | `curl -X POST http://localhost:3000/api/email-test -H "Content-Type: application/json" -d '{"to":"you@example.com"}'` (dev only; requires `RESEND_API_KEY` in `.env`) |
