@@ -10,7 +10,12 @@ vi.mock('stripe', () => {
   }
 })
 
+vi.mock('../../../../lib/sheets-availability', () => ({
+  getAvailability: vi.fn(),
+}))
+
 import { POST } from '../route'
+import { getAvailability } from '../../../../lib/sheets-availability'
 
 const validBody = {
   dateId: 'mar-18',
@@ -39,6 +44,11 @@ describe('POST /api/checkout', () => {
   beforeEach(() => {
     vi.resetModules()
     process.env = { ...env, STRIPE_SECRET_KEY: 'sk_test_xxx' }
+    vi.mocked(getAvailability).mockResolvedValue([
+      { dateId: 'mar-18', label: 'Wednesday, March 18', sold: 0, capacity: 45, soldOut: false },
+      { dateId: 'mar-19', label: 'Thursday, March 19', sold: 0, capacity: 45, soldOut: false },
+      { dateId: 'mar-20', label: 'Friday, March 20', sold: 0, capacity: 45, soldOut: false },
+    ])
   })
 
   it('returns 500 when STRIPE_SECRET_KEY is not set', async () => {
@@ -126,5 +136,29 @@ describe('POST /api/checkout', () => {
     expect(json.url).toBeDefined()
     expect(json.url).toContain('checkout.stripe.com')
     expect(res.ok).toBe(true)
+  })
+
+  it('returns 409 when date is sold out', async () => {
+    vi.mocked(getAvailability).mockResolvedValue([
+      { dateId: 'mar-18', label: 'Wednesday, March 18', sold: 45, capacity: 45, soldOut: true },
+      { dateId: 'mar-19', label: 'Thursday, March 19', sold: 0, capacity: 45, soldOut: false },
+      { dateId: 'mar-20', label: 'Friday, March 20', sold: 0, capacity: 45, soldOut: false },
+    ])
+    const res = await POST(req(validBody))
+    expect(res.status).toBe(409)
+    const json = await res.json()
+    expect(json.error).toContain('sold out')
+  })
+
+  it('returns 409 when order would exceed capacity', async () => {
+    vi.mocked(getAvailability).mockResolvedValue([
+      { dateId: 'mar-18', label: 'Wednesday, March 18', sold: 43, capacity: 45, soldOut: false },
+      { dateId: 'mar-19', label: 'Thursday, March 19', sold: 0, capacity: 45, soldOut: false },
+      { dateId: 'mar-20', label: 'Friday, March 20', sold: 0, capacity: 45, soldOut: false },
+    ])
+    const res = await POST(req({ ...validBody, items: [{ tierId: 'community', quantity: 4 }] }))
+    expect(res.status).toBe(409)
+    const json = await res.json()
+    expect(json.error).toMatch(/only.*ticket.*left/i)
   })
 })

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { eventDates, eventTiers } from '../../../content/event-invite.config'
 import { checkRateLimit } from '../../../lib/rate-limit'
+import { getAvailability } from '../../../lib/sheets-availability'
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const NAME_MAX_LEN = 200
@@ -75,6 +76,24 @@ export async function POST(req: NextRequest) {
   const totalQty = lineItems.reduce((s, li) => s + li.quantity, 0)
   if (totalQty > 4) {
     return NextResponse.json({ error: 'Maximum 4 tickets per order' }, { status: 400 })
+  }
+
+  // Capacity check
+  const availability = await getAvailability()
+  if (availability) {
+    const dateAvail = availability.find((a) => a.dateId === dateId)
+    if (dateAvail?.soldOut) {
+      return NextResponse.json(
+        { error: 'This date is sold out. Please choose another evening.' },
+        { status: 409 }
+      )
+    }
+    if (dateAvail && dateAvail.sold + totalQty > dateAvail.capacity) {
+      return NextResponse.json(
+        { error: `Only ${Math.max(0, dateAvail.capacity - dateAvail.sold)} ticket(s) left for this date.` },
+        { status: 409 }
+      )
+    }
   }
 
   // Validate name
