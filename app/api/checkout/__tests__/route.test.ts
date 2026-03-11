@@ -14,7 +14,12 @@ vi.mock('../../../../lib/sheets-availability', () => ({
   getAvailability: vi.fn(),
 }))
 
+vi.mock('../../../../lib/admin-token', () => ({
+  verifyToken: vi.fn(),
+}))
+
 import { POST } from '../route'
+import { verifyToken } from '../../../../lib/admin-token'
 import { getAvailability } from '../../../../lib/sheets-availability'
 
 const validBody = {
@@ -44,6 +49,7 @@ describe('POST /api/checkout', () => {
   beforeEach(() => {
     vi.resetModules()
     process.env = { ...env, STRIPE_SECRET_KEY: 'sk_test_xxx' }
+    vi.mocked(verifyToken).mockReturnValue(null)
     vi.mocked(getAvailability).mockResolvedValue([
       { dateId: 'mar-18', label: 'Wednesday, March 18', sold: 0, capacity: 45, soldOut: false },
       { dateId: 'mar-19', label: 'Thursday, March 19', sold: 0, capacity: 45, soldOut: false },
@@ -160,5 +166,18 @@ describe('POST /api/checkout', () => {
     expect(res.status).toBe(409)
     const json = await res.json()
     expect(json.error).toMatch(/only.*ticket.*left/i)
+  })
+
+  it('bypasses capacity when valid ticket provided', async () => {
+    vi.mocked(getAvailability).mockResolvedValue([
+      { dateId: 'mar-18', label: 'Wednesday, March 18', sold: 45, capacity: 45, soldOut: true },
+      { dateId: 'mar-19', label: 'Thursday, March 19', sold: 0, capacity: 45, soldOut: false },
+      { dateId: 'mar-20', label: 'Friday, March 20', sold: 0, capacity: 45, soldOut: false },
+    ])
+    vi.mocked(verifyToken).mockReturnValue({ dateId: 'mar-18', exp: Math.floor(Date.now() / 1000) + 3600 })
+    const res = await POST(req({ ...validBody, ticket: 'valid-token' }))
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    expect(json.url).toBeDefined()
   })
 })

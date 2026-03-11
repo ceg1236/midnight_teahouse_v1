@@ -1,124 +1,121 @@
-# Plan: Admin Override Links & Door Ticket Flow
+# Plan: Special Case Sales (Admin Links & Door Flow)
 
-Two features to support:
-1. **Admin override** – Create special purchase links that bypass sold-out, so admins can direct specific guests to buy even when a night shows "Sold Out"
-2. **Door flow** – A dedicated `/door` page for at-the-door sales, with one QR code
+One unified flow for both use cases: admin override links and door sales. Same page, same checkout, different tokens.
 
 ---
 
-## 1. Admin Override (Sold-Out Bypass)
+## Overview
 
-### Goal
-- Public site shows dates as "Sold Out" when capacity is hit
-- Admins can generate links that let a specific guest buy a ticket for a specific date/tier, bypassing capacity
+| Use case | Token | Date | Tier | Bypass sold-out? |
+|----------|-------|------|------|-------------------|
+| **Admin link (specific)** | `{ dateId, tierId?, exp }` | Pre-selected | Pre-selected or guest picks | Yes |
+| **Admin link (open)** | `{ door: true, exp }` | Guest picks | Guest picks | Yes |
+| **Door QR** | `{ door: true, exp }` | Inferred from today | Default Community | Yes |
 
-### Approach: Signed bypass token in URL
+---
 
-**Why:** The link is shared with the guest. We can't put a raw secret in the URL. A signed token (JWT or HMAC) proves the link was created by an admin without exposing the secret.
+## 1. Token System
+
+**Signed token in URL** – proves link was created by admin, no secret exposed.
+
+**Token types:**
+- **Specific:** `{ dateId, tierId?, exp }` – pre-selects date (and optionally tier)
+- **Door:** `{ door: true, exp }` – generic bypass; date inferred or guest picks; tier defaults to Community
+
+**Env:** `ADMIN_LINK_SECRET` – sign/verify. Generate: `openssl rand -hex 32`
+
+---
+
+## 2. Door Flow (One QR)
+
+**URL:** `https://site.com/invite?ticket=eyJ...` (door token)
 
 **Flow:**
-1. Admin visits an internal page (e.g. `/admin/link`) or uses a script
-2. Admin selects date, tier, optionally quantity
-3. System generates a signed token: `{ dateId, tierId?, expires }` signed with `ADMIN_LINK_SECRET`
-4. Admin copies link: `https://site.com/invite?ticket=eyJ...`
-5. Guest opens link → form pre-selects date (and tier if in token) → guest enters name/email → pays
-6. Checkout API receives `ticket` in the request body
-7. If token is valid and not expired → skip capacity check
-8. Webhook and sheet behave normally
+1. Guest scans QR → lands on main invite page with `?ticket=...`
+2. **Date:** Inferred from today (Wed/Thu/Fri). Fallback: first night if no match.
+3. **Tier:** Defaults to Community. Guest can change.
+4. Guest enters name, email → pays
+5. Same Stripe, webhook, sheet, confirmation email
+6. `device: 'door'` in metadata for sheet/analytics
 
-### Implementation
-
-| Item | Details |
-|------|---------|
-| **Token format** | JWT or HMAC-signed payload. Payload: `{ dateId, tierId?, exp }`. Sign with `ADMIN_LINK_SECRET`. |
-| **Token lifetime** | e.g. 7 days (configurable). Prevents old links from working indefinitely. |
-| **Admin page** | `/admin/link` – protected by simple password or `ADMIN_LINK_SECRET` in URL (admin-only). Form: date dropdown, tier dropdown, "Generate link" → copies URL. |
-| **Checkout API** | Accept optional `ticket` in POST body. If present: verify signature + expiry. If valid: skip capacity check (lines 81–96). |
-| **Main page** | When `?ticket=...` in URL: pass through to form. Form pre-selects date (and tier) from token payload. Sends `ticket` in checkout request. |
-| **Env var** | `ADMIN_LINK_SECRET` – used to sign/verify tokens. Never exposed to client. |
-
-### Security
-- Token is signed; guests can't forge it
-- Token doesn't contain the secret
-- Expiry limits abuse of leaked links
-- Admin page must be protected (password, or secret in URL that only staff know)
+**One QR** for all 3 nights. Date inference handles ~5 door sales/night; midnight edge case is rare.
 
 ---
 
-## 2. Door Ticket Flow
+## 3. Admin Link Flow
 
-### Goal
-- One QR code at the door
-- Guest scans → lands on a streamlined page
-- Single screen: date + tier + name + email → pay
-- Same Stripe flow, webhook, sheet, confirmation email
+**Admin page:** `/admin/link` (protected)
 
-### Approach: Dedicated `/door` page
+**Options:**
+- **Specific date:** Pre-select date (and optionally tier) → guest gets pre-filled form
+- **Open link:** Guest picks date and tier (same as door token, but for remote use)
 
 **Flow:**
-1. QR code links to `https://site.com/door`
-2. Page shows compact form: date (dropdown), tier (buttons), name, email
-3. Guest fills form, taps "Pay" → same `POST /api/checkout` as main flow
-4. Redirect to Stripe → success → `/invite/success`
-5. Webhook appends to sheet; confirmation email sent
-6. Optional: add `device: 'door'` in metadata so sheet/analytics can distinguish door vs online
-
-### Implementation
-
-| Item | Details |
-|------|---------|
-| **Route** | `app/door/page.tsx` – new page |
-| **Layout** | Minimal: same visual style as main site, but single-screen form. No hero video, no countdown. Date dropdown, tier selector, name, email, pay button. |
-| **Checkout** | Same `POST /api/checkout`. Include `device: 'door'` so webhook can record it. |
-| **Capacity** | Door uses same capacity check. If a night is sold out, checkout returns 409. For overflow at door, use admin link (see above) or manual door-sale form. |
-| **Success** | Redirect to same `/invite/success` – works with `session_id` and `date_id` from Stripe. |
-| **QR code** | Generate once (e.g. [qr-code-generator.com](https://www.qr-code-generator.com/) or similar). URL: `https://yoursite.com/door`. Print and post at door. |
-
-### Optional: Door bypass for sold-out
-If you want door sales to bypass capacity (staff decides at the door), options:
-- **A)** Add `?door=1` + signed token to `/door` URL – same token approach as admin links
-- **B)** Add `ADMIN_CHECKOUT_SECRET` – door page sends it when submitting (page would need to receive it from server at build time or a server action – more complex)
-- **C)** Keep it simple: door follows capacity. For overflow, staff uses admin link or manual form
-
-**Recommendation:** Start with (C). Add bypass later if needed.
+1. Admin picks "Specific date" or "Open link"
+2. If specific: picks date, optionally tier
+3. Clicks "Generate" → copies URL
+4. Sends to guest
+5. Guest opens → form pre-filled (or open) → pays
+6. Bypasses capacity in all cases
 
 ---
 
-## 3. Build Order
+## 4. Build Order
 
-1. **Door page** (`/door`) – standalone form, reuses checkout API
-2. **Checkout API** – add optional `ticket` param and bypass logic
-3. **Token lib** – sign/verify helpers for `ticket`
-4. **Main page** – read `?ticket=` from URL, pre-select date/tier, pass `ticket` to checkout
-5. **Admin link page** (`/admin/link`) – form to generate links, protected
+1. **Token lib** (`lib/admin-token.ts`) – sign, verify, parse
+2. **Checkout API** – accept `ticket`, verify, skip capacity when valid
+3. **Main page** – read `?ticket=`, infer date for door, default tier, pass `ticket` to checkout
+4. **Admin link page** (`/admin/link`) – generate links, protected
 
 ---
 
-## 4. File Changes Summary
+## 5. File Changes
 
 | File | Change |
 |------|--------|
-| `app/door/page.tsx` | New – door form page |
-| `app/admin/link/page.tsx` | New – admin link generator (protected) |
-| `lib/admin-token.ts` | New – sign/verify token helpers |
-| `app/api/checkout/route.ts` | Add `ticket` handling, skip capacity when valid |
-| `app/page.tsx` | Pass `ticket` from searchParams to CarrdStylePage |
-| `app/components/carrd-style-page.tsx` | Accept `initialTicket`, pre-select from token, send `ticket` in checkout |
-| `app/api/webhooks/stripe/route.ts` | Optional: record `device: 'door'` in sheet (if not already) |
+| `lib/admin-token.ts` | New – sign, verify, parse token |
+| `app/api/checkout/route.ts` | Add `ticket` param, skip capacity when valid |
+| `app/page.tsx` | Pass `ticket` from searchParams |
+| `app/components/carrd-style-page.tsx` | Accept `initialTicket`, `initialDate`, `initialTier`; infer date for door; default tier to Community; send `ticket` in checkout |
+| `app/admin/link/page.tsx` | New – form to generate links (protected) |
+| `app/api/webhooks/stripe/route.ts` | Add `device: 'door'` to row when present |
 | `.env.example` | Add `ADMIN_LINK_SECRET` |
 
 ---
 
-## 5. Environment Variables
+## 6. Implementation Details
 
+### Token payload
+```ts
+// Specific
+{ dateId: 'mar-18', tierId?: 'community', exp: number }
+
+// Door / Open
+{ door: true, exp: number }
 ```
-ADMIN_LINK_SECRET=  # Random string for signing bypass tokens. Generate with: openssl rand -hex 32
+
+### Date inference (door)
+```ts
+const today = new Date().toISOString().slice(0, 10) // "2026-03-18"
+const match = eventDates.find(d => d.value === today)
+const dateId = match?.id ?? eventDates[0].id
 ```
+
+### Checkout bypass
+```ts
+if (body.ticket) {
+  const payload = verifyToken(body.ticket)
+  if (payload) skipCapacityCheck = true
+}
+```
+
+### Admin page protection
+Simple: `?secret=xxx` in URL (matches `ADMIN_LINK_SECRET`) or basic password. Staff-only.
 
 ---
 
-## 6. Out of Scope (for now)
+## 7. Environment Variables
 
-- Full admin auth (login, sessions) – simple password or secret-in-URL is enough for small team
-- Manual door-sale form (Venmo/cash) – can add later if needed
-- QR auto-generation in app – manual QR creation is fine
+```
+ADMIN_LINK_SECRET=  # openssl rand -hex 32
+```

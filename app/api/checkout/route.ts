@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { eventDates, eventTiers } from '../../../content/event-invite.config'
+import { verifyToken } from '../../../lib/admin-token'
 import { checkRateLimit } from '../../../lib/rate-limit'
 import { getAvailability } from '../../../lib/sheets-availability'
 
@@ -38,6 +39,7 @@ export async function POST(req: NextRequest) {
     email?: string
     notes?: string
     device?: string
+    ticket?: string
   }
   try {
     body = await req.json()
@@ -45,13 +47,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
   }
 
-  const { dateId, items = [], supportedPrice, name, email, notes = '', device = 'desktop' } = body
+  const { dateId, items = [], supportedPrice, name, email, notes = '', device = 'desktop', ticket } = body
+
+  // Bypass capacity if valid admin/door token
+  const tokenPayload = ticket ? verifyToken(ticket) : null
+  const bypassCapacity = !!tokenPayload
 
   // Validate device (mobile | tablet | desktop)
-  const validDevices = ['mobile', 'tablet', 'desktop'] as const
-  const deviceType = validDevices.includes(device as (typeof validDevices)[number])
-    ? (device as (typeof validDevices)[number])
-    : 'desktop'
+  const validDevices = ['mobile', 'tablet', 'desktop', 'door'] as const
+  const deviceType = tokenPayload?.door
+    ? 'door'
+    : validDevices.includes(device as (typeof validDevices)[number])
+      ? (device as (typeof validDevices)[number])
+      : 'desktop'
 
   // Validate date
   const date = eventDates.find((d) => d.id === dateId)
@@ -78,21 +86,23 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Maximum 4 tickets per order' }, { status: 400 })
   }
 
-  // Capacity check
-  const availability = await getAvailability()
-  if (availability) {
-    const dateAvail = availability.find((a) => a.dateId === dateId)
-    if (dateAvail?.soldOut) {
-      return NextResponse.json(
-        { error: 'This date is sold out. Please choose another evening.' },
-        { status: 409 }
-      )
-    }
-    if (dateAvail && dateAvail.sold + totalQty > dateAvail.capacity) {
-      return NextResponse.json(
-        { error: `Only ${Math.max(0, dateAvail.capacity - dateAvail.sold)} ticket(s) left for this date.` },
-        { status: 409 }
-      )
+  // Capacity check (skip if valid admin/door token)
+  if (!bypassCapacity) {
+    const availability = await getAvailability()
+    if (availability) {
+      const dateAvail = availability.find((a) => a.dateId === dateId)
+      if (dateAvail?.soldOut) {
+        return NextResponse.json(
+          { error: 'This date is sold out. Please choose another evening.' },
+          { status: 409 }
+        )
+      }
+      if (dateAvail && dateAvail.sold + totalQty > dateAvail.capacity) {
+        return NextResponse.json(
+          { error: `Only ${Math.max(0, dateAvail.capacity - dateAvail.sold)} ticket(s) left for this date.` },
+          { status: 409 }
+        )
+      }
     }
   }
 
