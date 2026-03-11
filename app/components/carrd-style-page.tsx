@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { CountdownTimer } from './countdown-timer'
 import type { eventDates, eventTiers } from '../../content/event-invite.config'
 import { decodeTokenPayload } from '../../lib/admin-token-decode'
+import { resolveDoorDate } from '../../lib/door-date'
 import { SiteFooter } from './site-footer'
 
 const STORAGE_KEY = 'teahouse_reservation'
@@ -192,8 +193,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
     if (payload) {
       if (payload.door) {
         const today = new Date().toISOString().slice(0, 10)
-        const match = dates.find((d) => (d as { value?: string }).value === today)
-        date = match?.id ?? dates[0]?.id ?? null
+        date = resolveDoorDate(today, dates)
         selections = { community: 1 }
       } else if (payload.open) {
         date = null
