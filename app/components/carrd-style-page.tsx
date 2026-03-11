@@ -195,10 +195,15 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
         const match = dates.find((d) => (d as { value?: string }).value === today)
         date = match?.id ?? dates[0]?.id ?? null
         selections = { community: 1 }
+      } else if (payload.open) {
+        date = null
+        selections = {}
       } else if (payload.dateId && dates.some((d) => d.id === payload.dateId)) {
         date = payload.dateId
         if (payload.tierId && tiers.some((t) => t.id === payload.tierId)) {
           selections = { [payload.tierId]: 1 }
+        } else {
+          selections = {}
         }
       }
     }
@@ -211,7 +216,15 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
       setSupportedPriceInput('20')
     }
     setHydrated(true)
-    if (date) setReservationStep(2)
+    if (payload) {
+      setShowReservationView(true)
+      const hasSelection = Object.values(selections).some((q) => q > 0)
+      if (date && hasSelection) setReservationStep(3)
+      else if (date) setReservationStep(2)
+      else setReservationStep(1)
+    } else if (date) {
+      setReservationStep(2)
+    }
   }, [dates, tiers, initialTicket])
 
   useEffect(() => {
@@ -235,6 +248,16 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
       })
     }
   }, [showReservationView])
+
+  useEffect(() => {
+    if (!initialTicket || !hydrated) return
+    const t = setTimeout(() => {
+      if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+        joinRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }, 100)
+    return () => clearTimeout(t)
+  }, [initialTicket, hydrated])
 
   useEffect(() => {
     if (reservationStep === 3) {
