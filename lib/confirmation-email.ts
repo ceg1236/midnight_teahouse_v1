@@ -116,7 +116,7 @@ export async function sendConfirmationEmail(
     from,
     to: [to],
     ...(replyTo && { replyTo }),
-    subject: 'Confirmation: Crossing into Spring at Midnight Teahouse ✨',
+    subject: 'Confirmation: Your Midnight Teahouse reservation',
     html: buildHtml({
       to,
       name,

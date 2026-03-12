@@ -101,7 +101,7 @@ function InviteSuccessContent() {
               We are excited to share an evening with you.
             </p>
             <p className="text-[16px] leading-[1.55] text-[#FAEBD4]">
-              We&apos;ll send you an email with more details shortly.
+              We&apos;ve sent a confirmation email with your ticket details and venue info. Please check your inbox — and your Promotions folder if you use Gmail — so you have everything you need.
             </p>
           </div>
         </div>
