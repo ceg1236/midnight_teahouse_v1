@@ -17,8 +17,9 @@ test.describe('reservation flow', () => {
     await page.getByRole('button', { name: /Reserve Your Seat/i }).click()
     await page.getByRole('button', { name: 'Select' }).first().click()
 
-    // Click Select on Community tier (4th Select = first ticket tier after 3 date Selects)
-    await page.getByRole('button', { name: 'Select' }).nth(3).click()
+    await expect(page.getByRole('heading', { name: /2\. Choose Your Ticket/i })).toBeVisible({ timeout: 5000 })
+    const tierSection = page.getByRole('heading', { name: /2\. Choose Your Ticket/i }).locator('..')
+    await tierSection.getByRole('button', { name: 'Select' }).first().click()
 
     // Click Continue
     await page.getByRole('button', { name: /Continue/i }).click()
