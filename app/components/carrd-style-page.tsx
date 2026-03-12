@@ -4,6 +4,8 @@ import Link from 'next/link'
 import React, { useEffect, useRef, useState } from 'react'
 import { CountdownTimer } from './countdown-timer'
 import type { eventDates, eventTiers } from '../../content/event-invite.config'
+import { decodeTokenPayload } from '../../lib/admin-token-decode'
+import { resolveDoorDate } from '../../lib/door-date'
 import { SiteFooter } from './site-footer'
 
 const STORAGE_KEY = 'teahouse_reservation'
@@ -16,6 +18,8 @@ type CarrdStylePageProps = {
   countdownTarget: number
   /** dateId -> soldOut; used to disable and style sold-out dates */
   soldOutByDateId?: Record<string, boolean>
+  /** Admin/door token – bypasses sold-out, pre-fills date/tier */
+  initialTicket?: string
 }
 
 const SCROLL_DURATION = 1200
@@ -151,7 +155,10 @@ function savePersisted(
   }
 }
 
-export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, soldOutByDateId = {} }: CarrdStylePageProps) {
+export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, soldOutByDateId = {}, initialTicket }: CarrdStylePageProps) {
+  const tokenPayload = initialTicket ? decodeTokenPayload(initialTicket) : null
+  const bypassSoldOut = !!tokenPayload
+  const effectiveSoldOut = bypassSoldOut ? {} : soldOutByDateId
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [selections, setSelections] = useState<TierSelections>({})
   const [supportedPrice, setSupportedPrice] = useState(20)
@@ -179,16 +186,46 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
 
   useEffect(() => {
     const persisted = loadPersisted(dates, tiers)
-    setSelectedDate(persisted.date)
-    setSelections(persisted.selections)
+    let date = persisted.date
+    let selections = persisted.selections
+
+    const payload = initialTicket ? decodeTokenPayload(initialTicket) : null
+    if (payload) {
+      if (payload.door) {
+        const today = new Date().toISOString().slice(0, 10)
+        date = resolveDoorDate(today, dates)
+        selections = { community: 1 }
+      } else if (payload.open) {
+        date = null
+        selections = {}
+      } else if (payload.dateId && dates.some((d) => d.id === payload.dateId)) {
+        date = payload.dateId
+        if (payload.tierId && tiers.some((t) => t.id === payload.tierId)) {
+          selections = { [payload.tierId]: 1 }
+        } else {
+          selections = {}
+        }
+      }
+    }
+
+    setSelectedDate(date)
+    setSelections(selections)
     setFormData(persisted.form)
-    if (Object.keys(persisted.selections).some((id) => id === 'supported')) {
+    if (Object.keys(selections).some((id) => id === 'supported')) {
       setShowSupportedTier(true)
       setSupportedPriceInput('20')
     }
     setHydrated(true)
-    if (persisted.date) setReservationStep(2)
-  }, [dates, tiers])
+    if (payload) {
+      setShowReservationView(true)
+      const hasSelection = Object.values(selections).some((q) => q > 0)
+      if (date && hasSelection) setReservationStep(3)
+      else if (date) setReservationStep(2)
+      else setReservationStep(1)
+    } else if (date) {
+      setReservationStep(2)
+    }
+  }, [dates, tiers, initialTicket])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -211,6 +248,16 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
       })
     }
   }, [showReservationView])
+
+  useEffect(() => {
+    if (!initialTicket || !hydrated) return
+    const t = setTimeout(() => {
+      if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+        joinRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }, 100)
+    return () => clearTimeout(t)
+  }, [initialTicket, hydrated])
 
   useEffect(() => {
     if (reservationStep === 3) {
@@ -382,7 +429,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
                       const headerRest = timePart ? `${datePart} ${timePart.toUpperCase()}` : datePart
                       const musicianLine = d.musicians[0] ?? ''
                       const isSelected = selectedDate === d.id
-                      const soldOut = soldOutByDateId[d.id]
+                      const soldOut = effectiveSoldOut[d.id]
                       return (
                         <div
                           key={d.id}
@@ -518,7 +565,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
                       setIsSubmitting(true); setCheckoutError(null)
                       try {
                         const items = Object.entries(selections).filter(([, q]) => q > 0).map(([tierId, qty]) => ({ tierId, quantity: qty, ...(tierId === 'supported' && { supportedPrice }) }))
-                        const res = await fetch('/api/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dateId: selectedDate, items, supportedPrice: (selections['supported'] ?? 0) > 0 ? supportedPrice : undefined, name: formData.name.trim(), email: formData.email.trim(), notes: formData.notes.trim(), device: deviceType }) })
+                        const res = await fetch('/api/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dateId: selectedDate, items, supportedPrice: (selections['supported'] ?? 0) > 0 ? supportedPrice : undefined, name: formData.name.trim(), email: formData.email.trim(), notes: formData.notes.trim(), device: deviceType, ...(initialTicket && { ticket: initialTicket }) }) })
                         const data = await res.json()
                         if (!res.ok) { setCheckoutError(data.error ?? 'Something went wrong'); return }
                         if (data.url) window.location.href = data.url
@@ -678,7 +725,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
                   const headerRest = timePart ? `${datePart} ${timePart.toUpperCase()}` : datePart
                   const musicianLine = d.musicians[0] ?? ''
                   const isSelected = selectedDate === d.id
-                  const soldOut = soldOutByDateId[d.id]
+                  const soldOut = effectiveSoldOut[d.id]
                   return (
                     <div
                       key={d.id}
@@ -728,7 +775,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
               {/* Desktop: date cards */}
               <div className="hidden md:block w-full max-w-[650px] space-y-6">
                 {dates.map((d) => {
-                  const soldOut = soldOutByDateId[d.id]
+                  const soldOut = effectiveSoldOut[d.id]
                   return (
                   <div
                     key={d.id}
@@ -1329,6 +1376,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
                           email: formData.email.trim(),
                           notes: formData.notes.trim(),
                           device: deviceType,
+                          ...(initialTicket && { ticket: initialTicket }),
                         }),
                       })
                       const data = await res.json()

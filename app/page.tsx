@@ -13,7 +13,7 @@ function getCountdownTarget(): number {
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ mock?: string }>
+  searchParams: Promise<{ mock?: string; ticket?: string }>
 }) {
   const welcomeContent = getEventInviteContent()
   const countdownTarget = getCountdownTarget()
@@ -40,6 +40,7 @@ export default async function Page({
       tiers={eventTiers}
       countdownTarget={countdownTarget}
       soldOutByDateId={soldOutByDateId}
+      initialTicket={params.ticket ?? undefined}
     />
   )
 }
