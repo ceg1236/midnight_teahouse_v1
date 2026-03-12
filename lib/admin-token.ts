@@ -11,6 +11,7 @@ export type AdminTokenPayload = {
   dateId?: string
   tierId?: string
   door?: boolean
+  open?: boolean
   exp: number
 }
 

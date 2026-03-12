@@ -32,7 +32,10 @@ test.describe('door link', () => {
     const step3Heading = page.getByRole('heading', { name: /3\. Complete Your Reservation/i })
     await expect(step3Heading).toBeVisible({ timeout: 3000 })
 
-    await expect(page.getByText(/March 1[89]|March 2[0]/)).toBeVisible()
-    await expect(page.getByText('Community')).toBeVisible()
+    const step3Section = page.getByRole('heading', { name: /3\. Complete Your Reservation/i }).locator('..')
+    const summary = step3Section.locator('.rounded-lg').filter({ hasText: 'Date' }).filter({ hasText: 'Tickets' }).first()
+    await expect(summary).toBeVisible()
+    await expect(summary).toContainText(/March 1[89]|March 2[0]/)
+    await expect(summary).toContainText('Community')
   })
 })

@@ -9,14 +9,14 @@ function getBaseUrl(): string {
 }
 
 export async function POST(req: NextRequest) {
-  let body: { password?: string; dateId?: string; tierId?: string; open?: boolean }
+  let body: { password?: string; dateId?: string; tierId?: string; door?: boolean }
   try {
     body = await req.json()
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const { password, dateId, tierId, open } = body
+  const { password, dateId, tierId, door } = body
   const expected = process.env.ADMIN_PASSWORD
   if (!expected || !password || password !== expected) {
     return NextResponse.json({ error: 'Invalid password' }, { status: 401 })
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
 
   try {
     let token: string
-    if (open) {
+    if (door) {
       token = signToken({ door: true })
     } else if (dateId && eventDates.some((d) => d.id === dateId)) {
       const tierIdValid = !tierId || eventTiers.some((t) => t.id === tierId)
@@ -40,10 +40,7 @@ export async function POST(req: NextRequest) {
         ...(tierIdValid && tierId ? { tierId } : {}),
       })
     } else {
-      return NextResponse.json(
-        { error: 'Select a date or use Open link' },
-        { status: 400 }
-      )
+      token = signToken({ open: true })
     }
 
     const baseUrl = getBaseUrl()
