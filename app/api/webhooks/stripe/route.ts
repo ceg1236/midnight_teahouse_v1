@@ -110,9 +110,9 @@ async function handleChargeRefunded(
               cell: {
                 userEnteredFormat: {
                   backgroundColor: {
-                    red: 245 / 255,
-                    green: 245 / 255,
-                    blue: 245 / 255,
+                    red: 255 / 255,
+                    green: 204 / 255,
+                    blue: 204 / 255,
                   },
                 },
               },
