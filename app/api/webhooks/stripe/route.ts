@@ -19,6 +19,137 @@ function formatTicketType(orderStr: string): string {
   return Array.from(new Set(parts)).join(', ') || ''
 }
 
+async function handleChargeRefunded(
+  event: Stripe.Event,
+  _stripe: Stripe
+): Promise<NextResponse> {
+  const charge = event.data.object as Stripe.Charge
+  const paymentIntentId =
+    typeof charge.payment_intent === 'string'
+      ? charge.payment_intent
+      : charge.payment_intent?.id
+  if (!paymentIntentId) {
+    console.error('charge.refunded: no payment_intent on charge', charge.id)
+    return NextResponse.json({ received: true })
+  }
+
+  const spreadsheetId = process.env.SPREADSHEET_ID
+  const credentialsJson = process.env.GOOGLE_CREDENTIALS_JSON
+  const credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS
+  const sheetName = process.env.SPREADSHEET_SHEET_NAME || 'Sheet1'
+  if (!spreadsheetId || (!credentialsJson && !credentialsPath)) {
+    console.error('Sheets not configured for refund handling')
+    return NextResponse.json({ received: true })
+  }
+
+  const auth = new google.auth.GoogleAuth(
+    credentialsJson
+      ? {
+          credentials: JSON.parse(credentialsJson) as object,
+          scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+        }
+      : {
+          keyFile: credentialsPath,
+          scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+        }
+  )
+  const sheets = google.sheets({ version: 'v4', auth })
+
+  try {
+    // Find row by payment ID in column J (1-indexed col 10)
+    const res = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `${sheetName}!J2:J`,
+    })
+    const paymentIds = (res.data.values ?? []).flat() as string[]
+    const rowIndex = paymentIds.findIndex((id) => id?.trim() === paymentIntentId)
+    if (rowIndex < 0) {
+      console.log(
+        JSON.stringify({
+          event: 'refund_sheet_not_found',
+          chargeId: charge.id,
+          paymentIntentId,
+          message: 'Payment ID not found in sheet',
+        })
+      )
+      return NextResponse.json({ received: true })
+    }
+
+    const dataRow = rowIndex + 2 // 1-based, header is row 1
+    const refundDate = new Date().toISOString().split('T')[0]
+
+    // Update Refunded column (K)
+    await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: `${sheetName}!K${dataRow}`,
+      valueInputOption: 'USER_ENTERED',
+      requestBody: { values: [[refundDate]] },
+    })
+
+    // Get sheet ID for batchUpdate (formatting)
+    const meta = await sheets.spreadsheets.get({ spreadsheetId })
+    const sheet = meta.data.sheets?.find(
+      (s) => (s.properties?.title ?? '').trim() === sheetName.trim()
+    )
+    const sheetId = sheet?.properties?.sheetId ?? 0
+
+    // Apply light gray background to refunded row
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: {
+        requests: [
+          {
+            repeatCell: {
+              range: {
+                sheetId,
+                startRowIndex: dataRow - 1,
+                endRowIndex: dataRow,
+                startColumnIndex: 0,
+                endColumnIndex: 11,
+              },
+              cell: {
+                userEnteredFormat: {
+                  backgroundColor: {
+                    red: 245 / 255,
+                    green: 245 / 255,
+                    blue: 245 / 255,
+                  },
+                },
+              },
+              fields: 'userEnteredFormat.backgroundColor',
+            },
+          },
+        ],
+      },
+    })
+
+    console.log(
+      JSON.stringify({
+        event: 'refund_sheet_updated',
+        chargeId: charge.id,
+        paymentIntentId,
+        row: dataRow,
+      })
+    )
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error(
+      JSON.stringify({
+        event: 'refund_sheet_update_failed',
+        chargeId: charge.id,
+        paymentIntentId,
+        error: msg,
+      })
+    )
+    return NextResponse.json(
+      { error: 'Failed to update sheet for refund' },
+      { status: 500 }
+    )
+  }
+
+  return NextResponse.json({ received: true })
+}
+
 export async function POST(req: NextRequest) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
   const secretKey = process.env.STRIPE_SECRET_KEY
@@ -41,6 +172,10 @@ export async function POST(req: NextRequest) {
     const message = err instanceof Error ? err.message : 'Unknown error'
     console.error('Webhook signature verification failed:', message)
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
+  }
+
+  if (event.type === 'charge.refunded') {
+    return handleChargeRefunded(event, stripe)
   }
 
   if (event.type !== 'checkout.session.completed') {
@@ -94,6 +229,7 @@ export async function POST(req: NextRequest) {
     String(metadata.notes ?? ''),
     String(metadata.device ?? 'desktop'),
     String(paymentId),
+    '', // Refunded (K) - empty for new sales
   ]
 
   const spreadsheetId = process.env.SPREADSHEET_ID
@@ -163,8 +299,8 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // Append to data rows (A2:J) - Timestamp|Name|Email|Ticket date|Ticket type|Amount paid|Quantity|Notes|Device|Stripe Payment ID
-  const range = `${sheetName}!A2:J`
+  // Append to data rows (A2:K) - includes Refunded column
+  const range = `${sheetName}!A2:K`
   try {
     await sheets.spreadsheets.values.append({
       spreadsheetId,

@@ -4,6 +4,9 @@ import { NextRequest } from 'next/server'
 const mockConstructEvent = vi.fn()
 const mockSheetsGet = vi.fn()
 const mockSheetsAppend = vi.fn()
+const mockSheetsUpdate = vi.fn()
+const mockSpreadsheetsGet = vi.fn()
+const mockSpreadsheetsBatchUpdate = vi.fn()
 
 vi.mock('stripe', () => ({
   default: class MockStripe {
@@ -20,10 +23,13 @@ vi.mock('googleapis', () => ({
     },
     sheets: vi.fn().mockReturnValue({
       spreadsheets: {
+        get: mockSpreadsheetsGet,
         values: {
           get: mockSheetsGet,
           append: mockSheetsAppend,
+          update: mockSheetsUpdate,
         },
+        batchUpdate: mockSpreadsheetsBatchUpdate,
       },
     }),
   },
@@ -80,6 +86,11 @@ describe('POST /api/webhooks/stripe', () => {
     }
     mockSheetsGet.mockResolvedValue({ data: { values: [] } })
     mockSheetsAppend.mockResolvedValue({})
+    mockSheetsUpdate.mockResolvedValue({})
+    mockSpreadsheetsGet.mockResolvedValue({
+      data: { sheets: [{ properties: { sheetId: 0, title: 'Sheet1' } }] },
+    })
+    mockSpreadsheetsBatchUpdate.mockResolvedValue({})
   })
 
   it('returns 500 when STRIPE_WEBHOOK_SECRET is not set', async () => {
@@ -158,5 +169,44 @@ describe('POST /api/webhooks/stripe', () => {
     const json = await res.json()
     expect(json.received).toBe(true)
     expect(mockSheetsAppend).not.toHaveBeenCalled()
+  })
+
+  it('returns 200 and updates sheet for charge.refunded', async () => {
+    const chargeRefundedEvent = {
+      type: 'charge.refunded',
+      data: {
+        object: {
+          id: 'ch_refunded_123',
+          payment_intent: 'pi_test_123',
+        },
+      },
+    }
+    mockConstructEvent.mockReturnValue(chargeRefundedEvent)
+    mockSheetsGet.mockResolvedValue({ data: { values: [['pi_test_123']] } })
+    const res = await POST(req('{}'))
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    expect(json.received).toBe(true)
+    expect(mockSheetsUpdate).toHaveBeenCalled()
+    expect(mockSpreadsheetsBatchUpdate).toHaveBeenCalled()
+  })
+
+  it('returns 200 when charge.refunded but payment not found in sheet', async () => {
+    const chargeRefundedEvent = {
+      type: 'charge.refunded',
+      data: {
+        object: {
+          id: 'ch_refunded_123',
+          payment_intent: 'pi_unknown',
+        },
+      },
+    }
+    mockConstructEvent.mockReturnValue(chargeRefundedEvent)
+    mockSheetsGet.mockResolvedValue({ data: { values: [['pi_test_123']] } })
+    const res = await POST(req('{}'))
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    expect(json.received).toBe(true)
+    expect(mockSheetsUpdate).not.toHaveBeenCalled()
   })
 })

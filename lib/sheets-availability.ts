@@ -1,7 +1,7 @@
 /**
  * Read sold ticket counts from Google Sheets and compute availability per date.
- * Sheet columns: A=Timestamp, B=Name, C=Email, D=Ticket date, E=Ticket type, F=Amount paid, G=Quantity, ...
- * We sum Quantity (G) grouped by Ticket date (D).
+ * Sheet columns: A=Timestamp, B=Name, C=Email, D=Ticket date, E=Ticket type, F=Amount paid, G=Quantity, H=Notes, I=Device, J=Stripe Payment ID, K=Refunded.
+ * We sum Quantity (G) grouped by Ticket date (D), excluding rows where Refunded (K) is non-empty.
  */
 
 import { google } from 'googleapis'
@@ -67,16 +67,19 @@ export async function getAvailability(): Promise<DateAvailability[] | null> {
   if (!sheets) return null
 
   try {
-    // Read D (Ticket date) and G (Quantity) - columns 4 and 7, 1-indexed
+    // Read D (Ticket date), G (Quantity), K (Refunded) - exclude refunded rows
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!D2:G`,
+      range: `${sheetName}!D2:K`,
     })
     const rows = (res.data.values ?? []) as string[][]
 
-    // soldByLabel: label -> total quantity sold
+    // soldByLabel: label -> total quantity sold (excluding refunded)
     const soldByLabel: Record<string, number> = {}
     for (const row of rows) {
+      const refunded = (row[7] ?? '').trim() // K (0-indexed: D=0..K=7)
+      if (refunded) continue
+
       const ticketDate = row[0]?.trim() ?? '' // D
       const qtyStr = row[3] ?? '1' // G (0-indexed: D=0, E=1, F=2, G=3)
       const qty = parseInt(qtyStr, 10) || 1
