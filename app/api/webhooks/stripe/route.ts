@@ -21,17 +21,38 @@ function formatTicketType(orderStr: string): string {
 
 async function handleChargeRefunded(
   event: Stripe.Event,
-  _stripe: Stripe
+  stripe: Stripe
 ): Promise<NextResponse> {
   const charge = event.data.object as Stripe.Charge
+
+  // Retrieve charge with refunds to get correct payment_intent and refund reason
+  const chargeWithRefunds = await stripe.charges.retrieve(charge.id, {
+    expand: ['refunds'],
+  })
   const paymentIntentId =
-    typeof charge.payment_intent === 'string'
-      ? charge.payment_intent
-      : charge.payment_intent?.id
+    typeof chargeWithRefunds.payment_intent === 'string'
+      ? chargeWithRefunds.payment_intent
+      : chargeWithRefunds.payment_intent?.id
   if (!paymentIntentId) {
     console.error('charge.refunded: no payment_intent on charge', charge.id)
     return NextResponse.json({ received: true })
   }
+
+  const piTrimmed = paymentIntentId.trim()
+
+  // Build refund notes from Stripe (reason + metadata)
+  const refunds = chargeWithRefunds.refunds?.data ?? []
+  const latestRefund = refunds[refunds.length - 1]
+  const refundReason = latestRefund?.reason
+    ? `Reason: ${latestRefund.reason.replace(/_/g, ' ')}`
+    : ''
+  const refundMeta = latestRefund?.metadata
+    ? Object.entries(latestRefund.metadata)
+        .map(([k, v]) => (v ? `${k}: ${v}` : ''))
+        .filter(Boolean)
+        .join('; ')
+    : ''
+  const refundNotes = [refundReason, refundMeta].filter(Boolean).join(' | ') || ''
 
   const spreadsheetId = process.env.SPREADSHEET_ID
   const credentialsJson = process.env.GOOGLE_CREDENTIALS_JSON
@@ -56,19 +77,19 @@ async function handleChargeRefunded(
   const sheets = google.sheets({ version: 'v4', auth })
 
   try {
-    // Find row by payment ID in column J (1-indexed col 10)
+    // Read full data A2:L so row indices match sheet (J2:J alone can omit empty rows)
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: `${sheetName}!J2:J`,
+      range: `${sheetName}!A2:L`,
     })
-    const paymentIds = (res.data.values ?? []).flat() as string[]
-    const rowIndex = paymentIds.findIndex((id) => id?.trim() === paymentIntentId)
+    const rows = (res.data.values ?? []) as string[][]
+    const rowIndex = rows.findIndex((row) => (row[9] ?? '').trim() === piTrimmed)
     if (rowIndex < 0) {
       console.log(
         JSON.stringify({
           event: 'refund_sheet_not_found',
           chargeId: charge.id,
-          paymentIntentId,
+          paymentIntentId: piTrimmed,
           message: 'Payment ID not found in sheet',
         })
       )
@@ -78,12 +99,12 @@ async function handleChargeRefunded(
     const dataRow = rowIndex + 2 // 1-based, header is row 1
     const refundDate = new Date().toISOString().split('T')[0]
 
-    // Update Refunded column (K)
+    // Update Refunded (K) and Refund Notes (L)
     await sheets.spreadsheets.values.update({
       spreadsheetId,
-      range: `${sheetName}!K${dataRow}`,
+      range: `${sheetName}!K${dataRow}:L${dataRow}`,
       valueInputOption: 'USER_ENTERED',
-      requestBody: { values: [[refundDate]] },
+      requestBody: { values: [[refundDate, refundNotes]] },
     })
 
     // Get sheet ID for batchUpdate (formatting)
@@ -105,7 +126,7 @@ async function handleChargeRefunded(
                 startRowIndex: dataRow - 1,
                 endRowIndex: dataRow,
                 startColumnIndex: 0,
-                endColumnIndex: 11,
+                endColumnIndex: 12,
               },
               cell: {
                 userEnteredFormat: {
@@ -127,7 +148,7 @@ async function handleChargeRefunded(
       JSON.stringify({
         event: 'refund_sheet_updated',
         chargeId: charge.id,
-        paymentIntentId,
+        paymentIntentId: piTrimmed,
         row: dataRow,
       })
     )
@@ -137,7 +158,7 @@ async function handleChargeRefunded(
       JSON.stringify({
         event: 'refund_sheet_update_failed',
         chargeId: charge.id,
-        paymentIntentId,
+        paymentIntentId: piTrimmed,
         error: msg,
       })
     )
@@ -230,6 +251,7 @@ export async function POST(req: NextRequest) {
     String(metadata.device ?? 'desktop'),
     String(paymentId),
     '', // Refunded (K) - empty for new sales
+    '', // Refund Notes (L) - empty for new sales
   ]
 
   const spreadsheetId = process.env.SPREADSHEET_ID
@@ -299,8 +321,8 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // Append to data rows (A2:K) - includes Refunded column
-  const range = `${sheetName}!A2:K`
+  // Append to data rows (A2:L) - includes Refunded and Refund Notes
+  const range = `${sheetName}!A2:L`
   try {
     await sheets.spreadsheets.values.append({
       spreadsheetId,

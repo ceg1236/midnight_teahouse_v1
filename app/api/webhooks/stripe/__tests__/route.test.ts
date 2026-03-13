@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest } from 'next/server'
 
 const mockConstructEvent = vi.fn()
+const mockChargesRetrieve = vi.fn()
 const mockSheetsGet = vi.fn()
 const mockSheetsAppend = vi.fn()
 const mockSheetsUpdate = vi.fn()
@@ -12,6 +13,9 @@ vi.mock('stripe', () => ({
   default: class MockStripe {
     webhooks = {
       constructEvent: mockConstructEvent,
+    }
+    charges = {
+      retrieve: mockChargesRetrieve,
     }
   },
 }))
@@ -85,6 +89,11 @@ describe('POST /api/webhooks/stripe', () => {
       GOOGLE_CREDENTIALS_JSON: '{"type":"service_account"}',
     }
     mockSheetsGet.mockResolvedValue({ data: { values: [] } })
+    mockChargesRetrieve.mockResolvedValue({
+      id: 'ch_refunded_123',
+      payment_intent: 'pi_test_123',
+      refunds: { data: [{ reason: 'requested_by_customer' }] },
+    })
     mockSheetsAppend.mockResolvedValue({})
     mockSheetsUpdate.mockResolvedValue({})
     mockSpreadsheetsGet.mockResolvedValue({
@@ -182,7 +191,14 @@ describe('POST /api/webhooks/stripe', () => {
       },
     }
     mockConstructEvent.mockReturnValue(chargeRefundedEvent)
-    mockSheetsGet.mockResolvedValue({ data: { values: [['pi_test_123']] } })
+    // Full rows A2:L - row 0 has pi_test_123 in col J (index 9)
+    mockSheetsGet.mockResolvedValue({
+      data: {
+        values: [
+          ['2026-03-12', 'Kiel', 'k@x.com', 'Fri Mar 20', 'Community', '$80', '2', '', 'mobile', 'pi_test_123', '', ''],
+        ],
+      },
+    })
     const res = await POST(req('{}'))
     expect(res.status).toBe(200)
     const json = await res.json()
@@ -202,7 +218,18 @@ describe('POST /api/webhooks/stripe', () => {
       },
     }
     mockConstructEvent.mockReturnValue(chargeRefundedEvent)
-    mockSheetsGet.mockResolvedValue({ data: { values: [['pi_test_123']] } })
+    mockChargesRetrieve.mockResolvedValue({
+      id: 'ch_refunded_123',
+      payment_intent: 'pi_unknown',
+      refunds: { data: [] },
+    })
+    mockSheetsGet.mockResolvedValue({
+      data: {
+        values: [
+          ['2026-03-12', 'Kiel', 'k@x.com', 'Fri Mar 20', 'Community', '$80', '2', '', 'mobile', 'pi_test_123', '', ''],
+        ],
+      },
+    })
     const res = await POST(req('{}'))
     expect(res.status).toBe(200)
     const json = await res.json()
