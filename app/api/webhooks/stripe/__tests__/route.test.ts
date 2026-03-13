@@ -95,7 +95,9 @@ describe('POST /api/webhooks/stripe', () => {
       refunds: { data: [{ reason: 'requested_by_customer' }] },
     })
     mockSheetsAppend.mockResolvedValue({
-      data: { updatedRange: 'Sheet1!A2:L2', updatedRows: 1, updatedColumns: 12 },
+      data: {
+        updates: { updatedRange: 'Sheet1!A2:L2', updatedRows: 1, updatedColumns: 12 },
+      },
     })
     mockSheetsUpdate.mockResolvedValue({})
     mockSpreadsheetsGet.mockResolvedValue({

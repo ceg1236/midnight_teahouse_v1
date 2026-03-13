@@ -350,7 +350,7 @@ export async function POST(req: NextRequest) {
       insertDataOption: 'INSERT_ROWS',
       requestBody: { values: [row] },
     })
-    const updatedRange = appendRes.data?.updatedRange
+    const updatedRange = appendRes.data?.updates?.updatedRange
     if (updatedRange) {
       const rowMatch = updatedRange.match(/!A(\d+):/)
       const appendedRow = rowMatch ? parseInt(rowMatch[1], 10) : null
