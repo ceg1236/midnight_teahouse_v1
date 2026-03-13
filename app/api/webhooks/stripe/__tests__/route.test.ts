@@ -94,7 +94,9 @@ describe('POST /api/webhooks/stripe', () => {
       payment_intent: 'pi_test_123',
       refunds: { data: [{ reason: 'requested_by_customer' }] },
     })
-    mockSheetsAppend.mockResolvedValue({})
+    mockSheetsAppend.mockResolvedValue({
+      data: { updatedRange: 'Sheet1!A2:L2', updatedRows: 1, updatedColumns: 12 },
+    })
     mockSheetsUpdate.mockResolvedValue({})
     mockSpreadsheetsGet.mockResolvedValue({
       data: { sheets: [{ properties: { sheetId: 0, title: 'Sheet1' } }] },

@@ -326,13 +326,53 @@ export async function POST(req: NextRequest) {
   // Append to data rows (A2:L) - includes Refunded and Refund Notes
   const range = `${sheetName}!A2:L`
   try {
-    await sheets.spreadsheets.values.append({
+    const appendRes = await sheets.spreadsheets.values.append({
       spreadsheetId,
       range,
       valueInputOption: 'USER_ENTERED',
       insertDataOption: 'INSERT_ROWS',
       requestBody: { values: [row] },
     })
+    const updatedRange = appendRes.data?.updatedRange
+    if (updatedRange) {
+      const rowMatch = updatedRange.match(/!A(\d+):/)
+      const appendedRow = rowMatch ? parseInt(rowMatch[1], 10) : null
+      if (appendedRow != null) {
+        const meta = await sheets.spreadsheets.get({ spreadsheetId })
+        const sheet = meta.data.sheets?.find(
+          (s) => (s.properties?.title ?? '').trim() === sheetName.trim()
+        )
+        const sheetId = sheet?.properties?.sheetId ?? 0
+        await sheets.spreadsheets.batchUpdate({
+          spreadsheetId,
+          requestBody: {
+            requests: [
+              {
+                repeatCell: {
+                  range: {
+                    sheetId,
+                    startRowIndex: appendedRow - 1,
+                    endRowIndex: appendedRow,
+                    startColumnIndex: 0,
+                    endColumnIndex: 12,
+                  },
+                  cell: {
+                    userEnteredFormat: {
+                      backgroundColor: {
+                        red: 1,
+                        green: 1,
+                        blue: 1,
+                      },
+                    },
+                  },
+                  fields: 'userEnteredFormat.backgroundColor',
+                },
+              },
+            ],
+          },
+        })
+      }
+    }
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err)
     const details = err && typeof err === 'object' && 'response' in err
