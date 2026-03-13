@@ -40,19 +40,21 @@ async function handleChargeRefunded(
 
   const piTrimmed = paymentIntentId.trim()
 
-  // Build refund notes from Stripe (reason + metadata)
+  // Build refund notes: Reason + Notes (Dashboard "Add more details" field)
   const refunds = chargeWithRefunds.refunds?.data ?? []
   const latestRefund = refunds[refunds.length - 1]
   const refundReason = latestRefund?.reason
     ? `Reason: ${latestRefund.reason.replace(/_/g, ' ')}`
     : ''
-  const refundMeta = latestRefund?.metadata
-    ? Object.entries(latestRefund.metadata)
-        .map(([k, v]) => (v ? `${k}: ${v}` : ''))
-        .filter(Boolean)
-        .join('; ')
+  const meta = latestRefund?.metadata ?? {}
+  const notesKeys = ['comment', 'notes', 'refund_notes', 'details']
+  const notesValue = notesKeys
+    .map((k) => meta[k])
+    .find((v): v is string => typeof v === 'string' && v.trim() !== '')
+  const refundNotesLine = notesValue?.trim()
+    ? `Notes: ${notesValue.trim()}`
     : ''
-  const refundNotes = [refundReason, refundMeta].filter(Boolean).join('\n') || ''
+  const refundNotes = [refundReason, refundNotesLine].filter(Boolean).join('\n') || ''
 
   const spreadsheetId = process.env.SPREADSHEET_ID
   const credentialsJson = process.env.GOOGLE_CREDENTIALS_JSON
