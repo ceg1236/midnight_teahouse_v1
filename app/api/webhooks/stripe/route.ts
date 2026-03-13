@@ -3,6 +3,7 @@ import Stripe from 'stripe'
 import { google } from 'googleapis'
 import { eventDates, eventTiers } from '../../../../content/event-invite.config'
 import { sendConfirmationEmail } from '../../../../lib/confirmation-email'
+import { applyRefundToSheet } from '../../../../lib/sheets-refund'
 
 const TIER_LABELS: Record<string, string> = Object.fromEntries(
   eventTiers.map((t) => [t.id, t.label])
@@ -73,102 +74,25 @@ async function handleChargeRefunded(
     )
   }
 
-  const spreadsheetId = process.env.SPREADSHEET_ID
-  const credentialsJson = process.env.GOOGLE_CREDENTIALS_JSON
-  const credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS
-  const sheetName = process.env.SPREADSHEET_SHEET_NAME || 'Sheet1'
-  if (!spreadsheetId || (!credentialsJson && !credentialsPath)) {
-    console.error('Sheets not configured for refund handling')
-    return NextResponse.json({ received: true })
-  }
-
-  const auth = new google.auth.GoogleAuth(
-    credentialsJson
-      ? {
-          credentials: JSON.parse(credentialsJson) as object,
-          scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-        }
-      : {
-          keyFile: credentialsPath,
-          scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-        }
-  )
-  const sheets = google.sheets({ version: 'v4', auth })
-
   try {
-    // Read full data A2:L so row indices match sheet (J2:J alone can omit empty rows)
-    const res = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: `${sheetName}!A2:L`,
-    })
-    const rows = (res.data.values ?? []) as string[][]
-    const rowIndex = rows.findIndex((row) => (row[9] ?? '').trim() === piTrimmed)
-    if (rowIndex < 0) {
+    const result = await applyRefundToSheet(piTrimmed, refundNotes)
+    if (!result.ok) {
       console.log(
         JSON.stringify({
           event: 'refund_sheet_not_found',
           chargeId: charge.id,
           paymentIntentId: piTrimmed,
-          message: 'Payment ID not found in sheet',
+          message: result.error,
         })
       )
       return NextResponse.json({ received: true })
     }
-
-    const dataRow = rowIndex + 2 // 1-based, header is row 1
-    const refundDate = new Date().toISOString().split('T')[0]
-
-    // Update Refunded (K) and Refund Notes (L)
-    await sheets.spreadsheets.values.update({
-      spreadsheetId,
-      range: `${sheetName}!K${dataRow}:L${dataRow}`,
-      valueInputOption: 'USER_ENTERED',
-      requestBody: { values: [[refundDate, refundNotes]] },
-    })
-
-    // Get sheet ID for batchUpdate (formatting)
-    const meta = await sheets.spreadsheets.get({ spreadsheetId })
-    const sheet = meta.data.sheets?.find(
-      (s) => (s.properties?.title ?? '').trim() === sheetName.trim()
-    )
-    const sheetId = sheet?.properties?.sheetId ?? 0
-
-    // Apply light gray background to refunded row
-    await sheets.spreadsheets.batchUpdate({
-      spreadsheetId,
-      requestBody: {
-        requests: [
-          {
-            repeatCell: {
-              range: {
-                sheetId,
-                startRowIndex: dataRow - 1,
-                endRowIndex: dataRow,
-                startColumnIndex: 0,
-                endColumnIndex: 12,
-              },
-              cell: {
-                userEnteredFormat: {
-                  backgroundColor: {
-                    red: 255 / 255,
-                    green: 204 / 255,
-                    blue: 204 / 255,
-                  },
-                },
-              },
-              fields: 'userEnteredFormat.backgroundColor',
-            },
-          },
-        ],
-      },
-    })
-
     console.log(
       JSON.stringify({
         event: 'refund_sheet_updated',
         chargeId: charge.id,
         paymentIntentId: piTrimmed,
-        row: dataRow,
+        row: result.row,
       })
     )
   } catch (err) {
