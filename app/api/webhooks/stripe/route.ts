@@ -47,14 +47,31 @@ async function handleChargeRefunded(
     ? `Reason: ${latestRefund.reason.replace(/_/g, ' ')}`
     : ''
   const meta = latestRefund?.metadata ?? {}
-  const notesKeys = ['comment', 'notes', 'refund_notes', 'details']
-  const notesValue = notesKeys
+  const notesKeys = ['comment', 'notes', 'refund_notes', 'details', 'reason_note', 'refund_reason']
+  let notesValue = notesKeys
     .map((k) => meta[k])
     .find((v): v is string => typeof v === 'string' && v.trim() !== '')
+  if (!notesValue && Object.keys(meta).length > 0) {
+    notesValue = Object.entries(meta)
+      .filter(([, v]) => typeof v === 'string' && (v as string).trim() !== '')
+      .map(([k, v]) => `${k}: ${v}`)
+      .join('\n')
+  }
   const refundNotesLine = notesValue?.trim()
     ? `Notes: ${notesValue.trim()}`
     : ''
   const refundNotes = [refundReason, refundNotesLine].filter(Boolean).join('\n') || ''
+
+  if (Object.keys(meta).length > 0) {
+    console.log(
+      JSON.stringify({
+        event: 'refund_metadata_debug',
+        chargeId: charge.id,
+        metadataKeys: Object.keys(meta),
+        metadata: meta,
+      })
+    )
+  }
 
   const spreadsheetId = process.env.SPREADSHEET_ID
   const credentialsJson = process.env.GOOGLE_CREDENTIALS_JSON
