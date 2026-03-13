@@ -52,7 +52,7 @@ async function handleChargeRefunded(
         .filter(Boolean)
         .join('; ')
     : ''
-  const refundNotes = [refundReason, refundMeta].filter(Boolean).join(' | ') || ''
+  const refundNotes = [refundReason, refundMeta].filter(Boolean).join('\n') || ''
 
   const spreadsheetId = process.env.SPREADSHEET_ID
   const credentialsJson = process.env.GOOGLE_CREDENTIALS_JSON
