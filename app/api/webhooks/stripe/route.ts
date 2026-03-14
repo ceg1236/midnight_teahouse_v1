@@ -3,6 +3,7 @@ import Stripe from 'stripe'
 import { google } from 'googleapis'
 import { eventDates, eventTiers } from '../../../../content/event-invite.config'
 import { sendConfirmationEmail } from '../../../../lib/confirmation-email'
+import { applyRefundToSheet } from '../../../../lib/sheets-refund'
 
 const TIER_LABELS: Record<string, string> = Object.fromEntries(
   eventTiers.map((t) => [t.id, t.label])
@@ -17,6 +18,100 @@ function formatTicketType(orderStr: string): string {
     parts.push(label)
   }
   return Array.from(new Set(parts)).join(', ') || ''
+}
+
+async function handleChargeRefunded(
+  event: Stripe.Event,
+  stripe: Stripe
+): Promise<NextResponse> {
+  const charge = event.data.object as Stripe.Charge
+
+  // Retrieve charge with refunds to get correct payment_intent and refund reason
+  const chargeWithRefunds = await stripe.charges.retrieve(charge.id, {
+    expand: ['refunds'],
+  })
+  const paymentIntentId =
+    typeof chargeWithRefunds.payment_intent === 'string'
+      ? chargeWithRefunds.payment_intent
+      : chargeWithRefunds.payment_intent?.id
+  if (!paymentIntentId) {
+    console.error('charge.refunded: no payment_intent on charge', charge.id)
+    return NextResponse.json({ received: true })
+  }
+
+  const piTrimmed = paymentIntentId.trim()
+
+  // Build refund notes: Reason + Notes (Dashboard "Add more details" field)
+  const refunds = chargeWithRefunds.refunds?.data ?? []
+  const latestRefund = refunds[refunds.length - 1]
+  const refundReason = latestRefund?.reason
+    ? `Reason: ${latestRefund.reason.replace(/_/g, ' ')}`
+    : ''
+  const meta = latestRefund?.metadata ?? {}
+  const notesKeys = ['comment', 'notes', 'refund_notes', 'details', 'reason_note', 'refund_reason']
+  let notesValue = notesKeys
+    .map((k) => meta[k])
+    .find((v): v is string => typeof v === 'string' && v.trim() !== '')
+  if (!notesValue && Object.keys(meta).length > 0) {
+    notesValue = Object.entries(meta)
+      .filter(([, v]) => typeof v === 'string' && (v as string).trim() !== '')
+      .map(([k, v]) => `${k}: ${v}`)
+      .join('\n')
+  }
+  const refundNotesLine = notesValue?.trim()
+    ? `Notes: ${notesValue.trim()}`
+    : ''
+  const refundNotes = [refundReason, refundNotesLine].filter(Boolean).join('\n') || ''
+
+  if (Object.keys(meta).length > 0) {
+    console.log(
+      JSON.stringify({
+        event: 'refund_metadata_debug',
+        chargeId: charge.id,
+        metadataKeys: Object.keys(meta),
+        metadata: meta,
+      })
+    )
+  }
+
+  try {
+    const result = await applyRefundToSheet(piTrimmed, refundNotes)
+    if (!result.ok) {
+      console.log(
+        JSON.stringify({
+          event: 'refund_sheet_not_found',
+          chargeId: charge.id,
+          paymentIntentId: piTrimmed,
+          message: result.error,
+        })
+      )
+      return NextResponse.json({ received: true })
+    }
+    console.log(
+      JSON.stringify({
+        event: 'refund_sheet_updated',
+        chargeId: charge.id,
+        paymentIntentId: piTrimmed,
+        row: result.row,
+      })
+    )
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error(
+      JSON.stringify({
+        event: 'refund_sheet_update_failed',
+        chargeId: charge.id,
+        paymentIntentId: piTrimmed,
+        error: msg,
+      })
+    )
+    return NextResponse.json(
+      { error: 'Failed to update sheet for refund' },
+      { status: 500 }
+    )
+  }
+
+  return NextResponse.json({ received: true })
 }
 
 export async function POST(req: NextRequest) {
@@ -41,6 +136,10 @@ export async function POST(req: NextRequest) {
     const message = err instanceof Error ? err.message : 'Unknown error'
     console.error('Webhook signature verification failed:', message)
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
+  }
+
+  if (event.type === 'charge.refunded') {
+    return handleChargeRefunded(event, stripe)
   }
 
   if (event.type !== 'checkout.session.completed') {
@@ -94,6 +193,8 @@ export async function POST(req: NextRequest) {
     String(metadata.notes ?? ''),
     String(metadata.device ?? 'desktop'),
     String(paymentId),
+    '', // Refunded (K) - empty for new sales
+    '', // Refund Notes (L) - empty for new sales
   ]
 
   const spreadsheetId = process.env.SPREADSHEET_ID
@@ -163,16 +264,56 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // Append to data rows (A2:J) - Timestamp|Name|Email|Ticket date|Ticket type|Amount paid|Quantity|Notes|Device|Stripe Payment ID
-  const range = `${sheetName}!A2:J`
+  // Append to data rows (A2:L) - includes Refunded and Refund Notes
+  const range = `${sheetName}!A2:L`
   try {
-    await sheets.spreadsheets.values.append({
+    const appendRes = await sheets.spreadsheets.values.append({
       spreadsheetId,
       range,
       valueInputOption: 'USER_ENTERED',
       insertDataOption: 'INSERT_ROWS',
       requestBody: { values: [row] },
     })
+    const updatedRange = appendRes.data?.updates?.updatedRange
+    if (updatedRange) {
+      const rowMatch = updatedRange.match(/!A(\d+):/)
+      const appendedRow = rowMatch ? parseInt(rowMatch[1], 10) : null
+      if (appendedRow != null) {
+        const meta = await sheets.spreadsheets.get({ spreadsheetId })
+        const sheet = meta.data.sheets?.find(
+          (s) => (s.properties?.title ?? '').trim() === sheetName.trim()
+        )
+        const sheetId = sheet?.properties?.sheetId ?? 0
+        await sheets.spreadsheets.batchUpdate({
+          spreadsheetId,
+          requestBody: {
+            requests: [
+              {
+                repeatCell: {
+                  range: {
+                    sheetId,
+                    startRowIndex: appendedRow - 1,
+                    endRowIndex: appendedRow,
+                    startColumnIndex: 0,
+                    endColumnIndex: 12,
+                  },
+                  cell: {
+                    userEnteredFormat: {
+                      backgroundColor: {
+                        red: 1,
+                        green: 1,
+                        blue: 1,
+                      },
+                    },
+                  },
+                  fields: 'userEnteredFormat.backgroundColor',
+                },
+              },
+            ],
+          },
+        })
+      }
+    }
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err)
     const details = err && typeof err === 'object' && 'response' in err

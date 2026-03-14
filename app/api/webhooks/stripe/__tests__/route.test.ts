@@ -2,13 +2,20 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest } from 'next/server'
 
 const mockConstructEvent = vi.fn()
+const mockChargesRetrieve = vi.fn()
 const mockSheetsGet = vi.fn()
 const mockSheetsAppend = vi.fn()
+const mockSheetsUpdate = vi.fn()
+const mockSpreadsheetsGet = vi.fn()
+const mockSpreadsheetsBatchUpdate = vi.fn()
 
 vi.mock('stripe', () => ({
   default: class MockStripe {
     webhooks = {
       constructEvent: mockConstructEvent,
+    }
+    charges = {
+      retrieve: mockChargesRetrieve,
     }
   },
 }))
@@ -20,10 +27,13 @@ vi.mock('googleapis', () => ({
     },
     sheets: vi.fn().mockReturnValue({
       spreadsheets: {
+        get: mockSpreadsheetsGet,
         values: {
           get: mockSheetsGet,
           append: mockSheetsAppend,
+          update: mockSheetsUpdate,
         },
+        batchUpdate: mockSpreadsheetsBatchUpdate,
       },
     }),
   },
@@ -79,7 +89,21 @@ describe('POST /api/webhooks/stripe', () => {
       GOOGLE_CREDENTIALS_JSON: '{"type":"service_account"}',
     }
     mockSheetsGet.mockResolvedValue({ data: { values: [] } })
-    mockSheetsAppend.mockResolvedValue({})
+    mockChargesRetrieve.mockResolvedValue({
+      id: 'ch_refunded_123',
+      payment_intent: 'pi_test_123',
+      refunds: { data: [{ reason: 'requested_by_customer' }] },
+    })
+    mockSheetsAppend.mockResolvedValue({
+      data: {
+        updates: { updatedRange: 'Sheet1!A2:L2', updatedRows: 1, updatedColumns: 12 },
+      },
+    })
+    mockSheetsUpdate.mockResolvedValue({})
+    mockSpreadsheetsGet.mockResolvedValue({
+      data: { sheets: [{ properties: { sheetId: 0, title: 'Sheet1' } }] },
+    })
+    mockSpreadsheetsBatchUpdate.mockResolvedValue({})
   })
 
   it('returns 500 when STRIPE_WEBHOOK_SECRET is not set', async () => {
@@ -158,5 +182,62 @@ describe('POST /api/webhooks/stripe', () => {
     const json = await res.json()
     expect(json.received).toBe(true)
     expect(mockSheetsAppend).not.toHaveBeenCalled()
+  })
+
+  it('returns 200 and updates sheet for charge.refunded', async () => {
+    const chargeRefundedEvent = {
+      type: 'charge.refunded',
+      data: {
+        object: {
+          id: 'ch_refunded_123',
+          payment_intent: 'pi_test_123',
+        },
+      },
+    }
+    mockConstructEvent.mockReturnValue(chargeRefundedEvent)
+    // Full rows A2:L - row 0 has pi_test_123 in col J (index 9)
+    mockSheetsGet.mockResolvedValue({
+      data: {
+        values: [
+          ['2026-03-12', 'Kiel', 'k@x.com', 'Fri Mar 20', 'Community', '$80', '2', '', 'mobile', 'pi_test_123', '', ''],
+        ],
+      },
+    })
+    const res = await POST(req('{}'))
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    expect(json.received).toBe(true)
+    expect(mockSheetsUpdate).toHaveBeenCalled()
+    expect(mockSpreadsheetsBatchUpdate).toHaveBeenCalled()
+  })
+
+  it('returns 200 when charge.refunded but payment not found in sheet', async () => {
+    const chargeRefundedEvent = {
+      type: 'charge.refunded',
+      data: {
+        object: {
+          id: 'ch_refunded_123',
+          payment_intent: 'pi_unknown',
+        },
+      },
+    }
+    mockConstructEvent.mockReturnValue(chargeRefundedEvent)
+    mockChargesRetrieve.mockResolvedValue({
+      id: 'ch_refunded_123',
+      payment_intent: 'pi_unknown',
+      refunds: { data: [] },
+    })
+    mockSheetsGet.mockResolvedValue({
+      data: {
+        values: [
+          ['2026-03-12', 'Kiel', 'k@x.com', 'Fri Mar 20', 'Community', '$80', '2', '', 'mobile', 'pi_test_123', '', ''],
+        ],
+      },
+    })
+    const res = await POST(req('{}'))
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    expect(json.received).toBe(true)
+    expect(mockSheetsUpdate).not.toHaveBeenCalled()
   })
 })

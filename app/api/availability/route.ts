@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { getAvailability } from '../../../lib/sheets-availability'
 
+export const dynamic = 'force-dynamic'
+
 /**
  * GET /api/availability
  * Returns sold counts and sold-out status per date.
