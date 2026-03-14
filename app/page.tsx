@@ -3,6 +3,8 @@ import { getEventInviteContent } from '../content/parse'
 import { eventDates, eventTiers } from '../content/event-invite.config'
 import { getAvailability, getMockAvailability } from '../lib/sheets-availability'
 
+export const dynamic = 'force-dynamic'
+
 /** Unix timestamp for first event at 7pm Pacific (March 18, 2026) */
 function getCountdownTarget(): number {
   // March 18, 2026 7pm PDT (DST starts March 8)
