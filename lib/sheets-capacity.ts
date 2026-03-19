@@ -60,7 +60,7 @@ export async function getCapacityFromSheet(): Promise<Record<string, number> | n
     const rows = (res.data.values ?? []) as string[][]
     const capacityByDateId: Record<string, number> = {}
     for (const row of rows) {
-      const dateId = (row[0] ?? '').trim()
+      const dateId = (row[0] ?? '').trim().toLowerCase()
       const cap = parseInt(String(row[1] ?? ''), 10)
       if (dateId && !isNaN(cap) && cap >= 0) {
         capacityByDateId[dateId] = cap

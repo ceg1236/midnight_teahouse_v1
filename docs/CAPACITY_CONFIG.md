@@ -8,7 +8,7 @@ Capacity (max tickets per date) can be edited from the admin page. No code deplo
 2. Adjust capacity per date
 3. Click **Save**
 
-On first save, a **Config** sheet tab is created in your spreadsheet (same spreadsheet as sales data). Columns: `DateId` | `Capacity`.
+On first save, a **Config** sheet tab is created in your spreadsheet (same spreadsheet as sales data). Columns: `DateId` | `Capacity`. DateIds are matched case-insensitively (e.g. `mar-18` or `Mar-18` both work).
 
 ## Fallback
 
