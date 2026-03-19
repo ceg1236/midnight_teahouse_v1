@@ -64,9 +64,21 @@ export async function getCapacityFromSheet(): Promise<Record<string, number> | n
       }
     }
     return Object.keys(capacityByDateId).length > 0 ? capacityByDateId : null
-  } catch {
+  } catch (err: unknown) {
+    console.error('[sheets-capacity] getCapacityFromSheet failed:', extractErrorMessage(err), err)
     return null
   }
+}
+
+/** Extract a useful error message from Google API or generic errors */
+function extractErrorMessage(err: unknown): string {
+  if (err instanceof Error) {
+    const g = err as Error & { response?: { data?: { error?: { message?: string } } }; errors?: Array<{ message?: string }> }
+    const apiMsg = g.response?.data?.error?.message ?? g.errors?.[0]?.message
+    if (apiMsg) return apiMsg
+    return err.message
+  }
+  return String(err)
 }
 
 /**
@@ -79,7 +91,12 @@ export async function writeCapacityToSheet(
   if (!spreadsheetId) return { ok: false, error: 'SPREADSHEET_ID not set' }
 
   const sheets = getSheetsClient()
-  if (!sheets) return { ok: false, error: 'Sheets not configured' }
+  if (!sheets) {
+    return {
+      ok: false,
+      error: 'Sheets not configured. Set GOOGLE_CREDENTIALS_JSON or GOOGLE_APPLICATION_CREDENTIALS.',
+    }
+  }
 
   try {
     const meta = await sheets.spreadsheets.get({ spreadsheetId })
@@ -116,8 +133,9 @@ export async function writeCapacityToSheet(
     })
 
     return { ok: true }
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err)
+  } catch (err: unknown) {
+    const msg = extractErrorMessage(err)
+    console.error('[sheets-capacity] writeCapacityToSheet failed:', msg, err)
     return { ok: false, error: msg }
   }
 }

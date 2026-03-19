@@ -12,16 +12,22 @@ import {
 import { eventDates } from '../../../../content/event-invite.config'
 
 export async function GET() {
-  const fromSheet = await getCapacityFromSheet()
-  const capacities = fromSheet ?? getDefaultCapacity()
+  try {
+    const fromSheet = await getCapacityFromSheet()
+    const capacities = fromSheet ?? getDefaultCapacity()
 
-  const dates = eventDates.map((d) => ({
-    dateId: d.id,
-    label: d.label,
-    capacity: capacities[d.id] ?? 45,
-  }))
+    const dates = eventDates.map((d) => ({
+      dateId: d.id,
+      label: d.label,
+      capacity: capacities[d.id] ?? 45,
+    }))
 
-  return NextResponse.json({ dates, fromSheet: !!fromSheet })
+    return NextResponse.json({ dates, fromSheet: !!fromSheet })
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error('[api/admin/capacity] GET failed:', msg, err)
+    return NextResponse.json({ error: msg }, { status: 500 })
+  }
 }
 
 export async function POST(req: NextRequest) {

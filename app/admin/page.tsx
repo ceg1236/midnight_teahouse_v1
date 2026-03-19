@@ -228,6 +228,7 @@ function LinkTab({ password }: { password: string }) {
 function CapacityTab({ password }: { password: string }) {
   const [capacities, setCapacities] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
   const [saved, setSaved] = useState(false)
@@ -236,17 +237,22 @@ function CapacityTab({ password }: { password: string }) {
   useEffect(() => {
     let cancelled = false
     async function load() {
+      setLoadError('')
       const res = await fetch('/api/admin/capacity')
       const data = await res.json()
-      if (!cancelled && res.ok) {
-        const cap: Record<string, number> = {}
-        for (const d of data.dates ?? []) {
-          cap[d.dateId] = d.capacity
+      if (!cancelled) {
+        setLoading(false)
+        if (res.ok) {
+          const cap: Record<string, number> = {}
+          for (const d of data.dates ?? []) {
+            cap[d.dateId] = d.capacity
+          }
+          setCapacities(cap)
+          setFromSheet(data.fromSheet ?? false)
+        } else {
+          setLoadError(data.error ?? `Load failed (${res.status})`)
         }
-        setCapacities(cap)
-        setFromSheet(data.fromSheet ?? false)
       }
-      setLoading(false)
     }
     load()
     return () => { cancelled = true }
@@ -277,9 +283,24 @@ function CapacityTab({ password }: { password: string }) {
     return <p className="text-[#D9D0BF]">Loading capacity…</p>
   }
 
+  if (loadError) {
+    return (
+      <div className="space-y-4">
+        <h1 className="text-xl font-semibold text-[#FAEBD4]">Capacity</h1>
+        <div className="rounded-lg border border-amber-400/50 bg-amber-950/30 px-4 py-3">
+          <p className="text-sm font-medium text-amber-300">Could not load capacity</p>
+          <p className="mt-1 text-sm text-amber-200/90">{loadError}</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       <h1 className="text-xl font-semibold text-[#FAEBD4]">Capacity</h1>
+      <p className="text-sm text-[#D9D0BF]/80">
+        Capacity is stored in a <strong>Config</strong> tab in the same spreadsheet as your payment data. Save creates the tab if it doesn&apos;t exist. Ensure the spreadsheet is shared with your service account email (Editor).
+      </p>
       {!fromSheet && (
         <p className="text-sm text-[#D9D0BF]/80">
           Using defaults from config. Save to create a Config sheet and override.
@@ -305,7 +326,13 @@ function CapacityTab({ password }: { password: string }) {
           </label>
         ))}
 
-        {saveError && <p className="text-sm text-red-300">{saveError}</p>}
+        {saveError && (
+          <div className="rounded-lg border border-red-400/50 bg-red-950/30 px-4 py-3">
+            <p className="text-sm font-medium text-red-300">Save failed</p>
+            <p className="mt-1 text-sm text-red-200/90">{saveError}</p>
+            <p className="mt-2 text-xs text-[#D9D0BF]/70">Check the terminal for more details.</p>
+          </div>
+        )}
 
         <button
           type="submit"
