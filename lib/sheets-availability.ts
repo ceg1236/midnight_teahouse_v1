@@ -6,6 +6,7 @@
 
 import { google } from 'googleapis'
 import { eventDates } from '../content/event-invite.config'
+import { getCapacityFromSheet, getDefaultCapacity } from './sheets-capacity'
 
 export type DateAvailability = {
   dateId: string
@@ -88,10 +89,10 @@ export async function getAvailability(): Promise<DateAvailability[] | null> {
       }
     }
 
+    const capacityByDateId = (await getCapacityFromSheet()) ?? getDefaultCapacity()
+
     return eventDates.map((d) => {
-      const capacity = typeof (d as { capacity?: number }).capacity === 'number'
-        ? (d as { capacity: number }).capacity
-        : 999
+      const capacity = capacityByDateId[d.id] ?? 999
       const sold = soldByLabel[d.label] ?? 0
       const soldOut = capacity > 0 && sold >= capacity
 

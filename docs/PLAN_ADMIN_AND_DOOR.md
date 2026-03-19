@@ -44,7 +44,7 @@ One unified flow for both use cases: admin override links and door sales. Same p
 
 ## 3. Admin Link Flow
 
-**Admin page:** `/admin/link` (protected)
+**Admin page:** `/admin` (protected) – Link and Capacity tabs
 
 **Options:**
 - **Specific date:** Pre-select date (and optionally tier) → guest gets pre-filled form
@@ -65,7 +65,7 @@ One unified flow for both use cases: admin override links and door sales. Same p
 1. **Token lib** (`lib/admin-token.ts`) – sign, verify, parse
 2. **Checkout API** – accept `ticket`, verify, skip capacity when valid
 3. **Main page** – read `?ticket=`, infer date for door, default tier, pass `ticket` to checkout
-4. **Admin link page** (`/admin/link`) – generate links, protected
+4. **Admin page** (`/admin`) – generate links, capacity settings; protected
 
 ---
 
@@ -77,7 +77,7 @@ One unified flow for both use cases: admin override links and door sales. Same p
 | `app/api/checkout/route.ts` | Add `ticket` param, skip capacity when valid |
 | `app/page.tsx` | Pass `ticket` from searchParams |
 | `app/components/carrd-style-page.tsx` | Accept `initialTicket`, `initialDate`, `initialTier`; infer date for door; default tier to Community; send `ticket` in checkout |
-| `app/admin/link/page.tsx` | New – form to generate links (protected) |
+| `app/admin/page.tsx` | Admin – Link tab (generate links), Capacity tab (edit capacity) |
 | `app/api/webhooks/stripe/route.ts` | Add `device: 'door'` to row when present |
 | `.env.example` | Add `ADMIN_LINK_SECRET` |
 

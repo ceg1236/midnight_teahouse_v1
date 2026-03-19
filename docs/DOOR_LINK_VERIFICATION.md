@@ -4,7 +4,7 @@
 
 To confirm door auto-date selection works:
 
-1. **Generate a door link** – Go to `/admin/link`, authenticate, check "Door (QR)", click Generate Link.
+1. **Generate a door link** – Go to `/admin`, authenticate, open the Link tab, check "Door (QR)", click Generate Link.
 2. **Open the link** (in an incognito window or different browser to avoid session state).
 3. **Expected behavior:**
    - You land directly on **step 3 (Complete Your Reservation)** – no "Reserve Your Seat" click.
