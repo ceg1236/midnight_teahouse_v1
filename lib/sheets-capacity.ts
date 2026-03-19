@@ -3,6 +3,7 @@
  * Config sheet: A=DateId, B=Capacity. Row 1 = header.
  */
 
+import path from 'path'
 import { google } from 'googleapis'
 import { eventDates } from '../content/event-invite.config'
 
@@ -20,7 +21,9 @@ function getSheetsClient() {
           scopes: ['https://www.googleapis.com/auth/spreadsheets'],
         }
       : {
-          keyFile: credentialsPath,
+          keyFile: path.isAbsolute(credentialsPath)
+            ? credentialsPath
+            : path.resolve(process.cwd(), credentialsPath),
           scopes: ['https://www.googleapis.com/auth/spreadsheets'],
         }
   )
@@ -73,8 +76,12 @@ export async function getCapacityFromSheet(): Promise<Record<string, number> | n
 /** Extract a useful error message from Google API or generic errors */
 function extractErrorMessage(err: unknown): string {
   if (err instanceof Error) {
-    const g = err as Error & { response?: { data?: { error?: { message?: string } } }; errors?: Array<{ message?: string }> }
-    const apiMsg = g.response?.data?.error?.message ?? g.errors?.[0]?.message
+    const g = err as Error & {
+      response?: { data?: { error?: { message?: string; errors?: Array<{ message?: string }> } } }
+      errors?: Array<{ message?: string }>
+    }
+    const apiErr = g.response?.data?.error
+    const apiMsg = apiErr?.message ?? apiErr?.errors?.[0]?.message ?? g.errors?.[0]?.message
     if (apiMsg) return apiMsg
     return err.message
   }
@@ -105,18 +112,27 @@ export async function writeCapacityToSheet(
     )
 
     if (!configSheet) {
-      await sheets.spreadsheets.batchUpdate({
-        spreadsheetId,
-        requestBody: {
-          requests: [
-            {
-              addSheet: {
-                properties: { title: CONFIG_SHEET_NAME },
+      try {
+        await sheets.spreadsheets.batchUpdate({
+          spreadsheetId,
+          requestBody: {
+            requests: [
+              {
+                addSheet: {
+                  properties: { title: CONFIG_SHEET_NAME },
+                },
               },
-            },
-          ],
-        },
-      })
+            ],
+          },
+        })
+      } catch (addErr: unknown) {
+        const msg = extractErrorMessage(addErr)
+        console.error('[sheets-capacity] addSheet failed:', msg, addErr)
+        return {
+          ok: false,
+          error: `Could not create Config tab: ${msg}. Ensure the spreadsheet is shared with your service account email (Editor). You can also create a tab named "Config" manually.`,
+        }
+      }
     }
 
     const dateIds = eventDates.map((d) => d.id)
