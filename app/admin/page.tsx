@@ -69,14 +69,14 @@ export default function AdminPage() {
         <button
           type="button"
           onClick={() => setTab('link')}
-          className={`px-4 py-2 text-lg font-medium -mb-3 border-b-2 transition-colors ${tab === 'link' ? 'text-[#FAEBD4] border-[#C4AF86]' : 'text-[#D9D0BF]/70 hover:text-[#D9D0BF] border-transparent'}`}
+          className={`px-4 py-2 text-lg font-medium -mb-3 border-b-[3px] transition-colors rounded-t-md ${tab === 'link' ? 'text-[#FAEBD4] border-[#C4AF86] bg-[#FAE0B9]/15' : 'text-[#D9D0BF]/70 hover:text-[#D9D0BF] border-transparent'}`}
         >
           Link
         </button>
         <button
           type="button"
           onClick={() => setTab('capacity')}
-          className={`px-4 py-2 text-lg font-medium -mb-3 border-b-2 transition-colors ${tab === 'capacity' ? 'text-[#FAEBD4] border-[#C4AF86]' : 'text-[#D9D0BF]/70 hover:text-[#D9D0BF] border-transparent'}`}
+          className={`px-4 py-2 text-lg font-medium -mb-3 border-b-[3px] transition-colors rounded-t-md ${tab === 'capacity' ? 'text-[#FAEBD4] border-[#C4AF86] bg-[#FAE0B9]/15' : 'text-[#D9D0BF]/70 hover:text-[#D9D0BF] border-transparent'}`}
         >
           Capacity
         </button>
