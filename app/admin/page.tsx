@@ -65,18 +65,18 @@ export default function AdminPage() {
         <span className="text-[#C4AF86]/70" aria-hidden>✶</span>
       </p>
 
-      <nav className="flex gap-4 mb-8 border-b border-[#FAE0B9]/30 pb-2">
+      <nav className="flex gap-6 mb-8 border-b border-[#FAE0B9]/30 pb-3">
         <button
           type="button"
           onClick={() => setTab('link')}
-          className={`text-sm font-medium ${tab === 'link' ? 'text-[#FAEBD4] border-b-2 border-[#C4AF86]' : 'text-[#D9D0BF]/70 hover:text-[#D9D0BF]'}`}
+          className={`px-4 py-2 text-lg font-medium -mb-3 border-b-2 transition-colors ${tab === 'link' ? 'text-[#FAEBD4] border-[#C4AF86]' : 'text-[#D9D0BF]/70 hover:text-[#D9D0BF] border-transparent'}`}
         >
           Link
         </button>
         <button
           type="button"
           onClick={() => setTab('capacity')}
-          className={`text-sm font-medium ${tab === 'capacity' ? 'text-[#FAEBD4] border-b-2 border-[#C4AF86]' : 'text-[#D9D0BF]/70 hover:text-[#D9D0BF]'}`}
+          className={`px-4 py-2 text-lg font-medium -mb-3 border-b-2 transition-colors ${tab === 'capacity' ? 'text-[#FAEBD4] border-[#C4AF86]' : 'text-[#D9D0BF]/70 hover:text-[#D9D0BF] border-transparent'}`}
         >
           Capacity
         </button>
