@@ -1,6 +1,7 @@
 /**
- * Read/write capacity per date from Google Sheet "Config" tab.
- * Config sheet: A=DateId, B=Capacity. Row 1 = header.
+ * Read capacity per date from Google Sheet "Config" tab.
+ * Config sheet: A=DateId, B=Capacity. Row 1 = header, data from row 2.
+ * Edit capacity directly in the sheet; no admin portal.
  */
 
 import path from 'path'
@@ -12,22 +13,25 @@ const CONFIG_SHEET_NAME = 'Config'
 function getSheetsClient() {
   const credentialsJson = process.env.GOOGLE_CREDENTIALS_JSON
   const credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS
-  if (!credentialsJson && !credentialsPath) return null
-
-  const auth = new google.auth.GoogleAuth(
-    credentialsJson
-      ? {
-          credentials: JSON.parse(credentialsJson) as object,
-          scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-        }
-      : {
-          keyFile: path.isAbsolute(credentialsPath)
-            ? credentialsPath
-            : path.resolve(process.cwd(), credentialsPath),
-          scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-        }
-  )
-  return google.sheets({ version: 'v4', auth })
+  if (credentialsJson) {
+    return google.sheets({
+      version: 'v4',
+      auth: new google.auth.GoogleAuth({
+        credentials: JSON.parse(credentialsJson) as object,
+        scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+      }),
+    })
+  }
+  if (!credentialsPath) return null
+  return google.sheets({
+    version: 'v4',
+    auth: new google.auth.GoogleAuth({
+      keyFile: path.isAbsolute(credentialsPath)
+        ? credentialsPath
+        : path.resolve(process.cwd(), credentialsPath),
+      scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+    }),
+  })
 }
 
 /** Default capacity from event-invite.config */
@@ -86,72 +90,4 @@ function extractErrorMessage(err: unknown): string {
     return err.message
   }
   return String(err)
-}
-
-/**
- * Write capacity to Config sheet. Creates sheet if missing.
- */
-export async function writeCapacityToSheet(
-  capacities: Record<string, number>
-): Promise<{ ok: boolean; error?: string }> {
-  const spreadsheetId = process.env.SPREADSHEET_ID
-  if (!spreadsheetId) return { ok: false, error: 'SPREADSHEET_ID not set' }
-
-  const sheets = getSheetsClient()
-  if (!sheets) {
-    return {
-      ok: false,
-      error: 'Sheets not configured. Set GOOGLE_CREDENTIALS_JSON or GOOGLE_APPLICATION_CREDENTIALS.',
-    }
-  }
-
-  try {
-    const meta = await sheets.spreadsheets.get({ spreadsheetId })
-    const configSheet = meta.data.sheets?.find(
-      (s) => (s.properties?.title ?? '').trim() === CONFIG_SHEET_NAME
-    )
-
-    if (!configSheet) {
-      try {
-        await sheets.spreadsheets.batchUpdate({
-          spreadsheetId,
-          requestBody: {
-            requests: [
-              {
-                addSheet: {
-                  properties: { title: CONFIG_SHEET_NAME },
-                },
-              },
-            ],
-          },
-        })
-      } catch (addErr: unknown) {
-        const msg = extractErrorMessage(addErr)
-        console.error('[sheets-capacity] addSheet failed:', msg, addErr)
-        return {
-          ok: false,
-          error: `Could not create Config tab: ${msg}. Ensure the spreadsheet is shared with your service account email (Editor). You can also create a tab named "Config" manually.`,
-        }
-      }
-    }
-
-    const dateIds = eventDates.map((d) => d.id)
-    const values: (string | number)[][] = [['DateId', 'Capacity']]
-    for (const id of dateIds) {
-      values.push([id, capacities[id] ?? 45])
-    }
-
-    await sheets.spreadsheets.values.update({
-      spreadsheetId,
-      range: `${CONFIG_SHEET_NAME}!A1:B${values.length}`,
-      valueInputOption: 'USER_ENTERED',
-      requestBody: { values },
-    })
-
-    return { ok: true }
-  } catch (err: unknown) {
-    const msg = extractErrorMessage(err)
-    console.error('[sheets-capacity] writeCapacityToSheet failed:', msg, err)
-    return { ok: false, error: msg }
-  }
 }

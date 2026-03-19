@@ -1,16 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { eventDates, eventTiers } from '../../content/event-invite.config'
-
-type Tab = 'link' | 'capacity'
 
 export default function AdminPage() {
   const [password, setPassword] = useState('')
   const [authenticated, setAuthenticated] = useState(false)
   const [authError, setAuthError] = useState('')
-  const [tab, setTab] = useState<Tab>('link')
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -65,30 +62,8 @@ export default function AdminPage() {
         <span className="text-[#C4AF86]/70" aria-hidden>✶</span>
       </p>
 
-      <nav className="flex gap-6 mb-8 border-b border-[#FAE0B9]/30 pb-3">
-        <button
-          type="button"
-          onClick={() => setTab('link')}
-          className={`px-4 py-2 text-lg font-medium -mb-3 border-b-[3px] transition-colors rounded-t-md ${tab === 'link' ? 'text-[#FAEBD4] border-[#C4AF86] bg-[#FAE0B9]/15' : 'text-[#D9D0BF]/70 hover:text-[#D9D0BF] border-transparent'}`}
-        >
-          Link
-        </button>
-        <button
-          type="button"
-          onClick={() => setTab('capacity')}
-          className={`px-4 py-2 text-lg font-medium -mb-3 border-b-[3px] transition-colors rounded-t-md ${tab === 'capacity' ? 'text-[#FAEBD4] border-[#C4AF86] bg-[#FAE0B9]/15' : 'text-[#D9D0BF]/70 hover:text-[#D9D0BF] border-transparent'}`}
-        >
-          Capacity
-        </button>
-      </nav>
-
       <div className="w-full max-w-md">
-        {tab === 'link' && (
-          <LinkTab password={password} />
-        )}
-        {tab === 'capacity' && (
-          <CapacityTab password={password} />
-        )}
+        <LinkTab password={password} />
       </div>
     </div>
   )
@@ -225,123 +200,3 @@ function LinkTab({ password }: { password: string }) {
   )
 }
 
-function CapacityTab({ password }: { password: string }) {
-  const [capacities, setCapacities] = useState<Record<string, number>>({})
-  const [loading, setLoading] = useState(true)
-  const [loadError, setLoadError] = useState('')
-  const [saving, setSaving] = useState(false)
-  const [saveError, setSaveError] = useState('')
-  const [saved, setSaved] = useState(false)
-  const [fromSheet, setFromSheet] = useState(false)
-
-  useEffect(() => {
-    let cancelled = false
-    async function load() {
-      setLoadError('')
-      const res = await fetch('/api/admin/capacity')
-      const data = await res.json()
-      if (!cancelled) {
-        setLoading(false)
-        if (res.ok) {
-          const cap: Record<string, number> = {}
-          for (const d of data.dates ?? []) {
-            cap[d.dateId] = d.capacity
-          }
-          setCapacities(cap)
-          setFromSheet(data.fromSheet ?? false)
-        } else {
-          setLoadError(data.error ?? `Load failed (${res.status})`)
-        }
-      }
-    }
-    load()
-    return () => { cancelled = true }
-  }, [])
-
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSaveError('')
-    setSaved(false)
-    setSaving(true)
-    const res = await fetch('/api/admin/capacity', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password, capacities }),
-    })
-    const data = await res.json()
-    setSaving(false)
-    if (res.ok) {
-      setSaved(true)
-      setFromSheet(true)
-      setTimeout(() => setSaved(false), 2000)
-    } else {
-      setSaveError(data.error ?? 'Failed to save')
-    }
-  }
-
-  if (loading) {
-    return <p className="text-[#D9D0BF]">Loading capacity…</p>
-  }
-
-  if (loadError) {
-    return (
-      <div className="space-y-4">
-        <h1 className="text-xl font-semibold text-[#FAEBD4]">Capacity</h1>
-        <div className="rounded-lg border border-amber-400/50 bg-amber-950/30 px-4 py-3">
-          <p className="text-sm font-medium text-amber-300">Could not load capacity</p>
-          <p className="mt-1 text-sm text-amber-200/90">{loadError}</p>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="space-y-6">
-      <h1 className="text-xl font-semibold text-[#FAEBD4]">Capacity</h1>
-      <p className="text-sm text-[#D9D0BF]/80">
-        Capacity is stored in a <strong>Config</strong> tab in the same spreadsheet as your payment data. Save creates the tab if it doesn&apos;t exist. Ensure the spreadsheet is shared with your service account email (Editor).
-      </p>
-      {!fromSheet && (
-        <p className="text-sm text-[#D9D0BF]/80">
-          Using defaults from config. Save to create a Config sheet and override.
-        </p>
-      )}
-
-      <form onSubmit={handleSave} className="space-y-4">
-        {eventDates.map((d) => (
-          <label key={d.id} className="flex items-center justify-between gap-4">
-            <span className="text-sm text-[#D9D0BF]">{d.label}</span>
-            <input
-              type="number"
-              min={0}
-              value={capacities[d.id] ?? 45}
-              onChange={(e) =>
-                setCapacities((prev) => ({
-                  ...prev,
-                  [d.id]: parseInt(e.target.value, 10) || 0,
-                }))
-              }
-              className="w-20 rounded-lg border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-3 py-2 text-[#FAEBD4] text-right focus:border-[#FAE0B9] focus:outline-none"
-            />
-          </label>
-        ))}
-
-        {saveError && (
-          <div className="rounded-lg border border-red-400/50 bg-red-950/30 px-4 py-3">
-            <p className="text-sm font-medium text-red-300">Save failed</p>
-            <p className="mt-1 text-sm text-red-200/90">{saveError}</p>
-            <p className="mt-2 text-xs text-[#D9D0BF]/70">Check the terminal for more details.</p>
-          </div>
-        )}
-
-        <button
-          type="submit"
-          disabled={saving}
-          className="carrd-btn px-6 py-2 disabled:opacity-50"
-        >
-          {saving ? 'Saving…' : saved ? 'Saved!' : 'Save'}
-        </button>
-      </form>
-    </div>
-  )
-}
