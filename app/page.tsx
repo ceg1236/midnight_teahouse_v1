@@ -55,14 +55,8 @@ export default async function Page({
           </p>
         </div>
 
-        <div className="flex w-full max-w-sm flex-col gap-4 sm:flex-row sm:justify-center">
-          <Link href="/invite" className="carrd-btn px-8 py-4 text-center text-lg">
-            Tickets &amp; reservations
-          </Link>
-          <Link
-            href="/our-story"
-            className="inline-flex items-center justify-center rounded-lg border border-[#FAE0B9]/50 px-8 py-4 text-lg text-[#FAEBD4] transition-colors hover:border-[#FAE0B9] hover:bg-[#FAE0B9]/10"
-          >
+        <div className="flex justify-center">
+          <Link href="/our-story" className="carrd-btn px-8 py-4 text-center text-lg">
             Our story
           </Link>
         </div>
