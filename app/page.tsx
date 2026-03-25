@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import { HeroVideo } from './components/hero-video'
 import { SiteFooter } from './components/site-footer'
 
 export const dynamic = 'force-dynamic'
@@ -30,7 +31,7 @@ export default async function Page({
 
   return (
     <div className="carrd-page flex min-h-[100dvh] flex-col items-center px-6 pt-24 pb-12 md:min-h-screen md:pt-28">
-      <div className="mx-auto flex w-full max-w-xl flex-col items-center gap-10 text-center">
+      <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-10 text-center">
         <div>
           <p className="font-cursive text-xl text-[#C4AF86]/90 mb-4">✶</p>
           <h1 className="carrd-font-heading text-3xl md:text-4xl [font-variant:small-caps] text-[#FAEBD4] tracking-wide">
@@ -39,6 +40,12 @@ export default async function Page({
           <p className="carrd-font-subtitle mt-3 text-sm italic text-[#D9D0BF]/90">
             an enchanted world hidden in San Francisco
           </p>
+        </div>
+
+        <div className="carrd-video-fade w-full max-w-[650px] overflow-hidden py-2">
+          <div className="aspect-video overflow-hidden rounded-lg">
+            <HeroVideo className="h-full w-full object-cover" />
+          </div>
         </div>
 
         <div className="carrd-font-body space-y-4 text-lg leading-relaxed text-[#FAEBD4]">
