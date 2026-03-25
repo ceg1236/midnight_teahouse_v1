@@ -34,7 +34,7 @@ function GatheringsContent() {
           </div>
         </div>
         <Link
-          href="/"
+          href="/invite"
           className="carrd-btn px-10 py-4 font-inherit text-xl"
         >
           Reserve Your Seat

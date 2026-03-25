@@ -1,48 +1,67 @@
-import { CarrdStylePage } from './components/carrd-style-page'
-import { getEventInviteContent } from '../content/parse'
-import { eventDates, eventTiers } from '../content/event-invite.config'
-import { getAvailability, getMockAvailability } from '../lib/sheets-availability'
+import Link from 'next/link'
+import { redirect } from 'next/navigation'
+import { SiteFooter } from './components/site-footer'
 
 export const dynamic = 'force-dynamic'
 
-/** Unix timestamp for first event at 7pm Pacific (March 18, 2026) */
-function getCountdownTarget(): number {
-  // March 18, 2026 7pm PDT (DST starts March 8)
-  const d = new Date('2026-03-18T19:00:00-07:00')
-  return Math.floor(d.getTime() / 1000)
+function firstString(v: string | string[] | undefined): string | undefined {
+  if (v == null) return undefined
+  return Array.isArray(v) ? v[0] : v
 }
 
+/**
+ * Marketing home. Full reservation flow lives at /invite.
+ * Legacy ?ticket= and (dev) ?mock= on / redirect to /invite.
+ */
 export default async function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ mock?: string; ticket?: string }>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
-  const welcomeContent = getEventInviteContent()
-  const countdownTarget = getCountdownTarget()
   const params = await searchParams
-
-  let availability: Awaited<ReturnType<typeof getAvailability>>
-  if (process.env.NODE_ENV === 'development' && params.mock?.startsWith('soldOut:')) {
-    const ids = params.mock.replace('soldOut:', '').split(',').map((s) => s.trim()).filter(Boolean)
-    availability = getMockAvailability(ids)
-  } else {
-    availability = await getAvailability()
+  const ticket = firstString(params.ticket)
+  const mock = firstString(params.mock)
+  const qs = new URLSearchParams()
+  if (ticket) qs.set('ticket', ticket)
+  if (process.env.NODE_ENV === 'development' && mock) qs.set('mock', mock)
+  if (qs.toString()) {
+    redirect(`/invite?${qs.toString()}`)
   }
 
-  const soldOutByDateId: Record<string, boolean> = {}
-  if (availability) {
-    for (const a of availability) {
-      soldOutByDateId[a.dateId] = a.soldOut
-    }
-  }
   return (
-    <CarrdStylePage
-      welcomeContent={welcomeContent}
-      dates={eventDates}
-      tiers={eventTiers}
-      countdownTarget={countdownTarget}
-      soldOutByDateId={soldOutByDateId}
-      initialTicket={params.ticket ?? undefined}
-    />
+    <div className="carrd-page flex min-h-[100dvh] flex-col items-center px-6 pt-24 pb-12 md:min-h-screen md:pt-28">
+      <div className="mx-auto flex w-full max-w-xl flex-col items-center gap-10 text-center">
+        <div>
+          <p className="font-cursive text-xl text-[#C4AF86]/90 mb-4">✶</p>
+          <h1 className="carrd-font-heading text-3xl md:text-4xl [font-variant:small-caps] text-[#FAEBD4] tracking-wide">
+            Midnight Teahouse
+          </h1>
+          <p className="carrd-font-subtitle mt-3 text-sm italic text-[#D9D0BF]/90">
+            an enchanted world hidden in San Francisco
+          </p>
+        </div>
+
+        <div className="carrd-font-body space-y-4 text-lg leading-relaxed text-[#FAEBD4]">
+          <p>
+            We host curated evenings of gongfu tea, live music, and good company — a monthly pop-up
+            while we grow toward a permanent home.
+          </p>
+        </div>
+
+        <div className="flex w-full max-w-sm flex-col gap-4 sm:flex-row sm:justify-center">
+          <Link href="/invite" className="carrd-btn px-8 py-4 text-center text-lg">
+            Tickets &amp; reservations
+          </Link>
+          <Link
+            href="/our-story"
+            className="inline-flex items-center justify-center rounded-lg border border-[#FAE0B9]/50 px-8 py-4 text-lg text-[#FAEBD4] transition-colors hover:border-[#FAE0B9] hover:bg-[#FAE0B9]/10"
+          >
+            Our story
+          </Link>
+        </div>
+      </div>
+
+      <SiteFooter variant="main" className="mt-auto pt-16" />
+    </div>
   )
 }

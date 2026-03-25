@@ -46,7 +46,7 @@ export function Navbar() {
   const pathname = usePathname()
   const { theme, setTheme } = useTheme()
   const { titleRef, openTitleModal, titleModalOpen } = useTitleModal()
-  const isCarrdHome = pathname === '/'
+  const isCarrdHome = pathname === '/' || pathname === '/invite'
 
   return (
     <nav
@@ -74,7 +74,7 @@ export function Navbar() {
           </span>
         </button>
         <Link
-          href="/"
+          href="/invite"
           className={`nav-link-hover font-cursive text-lg ${isCarrdHome ? 'text-[#FAE0B9]' : 'text-[#f8f6f2]'}`}
         >
           {/* reservations */}

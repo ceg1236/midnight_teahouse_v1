@@ -31,7 +31,7 @@ One unified flow for both use cases: admin override links and door sales. Same p
 **URL:** `https://site.com/invite?ticket=eyJ...` (door token)
 
 **Flow:**
-1. Guest scans QR → lands on main invite page with `?ticket=...`
+1. Guest scans QR → lands on `/invite` with `?ticket=...`
 2. **Date:** Inferred from today (Wed/Thu/Fri). Fallback: first night if no match.
 3. **Tier:** Defaults to Community. Guest can change.
 4. Guest enters name, email → pays
