@@ -32,8 +32,7 @@ Goal: `/` is a general Midnight Teahouse homepage (no past “Crossing into Spri
 
 ## Phase 3 — Stripe & ops
 
-- [ ] **Checkout success URL**  
-  - `app/api/checkout/route.ts`: confirm `success_url` still points to `/invite/success?...` (or update if you move success).
+- [x] **Checkout success URL** — Still `.../invite/success?session_id=...` (unchanged).
 
 - [ ] **Stripe Dashboard**  
   - If any redirect URLs were manually set to `/`, update to `/invite` where appropriate.
