@@ -33,7 +33,6 @@ export default async function Page({
     <div className="carrd-page flex min-h-[100dvh] flex-col items-center px-6 pt-24 pb-12 md:min-h-screen md:pt-28">
       <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-10 text-center">
         <div>
-          <p className="font-cursive text-xl text-[#C4AF86]/90 mb-4">✶</p>
           <h1 className="carrd-font-heading text-3xl md:text-4xl [font-variant:small-caps] text-[#FAEBD4] tracking-wide">
             Midnight Teahouse
           </h1>
