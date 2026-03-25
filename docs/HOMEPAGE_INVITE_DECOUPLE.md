@@ -56,6 +56,10 @@ Goal: `/` is a general Midnight Teahouse homepage (no past “Crossing into Spri
 - [ ] Archive page: static route for “Crossing into Spring” recap (no checkout).
 - [ ] `NEXT_PUBLIC_TICKETING_ENABLED` or feature flag to hide CTA to `/invite` without removing the route.
 
+### Later (does not block Phase 1)
+
+- **Past events section:** e.g. `/events` list + per-event pages (or MDX). Homepage can link there when ready; keep **live ticketing** on `/invite` (or a future `/events/current`) so marketing URLs stay stable.
+
 ---
 
 ## Verify before merge
