@@ -36,7 +36,7 @@ function getSheetsClient() {
 }
 
 /**
- * Return mock availability for UI testing. Use with ?mock=soldOut:mar-18,mar-19
+ * Return mock availability for UI testing. Use with /invite?mock=soldOut:mar-18,mar-19 (dev only)
  */
 export function getMockAvailability(soldOutDateIds: string[]): DateAvailability[] {
   return eventDates.map((d) => {

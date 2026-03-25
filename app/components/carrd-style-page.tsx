@@ -6,6 +6,7 @@ import { CountdownTimer } from './countdown-timer'
 import type { eventDates, eventTiers } from '../../content/event-invite.config'
 import { decodeTokenPayload } from '../../lib/admin-token-decode'
 import { resolveDoorDate } from '../../lib/door-date'
+import { HeroVideo } from './hero-video'
 import { SiteFooter } from './site-footer'
 
 const STORAGE_KEY = 'teahouse_reservation'
@@ -32,48 +33,6 @@ const BOOKING_NOTES: Array<string | React.ReactNode> = [
   "Unfortunately, we don't offer refunds or exchanges for future events.",
   <>If you have any questions about the reservation, please <a href="mailto:midnight.teahouse.sf@gmail.com" className="text-[#FAE0B9] underline hover:underline focus:outline-none focus:underline">send us an email</a>.</>,
 ]
-
-/** Video that autoplays when visible - fixes iOS Safari, Chrome iOS, Firefox Android first-load */
-function HeroVideo({ className }: { className?: string }) {
-  const videoRef = useRef<HTMLVideoElement>(null)
-  useEffect(() => {
-    const video = videoRef.current
-    if (!video) return
-    const tryPlay = () => video.play().catch(() => {})
-    // Try play when visible (Intersection Observer)
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting) tryPlay()
-      },
-      { threshold: 0.01, rootMargin: '100px' }
-    )
-    observer.observe(video)
-    // Try play on mount (video may already be in view) and when loaded
-    const t = setTimeout(tryPlay, 150)
-    video.addEventListener('loadeddata', tryPlay)
-    video.addEventListener('canplay', tryPlay)
-    return () => {
-      clearTimeout(t)
-      observer.disconnect()
-      video.removeEventListener('loadeddata', tryPlay)
-      video.removeEventListener('canplay', tryPlay)
-    }
-  }, [])
-  return (
-    <video
-      ref={videoRef}
-      autoPlay
-      loop
-      muted
-      playsInline
-      preload="auto"
-      className={className}
-    >
-      <source src="/images/midnight_site_vid_hi_res.mp4" type="video/mp4" />
-      <source src="/images/midnight_site_vid_hi_res.mov" type="video/quicktime" />
-    </video>
-  )
-}
 
 function scrollToSection(ref: React.RefObject<HTMLElement | null>) {
   const el = ref.current

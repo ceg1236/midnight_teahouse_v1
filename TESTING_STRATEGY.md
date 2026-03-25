@@ -74,6 +74,6 @@ Preview sold-out date cards without hitting real capacity:
 
 | URL | What you see |
 |-----|--------------|
-| `http://localhost:3000/?mock=soldOut:mar-18` | Wednesday sold out |
-| `http://localhost:3000/?mock=soldOut:mar-18,mar-19` | Wednesday and Thursday sold out |
-| `http://localhost:3000/?mock=soldOut:mar-18,mar-19,mar-20` | All dates sold out |
+| `http://localhost:3000/invite?mock=soldOut:mar-18` | Wednesday sold out |
+| `http://localhost:3000/invite?mock=soldOut:mar-18,mar-19` | Wednesday and Thursday sold out |
+| `http://localhost:3000/invite?mock=soldOut:mar-18,mar-19,mar-20` | All dates sold out |

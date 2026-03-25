@@ -115,10 +115,10 @@ function InviteSuccessContent() {
             Add to Google Calendar
           </a>
           <Link
-            href="/"
+            href="/invite"
             className="carrd-btn px-10 py-4 font-inherit text-xl"
           >
-            Back to Invite
+            Back to reservation
           </Link>
         </div>
       </div>
