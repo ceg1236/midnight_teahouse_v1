@@ -9,6 +9,13 @@ import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { baseUrl } from './sitemap'
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover' as const,
+  themeColor: '#2E0303',
+}
+
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
@@ -45,9 +52,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className="text-foreground bg-background"
+      className="scroll-smooth bg-[#2E0303] text-foreground antialiased"
     >
-      <body className="antialiased">
+      <body className="min-h-[100dvh] bg-[#2E0303] antialiased">
         <div id="root">
           <ThemeProvider>
             <TitleModalProvider titleContent={getTitleModalContent()}>

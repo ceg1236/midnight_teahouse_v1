@@ -30,9 +30,9 @@ export default async function Page({
   }
 
   return (
-    <div className="carrd-page min-h-[100dvh] text-[#e8e0d5] md:min-h-screen">
-      {/* Top nav */}
-      <nav className="relative z-50 mx-auto flex max-w-[780px] items-center justify-between border-b border-[rgba(232,224,213,0.12)] bg-[#2E0303]/90 px-4 py-4 text-sm tracking-[0.12em] uppercase backdrop-blur-sm md:bg-transparent md:px-6 md:py-5 md:backdrop-blur-none">
+    <div className="carrd-page min-h-[100dvh] text-[#e8e0d5] max-md:pt-[calc(3.5rem+env(safe-area-inset-top,0px))] md:min-h-screen md:pt-0">
+      {/* Top nav — fixed on mobile (escapes stacking / overflow); in-flow on md */}
+      <nav className="z-[300] mx-auto flex w-full max-w-[780px] items-center justify-between border-b border-[rgba(232,224,213,0.12)] bg-[#2E0303] px-4 py-3 text-sm tracking-[0.12em] uppercase max-md:fixed max-md:left-0 max-md:right-0 max-md:top-0 max-md:z-[300] max-md:max-w-none max-md:pt-[env(safe-area-inset-top,0px)] max-md:pb-3 md:relative md:top-auto md:z-50 md:bg-transparent md:px-6 md:py-5 md:pt-5">
         <Link
           href="/"
           className="font-serif text-lg font-light tracking-[0.12em] text-[#e8e0d5] md:text-xl"
@@ -70,7 +70,7 @@ export default async function Page({
 
         {/* Mobile nav — hamburger + solid panel */}
         <details className="group relative md:hidden">
-          <summary className="flex h-11 w-11 cursor-pointer list-none items-center justify-center rounded-md border border-[rgba(232,224,213,0.35)] bg-[rgba(46,3,3,0.35)] text-[#e8e0d5] [&::-webkit-details-marker]:hidden">
+          <summary className="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded border border-[rgba(232,224,213,0.2)] bg-[#2E0303] text-[#e8e0d5] [&::-webkit-details-marker]:hidden">
             <span className="sr-only">Open menu</span>
             <span className="flex w-5 flex-col gap-1.5" aria-hidden>
               <span className="h-0.5 w-full rounded-full bg-current" />
@@ -78,7 +78,7 @@ export default async function Page({
               <span className="h-0.5 w-full rounded-full bg-current" />
             </span>
           </summary>
-          <div className="absolute right-0 z-[100] mt-2 w-[min(100vw-2rem,17rem)] overflow-hidden rounded-xl border border-[rgba(232,224,213,0.25)] bg-[#1a0808] py-2 text-base shadow-2xl">
+          <div className="fixed left-3 right-3 top-[calc(3.5rem+env(safe-area-inset-top,0px)+0.25rem)] z-[500] overflow-hidden rounded-lg border border-[rgba(232,224,213,0.15)] bg-[#1a0808] py-2 text-base shadow-[0_16px_48px_rgba(0,0,0,0.65)] md:hidden">
             <a
               href="#gatherings"
               className="flex min-h-[3.25rem] items-center border-b border-[rgba(232,224,213,0.08)] px-5 font-medium text-[#ebe4d6] active:bg-[rgba(232,224,213,0.08)]"
@@ -125,7 +125,7 @@ export default async function Page({
           <div className="relative z-10 px-6 py-8 md:pointer-events-none md:absolute md:inset-0 md:flex md:items-center md:justify-center md:py-16">
             <div className="pointer-events-auto w-full max-w-xl rounded-sm border border-[rgba(232,224,213,0.12)] bg-[rgba(20,8,8,0.72)] px-5 py-7 shadow-[0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-[6px] md:bg-[rgba(20,8,8,0.55)] md:px-7 md:py-9">
               <p className="mb-4 text-xs uppercase tracking-[0.18em] text-[rgba(248,242,232,0.95)] [text-shadow:0_1px_2px_rgba(0,0,0,0.85),0_0_20px_rgba(0,0,0,0.4)] md:text-sm">
-                San Francisco · Teahouse
+                San Francisco based Teahouse
               </p>
               <h1 className="mb-5 max-w-[18ch] font-serif text-[3rem] font-light italic leading-[1.08] text-[#faf6ef] [text-shadow:0_2px_4px_rgba(0,0,0,0.9),0_0_28px_rgba(0,0,0,0.55)] md:mb-6 md:text-[4.25rem] md:leading-[1.06]">
                 an enchanted world
