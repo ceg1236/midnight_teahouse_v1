@@ -152,7 +152,7 @@ export default async function Page({
           id="gatherings"
           className="border-b border-[rgba(232,224,213,0.08)] px-6 py-10"
         >
-          <h2 className="mb-8 font-serif text-xl font-normal tracking-[0.14em] text-[#f2ebe0] md:text-2xl md:tracking-[0.12em]">
+          <h2 className="mb-8 font-sans text-sm font-light uppercase tracking-[0.2em] text-[rgba(232,224,213,0.55)] md:mb-9 md:text-base md:tracking-[0.18em]">
             Upcoming gatherings
           </h2>
 
@@ -267,48 +267,9 @@ export default async function Page({
             </span>
           </div>
 
-          <div className="mt-8 grid gap-3 md:grid-cols-3">
-            <div className="rounded border border-[rgba(180,140,110,0.2)] bg-[rgba(180,140,110,0.05)] p-5 text-center">
-              <div className="mb-2 text-[18px] text-[#c9a87a]">◷</div>
-              <div className="mb-3 text-sm leading-relaxed text-[rgba(210,185,150,0.75)] md:text-base md:leading-7">
-                Book a 15-minute call and we&apos;ll figure out the details together.
-              </div>
-              <a
-                href="#"
-                className="inline-block rounded border border-[rgba(180,140,110,0.45)] bg-[rgba(180,140,110,0.15)] px-4 py-2.5 text-xs uppercase tracking-[0.1em] text-[#d4b896] md:text-sm"
-              >
-                Schedule a call
-              </a>
-            </div>
-            <div className="rounded border border-[rgba(180,140,110,0.2)] bg-[rgba(180,140,110,0.05)] p-5 text-center">
-              <div className="mb-2 text-[18px] text-[#c9a87a]">✉</div>
-              <div className="mb-3 text-sm leading-relaxed text-[rgba(210,185,150,0.75)] md:text-base md:leading-7">
-                Prefer to write? Send us a note and we&apos;ll follow up soon.
-              </div>
-              <a
-                href="mailto:hello@midnighttea.house"
-                className="inline-block rounded border border-[rgba(180,140,110,0.35)] bg-transparent px-4 py-2.5 text-xs uppercase tracking-[0.1em] text-[rgba(220,195,160,0.85)] md:text-sm"
-              >
-                Send an email
-              </a>
-            </div>
-            <div className="rounded border border-[rgba(180,140,110,0.2)] bg-[rgba(180,140,110,0.05)] p-5 text-center">
-              <div className="mb-2 text-[18px] text-[#c9a87a]">✦</div>
-              <div className="mb-3 text-sm leading-relaxed text-[rgba(210,185,150,0.75)] md:text-base md:leading-7">
-                Share a few details and we&apos;ll reach out with a quote.
-              </div>
-              <a
-                href="#home-inquiry"
-                className="inline-block rounded border border-[rgba(180,140,110,0.35)] bg-transparent px-4 py-2.5 text-xs uppercase tracking-[0.1em] text-[rgba(220,195,160,0.85)] md:text-sm"
-              >
-                Fill out the form
-              </a>
-            </div>
-          </div>
-
           <p
             id="home-inquiry"
-            className="mt-8 mb-6 text-center text-xs uppercase tracking-[0.18em] text-[rgba(200,175,140,0.55)] md:text-sm"
+            className="mt-10 mb-6 text-center text-xs uppercase tracking-[0.18em] text-[rgba(200,175,140,0.55)] md:text-sm"
           >
             or tell us about your event
           </p>
@@ -376,7 +337,7 @@ export default async function Page({
           id="our-story"
           className="border-b border-[rgba(232,224,213,0.08)] px-6 py-11"
         >
-          <h2 className="mb-6 font-serif text-xl font-normal tracking-[0.14em] text-[#f2ebe0] md:text-2xl md:tracking-[0.12em]">
+          <h2 className="mb-6 font-sans text-sm font-light uppercase tracking-[0.2em] text-[rgba(232,224,213,0.55)] md:mb-7 md:text-base md:tracking-[0.18em]">
             Our story
           </h2>
           <p className="mb-4 max-w-[32rem] text-base leading-8 text-[rgba(232,224,213,0.68)] md:text-lg md:leading-relaxed">
