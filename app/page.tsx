@@ -102,13 +102,16 @@ export default async function Page({
       </nav>
 
       <main className="mx-auto max-w-[780px]">
-        {/* Hero — full-bleed video behind headline; object-contain shows full frame */}
+        {/* Hero — video ~70% scale (proper ratio); copy on a light scrim for legibility */}
         <section
           id="top"
-          className="relative left-1/2 w-screen -translate-x-1/2 overflow-hidden border-b border-[rgba(232,224,213,0.1)] min-h-[58vh] md:min-h-[min(85vh,56.25vw)]"
+          className="relative left-1/2 w-screen -translate-x-1/2 overflow-hidden border-b border-[rgba(232,224,213,0.1)] min-h-[48vh] md:min-h-[min(68vh,39.375vw)]"
         >
           <div className="absolute inset-0 z-0 flex items-center justify-center bg-[#2E0303]">
-            <HeroVideo className="h-full w-full max-h-full max-w-full object-contain object-center" />
+            {/* Inset ~15% each side ≈ 70% linear size while keeping aspect ratio */}
+            <div className="flex h-full w-full items-center justify-center px-[15%] py-[14%] md:px-[18%] md:py-[16%]">
+              <HeroVideo className="max-h-full max-w-full object-contain object-center" />
+            </div>
           </div>
           <div
             className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-[#2E0303]/40 via-[#2E0303]/20 to-[#2E0303]/45"
@@ -118,32 +121,34 @@ export default async function Page({
             className="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_90%_75%_at_50%_40%,transparent_35%,rgba(46,3,3,0.35)_100%)]"
             aria-hidden
           />
-          <div className="relative z-10 mx-auto max-w-[780px] px-6 pb-14 pt-16 md:pb-16 md:pt-20">
-            <p className="mb-5 text-[10px] uppercase tracking-[0.22em] text-[rgba(240,232,221,0.82)] drop-shadow-[0_1px_12px_rgba(0,0,0,0.45)]">
-              San Francisco · By reservation
-            </p>
-            <h1 className="mb-6 max-w-[20ch] font-serif text-[40px] font-light italic leading-tight text-[#f0e8dd] drop-shadow-[0_2px_24px_rgba(0,0,0,0.5)] md:text-[56px]">
-              an enchanted world
-              <br />
-              hidden in the city
-            </h1>
-            <p className="mb-8 max-w-[460px] text-sm leading-7 text-[rgba(240,232,221,0.88)] drop-shadow-[0_1px_16px_rgba(0,0,0,0.45)]">
-              We host intimate, curated gatherings around gong-fu tea, live music and gentle, creative
-              play.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href="/invite"
-                className="inline-flex items-center justify-center border border-[rgba(180,140,110,0.5)] bg-[rgba(46,3,3,0.45)] px-6 py-2 text-[11px] font-normal uppercase tracking-[0.1em] text-[#e8d4b8] backdrop-blur-[2px]"
-              >
-                Reserve Your Seat
-              </Link>
-              <Link
-                href="/our-story"
-                className="inline-flex items-center justify-center border border-[rgba(232,224,213,0.35)] bg-[rgba(46,3,3,0.25)] px-6 py-2 text-[11px] font-normal uppercase tracking-[0.1em] text-[rgba(240,232,221,0.92)] backdrop-blur-[2px]"
-              >
-                Our story
-              </Link>
+          <div className="relative z-10 mx-auto max-w-[780px] px-6 pb-12 pt-14 md:pb-14 md:pt-20">
+            <div className="max-w-xl rounded-sm border border-[rgba(232,224,213,0.12)] bg-[rgba(20,8,8,0.55)] px-5 py-7 shadow-[0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-[6px] md:px-7 md:py-9">
+              <p className="mb-4 text-[11px] uppercase tracking-[0.2em] text-[rgba(248,242,232,0.92)] [text-shadow:0_1px_2px_rgba(0,0,0,0.85),0_0_20px_rgba(0,0,0,0.4)] md:text-xs">
+                San Francisco · By reservation
+              </p>
+              <h1 className="mb-5 max-w-[18ch] font-serif text-[2.75rem] font-light italic leading-[1.08] text-[#faf6ef] [text-shadow:0_2px_4px_rgba(0,0,0,0.9),0_0_28px_rgba(0,0,0,0.55)] md:mb-6 md:text-[4rem] md:leading-[1.06]">
+                an enchanted world
+                <br />
+                hidden in the city
+              </h1>
+              <p className="mb-8 max-w-[28rem] text-base leading-relaxed text-[rgba(248,242,232,0.95)] [text-shadow:0_1px_3px_rgba(0,0,0,0.88)] md:text-lg md:leading-8">
+                We host intimate, curated gatherings around gong-fu tea, live music and gentle, creative
+                play.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  href="/invite"
+                  className="inline-flex items-center justify-center border border-[rgba(180,140,110,0.55)] bg-[rgba(46,3,3,0.55)] px-7 py-2.5 text-xs font-normal uppercase tracking-[0.1em] text-[#f5ead8] backdrop-blur-sm md:px-8 md:text-[13px]"
+                >
+                  Reserve Your Seat
+                </Link>
+                <Link
+                  href="/our-story"
+                  className="inline-flex items-center justify-center border border-[rgba(232,224,213,0.4)] bg-[rgba(46,3,3,0.35)] px-7 py-2.5 text-xs font-normal uppercase tracking-[0.1em] text-[rgba(248,242,232,0.96)] backdrop-blur-sm md:px-8 md:text-[13px]"
+                >
+                  Our story
+                </Link>
+              </div>
             </div>
           </div>
         </section>
