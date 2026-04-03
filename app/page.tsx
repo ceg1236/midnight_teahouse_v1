@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { HeroVideo } from './components/hero-video'
+import { HomeSiteHeader } from './components/home-site-header'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,76 +31,8 @@ export default async function Page({
   }
 
   return (
-    <div className="carrd-page min-h-[100dvh] text-[#e8e0d5] max-md:pt-[calc(3.5rem+env(safe-area-inset-top,0px))] md:min-h-screen md:pt-0">
-      {/* Top nav — fixed on mobile (escapes stacking / overflow); in-flow on md */}
-      <nav className="z-[300] mx-auto flex w-full max-w-[780px] items-center justify-between border-b border-[rgba(232,224,213,0.12)] bg-[#2E0303] px-4 py-3 text-sm tracking-[0.12em] uppercase max-md:fixed max-md:left-0 max-md:right-0 max-md:top-0 max-md:z-[300] max-md:max-w-none max-md:pt-[env(safe-area-inset-top,0px)] max-md:pb-3 md:relative md:top-auto md:z-50 md:bg-transparent md:px-6 md:py-5 md:pt-5">
-        <Link
-          href="/"
-          className="font-serif text-lg font-light tracking-[0.12em] text-[#e8e0d5] md:text-xl"
-        >
-          Midnight Teahouse
-        </Link>
-
-        {/* Desktop nav */}
-        <ul className="hidden list-none gap-8 md:flex">
-          <li>
-            <a
-              href="#gatherings"
-              className="text-[13px] tracking-[0.14em] text-[rgba(232,224,213,0.65)] transition-colors hover:text-[#e8e0d5] md:text-sm"
-            >
-              Gatherings
-            </a>
-          </li>
-          <li>
-            <a
-              href="#private-events"
-              className="text-[13px] tracking-[0.14em] text-[rgba(232,224,213,0.65)] transition-colors hover:text-[#e8e0d5] md:text-sm"
-            >
-              Private events
-            </a>
-          </li>
-          <li>
-            <a
-              href="#our-story"
-              className="text-[13px] tracking-[0.14em] text-[rgba(232,224,213,0.65)] transition-colors hover:text-[#e8e0d5] md:text-sm"
-            >
-              Our Story
-            </a>
-          </li>
-        </ul>
-
-        {/* Mobile nav — hamburger + solid panel */}
-        <details className="group relative md:hidden">
-          <summary className="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded border border-[rgba(232,224,213,0.2)] bg-[#2E0303] text-[#e8e0d5] [&::-webkit-details-marker]:hidden">
-            <span className="sr-only">Open menu</span>
-            <span className="flex w-5 flex-col gap-1.5" aria-hidden>
-              <span className="h-0.5 w-full rounded-full bg-current" />
-              <span className="h-0.5 w-full rounded-full bg-current" />
-              <span className="h-0.5 w-full rounded-full bg-current" />
-            </span>
-          </summary>
-          <div className="fixed left-3 right-3 top-[calc(3.5rem+env(safe-area-inset-top,0px)+0.25rem)] z-[500] overflow-hidden rounded-lg border border-[rgba(232,224,213,0.15)] bg-[#1a0808] py-2 text-base shadow-[0_16px_48px_rgba(0,0,0,0.65)] md:hidden">
-            <a
-              href="#gatherings"
-              className="flex min-h-[3.25rem] items-center border-b border-[rgba(232,224,213,0.08)] px-5 font-medium text-[#ebe4d6] active:bg-[rgba(232,224,213,0.08)]"
-            >
-              Gatherings
-            </a>
-            <a
-              href="#private-events"
-              className="flex min-h-[3.25rem] items-center border-b border-[rgba(232,224,213,0.08)] px-5 font-medium text-[#ebe4d6] active:bg-[rgba(232,224,213,0.08)]"
-            >
-              Private events
-            </a>
-            <a
-              href="#our-story"
-              className="flex min-h-[3.25rem] items-center px-5 font-medium text-[#ebe4d6] active:bg-[rgba(232,224,213,0.08)]"
-            >
-              Our Story
-            </a>
-          </div>
-        </details>
-      </nav>
+    <div className="carrd-page min-h-[100dvh] text-[#e8e0d5] max-md:pt-[calc(4.25rem+env(safe-area-inset-top,0px))] md:min-h-screen md:pt-0">
+      <HomeSiteHeader />
 
       <main className="mx-auto max-w-[780px]">
         {/* Hero — mobile: 16:9 video strip on top, copy below; md+: full-bleed video + centered overlay */}
