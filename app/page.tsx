@@ -31,10 +31,11 @@ export default async function Page({
   }
 
   return (
-    <div className="carrd-page min-h-[100dvh] text-[#e8e0d5] max-md:pt-[calc(4.25rem+env(safe-area-inset-top,0px))] md:min-h-screen md:pt-0">
+    <>
+      {/* Outside .carrd-page so overflow-x:hidden does not break sticky/fixed on mobile */}
       <HomeSiteHeader />
-
-      <main className="mx-auto max-w-[780px]">
+      <div className="carrd-page min-h-[100dvh] text-[#e8e0d5] md:min-h-screen">
+        <main className="mx-auto max-w-[780px]">
         {/* Hero — mobile: 16:9 video strip on top, copy below; md+: full-bleed video + centered overlay */}
         <section
           id="top"
@@ -314,6 +315,7 @@ export default async function Page({
           <a href="mailto:hello@midnighttea.house">Contact</a>
         </div>
       </footer>
-    </div>
+      </div>
+    </>
   )
 }

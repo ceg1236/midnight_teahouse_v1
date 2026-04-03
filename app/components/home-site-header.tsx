@@ -74,8 +74,8 @@ export function HomeSiteHeader() {
     <>
       <header
         className={
-          'left-0 right-0 border-b border-[rgba(232,224,213,0.12)] bg-[#2E0303] text-sm uppercase tracking-[0.12em] ' +
-          'fixed top-0 z-[100000] w-full pt-[env(safe-area-inset-top,0px)] md:static md:top-auto md:z-auto md:w-auto md:bg-transparent md:pt-5'
+          'sticky top-0 z-[100000] w-full border-b border-[rgba(232,224,213,0.12)] bg-[#2E0303] text-sm uppercase tracking-[0.12em] ' +
+          'pt-[env(safe-area-inset-top,0px)] md:static md:z-auto md:bg-transparent md:pt-5'
         }
       >
         <div className="mx-auto flex h-14 max-w-[780px] items-center justify-between px-4 pb-3 md:h-auto md:px-6 md:pb-5">
