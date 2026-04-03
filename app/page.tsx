@@ -102,14 +102,13 @@ export default async function Page({
       </nav>
 
       <main className="mx-auto max-w-[780px]">
-        {/* Hero — video ~70% scale (proper ratio); copy on a light scrim for legibility */}
+        {/* Hero — object-contain video; tight margins on desktop, modest on mobile */}
         <section
           id="top"
-          className="relative left-1/2 w-screen -translate-x-1/2 overflow-hidden border-b border-[rgba(232,224,213,0.1)] min-h-[48vh] md:min-h-[min(68vh,39.375vw)]"
+          className="relative left-1/2 w-screen -translate-x-1/2 overflow-hidden border-b border-[rgba(232,224,213,0.1)] min-h-[52vh] md:min-h-[min(82vh,56.25vw)]"
         >
           <div className="absolute inset-0 z-0 flex items-center justify-center bg-[#2E0303]">
-            {/* Inset ~15% each side ≈ 70% linear size while keeping aspect ratio */}
-            <div className="flex h-full w-full items-center justify-center px-[15%] py-[14%] md:px-[18%] md:py-[16%]">
+            <div className="flex h-full w-full items-center justify-center px-[11%] py-[9%] md:px-[4%] md:py-[3%] lg:px-[2.5%] lg:py-[2.5%]">
               <HeroVideo className="max-h-full max-w-full object-contain object-center" />
             </div>
           </div>
