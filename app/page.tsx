@@ -120,8 +120,8 @@ export default async function Page({
             className="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_90%_75%_at_50%_40%,transparent_35%,rgba(46,3,3,0.35)_100%)]"
             aria-hidden
           />
-          <div className="relative z-10 mx-auto max-w-[780px] px-6 pb-12 pt-14 md:pb-14 md:pt-20">
-            <div className="max-w-xl rounded-sm border border-[rgba(232,224,213,0.12)] bg-[rgba(20,8,8,0.55)] px-5 py-7 shadow-[0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-[6px] md:px-7 md:py-9">
+          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center px-6 py-12 md:py-16">
+            <div className="pointer-events-auto w-full max-w-xl rounded-sm border border-[rgba(232,224,213,0.12)] bg-[rgba(20,8,8,0.55)] px-5 py-7 shadow-[0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-[6px] md:px-7 md:py-9">
               <p className="mb-4 text-[11px] uppercase tracking-[0.2em] text-[rgba(248,242,232,0.92)] [text-shadow:0_1px_2px_rgba(0,0,0,0.85),0_0_20px_rgba(0,0,0,0.4)] md:text-xs">
                 San Francisco · By reservation
               </p>
