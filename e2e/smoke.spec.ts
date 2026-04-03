@@ -3,17 +3,18 @@ import { test, expect } from '@playwright/test'
 test.describe('smoke', () => {
   test('homepage loads', async ({ page }) => {
     await page.goto('/')
-    await expect(page.getByRole('heading', { name: 'Midnight Teahouse' }).first()).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Midnight Teahouse' }).first()).toBeVisible()
+    await expect(page.getByRole('heading', { name: /an enchanted world/i })).toBeVisible()
   })
 
-  test('Reserve Your Seat button is visible', async ({ page }) => {
+  test('Reserve Your Seat CTA is visible', async ({ page }) => {
     await page.goto('/')
-    await expect(page.getByRole('button', { name: /Reserve Your Seat/i })).toBeVisible()
+    await expect(page.getByRole('link', { name: /Reserve Your Seat/i })).toBeVisible()
   })
 
-  test('Our Story link works', async ({ page }) => {
+  test('Our story hero link goes to story page', async ({ page }) => {
     await page.goto('/')
-    await page.getByRole('link', { name: /Our Story/i }).first().click()
+    await page.locator('#top a[href="/our-story"]').click()
     await expect(page).toHaveURL(/\/our-story/)
   })
 })

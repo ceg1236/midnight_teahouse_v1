@@ -74,11 +74,14 @@ export function HomeSiteHeader() {
     <>
       <header
         className={
-          'sticky top-0 z-[100000] w-full border-b border-[rgba(232,224,213,0.12)] bg-[#2E0303] text-sm uppercase tracking-[0.12em] ' +
-          'pt-[env(safe-area-inset-top,0px)] md:static md:z-auto md:bg-transparent md:pt-5'
+          'home-site-header mx-auto w-full max-w-[780px] border-b border-[rgba(232,224,213,0.12)] bg-[#2E0303] text-sm uppercase tracking-[0.12em] ' +
+          /* Desktop: visible bar above hero (transparent bar read as “missing” on gradient) */
+          'relative z-40 px-4 pt-[env(safe-area-inset-top,0px)] pb-3 md:bg-[#2E0303]/92 md:px-6 md:pt-5 md:pb-5 md:backdrop-blur-sm ' +
+          /* Mobile: viewport-fixed bar; global.css reinforces so nothing overrides position */
+          'max-md:fixed max-md:left-0 max-md:right-0 max-md:top-0 max-md:z-[500] max-md:max-w-none max-md:w-full max-md:bg-[#2E0303]'
         }
       >
-        <div className="mx-auto flex h-14 max-w-[780px] items-center justify-between px-4 pb-3 md:h-auto md:px-6 md:pb-5">
+        <div className="mx-auto flex h-14 max-w-[780px] items-center justify-between md:h-auto md:max-w-none">
           <Link
             href="/"
             className="min-w-0 shrink font-serif text-lg font-light tracking-[0.12em] text-[#e8e0d5] md:text-xl"
