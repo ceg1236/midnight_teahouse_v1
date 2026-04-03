@@ -32,7 +32,7 @@ export default async function Page({
   return (
     <div className="carrd-page min-h-[100dvh] text-[#e8e0d5] md:min-h-screen">
       {/* Top nav */}
-      <nav className="mx-auto flex max-w-[780px] items-center justify-between border-b border-[rgba(232,224,213,0.12)] px-4 py-4 text-sm tracking-[0.12em] uppercase md:px-6 md:py-5">
+      <nav className="relative z-50 mx-auto flex max-w-[780px] items-center justify-between border-b border-[rgba(232,224,213,0.12)] bg-[#2E0303]/90 px-4 py-4 text-sm tracking-[0.12em] uppercase backdrop-blur-sm md:bg-transparent md:px-6 md:py-5 md:backdrop-blur-none">
         <Link
           href="/"
           className="font-serif text-lg font-light tracking-[0.12em] text-[#e8e0d5] md:text-xl"
@@ -125,7 +125,7 @@ export default async function Page({
           <div className="relative z-10 px-6 py-8 md:pointer-events-none md:absolute md:inset-0 md:flex md:items-center md:justify-center md:py-16">
             <div className="pointer-events-auto w-full max-w-xl rounded-sm border border-[rgba(232,224,213,0.12)] bg-[rgba(20,8,8,0.72)] px-5 py-7 shadow-[0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-[6px] md:bg-[rgba(20,8,8,0.55)] md:px-7 md:py-9">
               <p className="mb-4 text-xs uppercase tracking-[0.18em] text-[rgba(248,242,232,0.95)] [text-shadow:0_1px_2px_rgba(0,0,0,0.85),0_0_20px_rgba(0,0,0,0.4)] md:text-sm">
-                San Francisco · By reservation
+                San Francisco · Teahouse
               </p>
               <h1 className="mb-5 max-w-[18ch] font-serif text-[3rem] font-light italic leading-[1.08] text-[#faf6ef] [text-shadow:0_2px_4px_rgba(0,0,0,0.9),0_0_28px_rgba(0,0,0,0.55)] md:mb-6 md:text-[4.25rem] md:leading-[1.06]">
                 an enchanted world
