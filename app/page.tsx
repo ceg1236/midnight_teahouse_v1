@@ -68,27 +68,32 @@ export default async function Page({
           </li>
         </ul>
 
-        {/* Mobile nav */}
-        <details className="relative md:hidden">
-          <summary className="list-none cursor-pointer rounded-full border border-[rgba(232,224,213,0.25)] px-4 py-2.5 text-sm uppercase tracking-[0.16em] text-[rgba(232,224,213,0.95)]">
-            Menu
+        {/* Mobile nav — hamburger + solid panel */}
+        <details className="group relative md:hidden">
+          <summary className="flex h-11 w-11 cursor-pointer list-none items-center justify-center rounded-md border border-[rgba(232,224,213,0.35)] bg-[rgba(46,3,3,0.35)] text-[#e8e0d5] [&::-webkit-details-marker]:hidden">
+            <span className="sr-only">Open menu</span>
+            <span className="flex w-5 flex-col gap-1.5" aria-hidden>
+              <span className="h-0.5 w-full rounded-full bg-current" />
+              <span className="h-0.5 w-full rounded-full bg-current" />
+              <span className="h-0.5 w-full rounded-full bg-current" />
+            </span>
           </summary>
-          <div className="absolute right-0 z-20 mt-3 h-[30vh] w-56 rounded-2xl border border-[rgba(232,224,213,0.2)] bg-[#2E0303]/95 py-4 text-base shadow-xl backdrop-blur-sm">
+          <div className="absolute right-0 z-[100] mt-2 w-[min(100vw-2rem,17rem)] overflow-hidden rounded-xl border border-[rgba(232,224,213,0.25)] bg-[#1a0808] py-2 text-base shadow-2xl">
             <a
               href="#gatherings"
-              className="flex h-1/3 items-center px-5 text-[rgba(232,224,213,0.9)] hover:bg-[rgba(232,224,213,0.08)]"
+              className="flex min-h-[3.25rem] items-center border-b border-[rgba(232,224,213,0.08)] px-5 font-medium text-[#ebe4d6] active:bg-[rgba(232,224,213,0.08)]"
             >
               Gatherings
             </a>
             <a
               href="#private-events"
-              className="flex h-1/3 items-center px-5 text-[rgba(232,224,213,0.88)] hover:bg-[rgba(232,224,213,0.08)]"
+              className="flex min-h-[3.25rem] items-center border-b border-[rgba(232,224,213,0.08)] px-5 font-medium text-[#ebe4d6] active:bg-[rgba(232,224,213,0.08)]"
             >
               Private events
             </a>
             <a
               href="#our-story"
-              className="flex h-1/3 items-center px-5 text-[rgba(232,224,213,0.88)] hover:bg-[rgba(232,224,213,0.08)]"
+              className="flex min-h-[3.25rem] items-center px-5 font-medium text-[#ebe4d6] active:bg-[rgba(232,224,213,0.08)]"
             >
               Our Story
             </a>
@@ -97,26 +102,28 @@ export default async function Page({
       </nav>
 
       <main className="mx-auto max-w-[780px]">
-        {/* Hero — object-contain video; tight margins on desktop, modest on mobile */}
+        {/* Hero — mobile: 16:9 video strip on top, copy below; md+: full-bleed video + centered overlay */}
         <section
           id="top"
-          className="relative left-1/2 w-screen -translate-x-1/2 overflow-hidden border-b border-[rgba(232,224,213,0.1)] min-h-[52vh] md:min-h-[min(82vh,56.25vw)]"
+          className="relative left-1/2 flex w-screen -translate-x-1/2 flex-col overflow-hidden border-b border-[rgba(232,224,213,0.1)] md:block md:min-h-[min(82vh,56.25vw)]"
         >
-          <div className="absolute inset-0 z-0 flex items-center justify-center bg-[#2E0303]">
-            <div className="flex h-full w-full items-center justify-center px-[11%] py-[9%] md:px-[4%] md:py-[3%] lg:px-[2.5%] lg:py-[2.5%]">
-              <HeroVideo className="max-h-full max-w-full object-contain object-center" />
+          <div className="relative aspect-video w-full shrink-0 bg-[#2E0303] md:absolute md:inset-0 md:aspect-auto md:min-h-0 md:shrink">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="h-full w-full md:flex md:items-center md:justify-center md:px-[4%] md:py-[3%] lg:px-[2.5%] lg:py-[2.5%]">
+                <HeroVideo className="h-full w-full object-cover object-center md:max-h-full md:max-w-full md:object-contain" />
+              </div>
             </div>
+            <div
+              className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t from-[#2E0303]/85 via-transparent to-transparent md:bg-gradient-to-b md:from-[#2E0303]/40 md:via-[#2E0303]/20 md:to-[#2E0303]/45"
+              aria-hidden
+            />
+            <div
+              className="pointer-events-none absolute inset-0 z-[1] hidden bg-[radial-gradient(ellipse_90%_75%_at_50%_40%,transparent_35%,rgba(46,3,3,0.35)_100%)] md:block"
+              aria-hidden
+            />
           </div>
-          <div
-            className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-[#2E0303]/40 via-[#2E0303]/20 to-[#2E0303]/45"
-            aria-hidden
-          />
-          <div
-            className="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_90%_75%_at_50%_40%,transparent_35%,rgba(46,3,3,0.35)_100%)]"
-            aria-hidden
-          />
-          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center px-6 py-12 md:py-16">
-            <div className="pointer-events-auto w-full max-w-xl rounded-sm border border-[rgba(232,224,213,0.12)] bg-[rgba(20,8,8,0.55)] px-5 py-7 shadow-[0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-[6px] md:px-7 md:py-9">
+          <div className="relative z-10 px-6 py-8 md:pointer-events-none md:absolute md:inset-0 md:flex md:items-center md:justify-center md:py-16">
+            <div className="pointer-events-auto w-full max-w-xl rounded-sm border border-[rgba(232,224,213,0.12)] bg-[rgba(20,8,8,0.72)] px-5 py-7 shadow-[0_12px_40px_rgba(0,0,0,0.35)] backdrop-blur-[6px] md:bg-[rgba(20,8,8,0.55)] md:px-7 md:py-9">
               <p className="mb-4 text-xs uppercase tracking-[0.18em] text-[rgba(248,242,232,0.95)] [text-shadow:0_1px_2px_rgba(0,0,0,0.85),0_0_20px_rgba(0,0,0,0.4)] md:text-sm">
                 San Francisco · By reservation
               </p>
@@ -232,21 +239,21 @@ export default async function Page({
 
           <div className="mt-4 flex flex-wrap gap-2">
             <span className="rounded-full border border-[rgba(232,224,213,0.22)] px-3.5 py-1.5 text-xs uppercase tracking-[0.1em] text-[rgba(232,224,213,0.55)] md:text-sm">
-              Weddings
+              Private parties
             </span>
             <span className="rounded-full border border-[rgba(232,224,213,0.22)] px-3.5 py-1.5 text-xs uppercase tracking-[0.1em] text-[rgba(232,224,213,0.55)] md:text-sm">
               Corporate offsites
             </span>
             <span className="rounded-full border border-[rgba(232,224,213,0.22)] px-3.5 py-1.5 text-xs uppercase tracking-[0.1em] text-[rgba(232,224,213,0.55)] md:text-sm">
-              Private parties
+              Weddings
             </span>
           </div>
 
           <p
             id="home-inquiry"
-            className="mt-10 mb-6 text-center text-xs uppercase tracking-[0.18em] text-[rgba(200,175,140,0.55)] md:text-sm"
+            className="mt-10 mb-6 text-center text-md uppercase tracking-[0.18em] text-[rgba(200,175,140,0.55)] md:text-medium"
           >
-            or tell us about your event
+            tell us about your event
           </p>
 
           <div className="rounded border border-[rgba(180,140,110,0.25)] bg-[rgba(180,140,110,0.06)] p-7 md:p-8">
