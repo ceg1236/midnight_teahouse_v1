@@ -102,45 +102,50 @@ export default async function Page({
       </nav>
 
       <main className="mx-auto max-w-[780px]">
-        {/* Hero */}
+        {/* Hero — full-bleed video banner behind headline */}
         <section
           id="top"
-          className="border-b border-[rgba(232,224,213,0.1)] px-6 pb-12 pt-16"
+          className="relative left-1/2 w-screen -translate-x-1/2 overflow-hidden border-b border-[rgba(232,224,213,0.1)] min-h-[50vh] md:min-h-[56vh]"
         >
-          <p className="mb-5 text-[10px] uppercase tracking-[0.22em] text-[rgba(232,224,213,0.35)]">
-            San Francisco · By reservation
-          </p>
-          <h1 className="mb-6 font-serif text-[40px] font-light italic leading-tight text-[#f0e8dd] md:text-[56px]">
-            an enchanted world
-            <br />
-            hidden in the city
-          </h1>
-          <p className="mb-8 max-w-[460px] text-sm leading-7 text-[rgba(232,224,213,0.6)]">
-            We host intimate, curated gatherings around gong-fu tea, live music and gentle, creative
-            play.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/invite"
-              className="inline-flex items-center justify-center border border-[rgba(180,140,110,0.4)] bg-[rgba(180,140,110,0.15)] px-6 py-2 text-[11px] font-normal uppercase tracking-[0.1em] text-[#c9a87a]"
-            >
-              Reserve Your Seat
-            </Link>
-            <Link
-              href="/our-story"
-              className="inline-flex items-center justify-center border border-[rgba(232,224,213,0.18)] bg-transparent px-6 py-2 text-[11px] font-normal uppercase tracking-[0.1em] text-[rgba(232,224,213,0.55)]"
-            >
-              Our story
-            </Link>
+          <div className="absolute inset-0 z-0 bg-[#2E0303]">
+            <HeroVideo className="h-full w-full object-cover opacity-[0.55] md:opacity-60" />
           </div>
-        </section>
-
-        {/* Video strip */}
-        <section className="relative flex h-60 items-center justify-center overflow-hidden border-b border-[rgba(232,224,213,0.08)] bg-[#2E0303]">
-          <div className="absolute inset-0">
-            <HeroVideo className="h-full w-full object-cover opacity-60" />
+          <div
+            className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-[#2E0303]/75 via-[#2E0303]/45 to-[#2E0303]/82"
+            aria-hidden
+          />
+          <div
+            className="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_85%_70%_at_50%_35%,transparent_0%,#2E0303_78%)]"
+            aria-hidden
+          />
+          <div className="relative z-10 mx-auto max-w-[780px] px-6 pb-14 pt-16 md:pb-16 md:pt-20">
+            <p className="mb-5 text-[10px] uppercase tracking-[0.22em] text-[rgba(240,232,221,0.82)] drop-shadow-[0_1px_12px_rgba(0,0,0,0.45)]">
+              San Francisco · By reservation
+            </p>
+            <h1 className="mb-6 max-w-[20ch] font-serif text-[40px] font-light italic leading-tight text-[#f0e8dd] drop-shadow-[0_2px_24px_rgba(0,0,0,0.5)] md:text-[56px]">
+              an enchanted world
+              <br />
+              hidden in the city
+            </h1>
+            <p className="mb-8 max-w-[460px] text-sm leading-7 text-[rgba(240,232,221,0.88)] drop-shadow-[0_1px_16px_rgba(0,0,0,0.45)]">
+              We host intimate, curated gatherings around gong-fu tea, live music and gentle, creative
+              play.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/invite"
+                className="inline-flex items-center justify-center border border-[rgba(180,140,110,0.5)] bg-[rgba(46,3,3,0.45)] px-6 py-2 text-[11px] font-normal uppercase tracking-[0.1em] text-[#e8d4b8] backdrop-blur-[2px]"
+              >
+                Reserve Your Seat
+              </Link>
+              <Link
+                href="/our-story"
+                className="inline-flex items-center justify-center border border-[rgba(232,224,213,0.35)] bg-[rgba(46,3,3,0.25)] px-6 py-2 text-[11px] font-normal uppercase tracking-[0.1em] text-[rgba(240,232,221,0.92)] backdrop-blur-[2px]"
+              >
+                Our story
+              </Link>
+            </div>
           </div>
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,#2E0303_100%)]" />
         </section>
 
         {/* Upcoming gatherings teaser */}
