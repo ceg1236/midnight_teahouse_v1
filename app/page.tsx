@@ -217,37 +217,12 @@ export default async function Page({
           </div>
         </section>
 
-        {/* Mailing list */}
-        <section className="border-b border-[rgba(232,224,213,0.08)] flex flex-wrap items-center gap-9 px-6 py-11">
-          <div className="min-w-[200px] flex-1">
-            <h2 className="mb-2 font-serif text-[1.65rem] italic leading-tight text-[#f2ebe0] md:text-3xl">
-              Stay in the loop
-            </h2>
-            <p className="text-base leading-8 text-[rgba(232,224,213,0.62)] md:text-lg md:leading-relaxed">
-              New gatherings, behind-the-scenes notes, and the occasional love letter about tea.
-            </p>
-          </div>
-          <form className="flex min-w-[220px] flex-1 items-center gap-2">
-            <input
-              type="email"
-              placeholder="your@email.com"
-              className="flex-1 rounded border border-[rgba(180,140,110,0.35)] bg-[rgba(180,140,110,0.08)] px-3 py-2.5 text-base text-[#d4b896] outline-none md:px-4"
-            />
-            <button
-              type="submit"
-              className="inline-flex items-center justify-center border border-[rgba(180,140,110,0.45)] bg-[rgba(180,140,110,0.18)] px-5 py-2.5 text-sm font-normal uppercase tracking-[0.1em] text-[#e8d4b8]"
-            >
-              Join
-            </button>
-          </form>
-        </section>
-
         {/* Private events teaser + inquiry */}
         <section
           id="private-events"
           className="border-b border-[rgba(232,224,213,0.08)] px-6 py-11"
         >
-          <h2 className="mb-3 font-serif text-[1.65rem] font-light leading-tight text-[#f2ebe0] md:text-3xl">
+          <h2 className="mb-6 font-sans text-sm font-light uppercase tracking-[0.2em] text-[rgba(232,224,213,0.55)] md:mb-7 md:text-base md:tracking-[0.18em]">
             Bring us to your event
           </h2>
           <p className="mb-5 max-w-[32rem] text-base leading-8 text-[rgba(232,224,213,0.65)] md:text-lg md:leading-relaxed">
@@ -357,6 +332,31 @@ export default async function Page({
               Read the full story
             </Link>
           </div>
+        </section>
+
+        {/* Mailing list — after Our story */}
+        <section className="border-b border-[rgba(232,224,213,0.08)] flex flex-wrap items-center gap-9 px-6 py-11">
+          <div className="min-w-[200px] flex-1">
+            <h2 className="mb-2 font-serif text-[1.65rem] italic leading-tight text-[#f2ebe0] md:text-3xl">
+              Stay in the loop
+            </h2>
+            <p className="text-base leading-8 text-[rgba(232,224,213,0.62)] md:text-lg md:leading-relaxed">
+              New gatherings, behind-the-scenes notes, and the occasional love letter about tea.
+            </p>
+          </div>
+          <form className="flex min-w-[220px] flex-1 items-center gap-2">
+            <input
+              type="email"
+              placeholder="your@email.com"
+              className="flex-1 rounded border border-[rgba(180,140,110,0.35)] bg-[rgba(180,140,110,0.08)] px-3 py-2.5 text-base text-[#d4b896] outline-none md:px-4"
+            />
+            <button
+              type="submit"
+              className="inline-flex items-center justify-center border border-[rgba(180,140,110,0.45)] bg-[rgba(180,140,110,0.18)] px-5 py-2.5 text-sm font-normal uppercase tracking-[0.1em] text-[#e8d4b8]"
+            >
+              Join
+            </button>
+          </form>
         </section>
       </main>
 
