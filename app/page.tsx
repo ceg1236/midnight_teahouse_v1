@@ -102,20 +102,20 @@ export default async function Page({
       </nav>
 
       <main className="mx-auto max-w-[780px]">
-        {/* Hero — full-bleed video banner behind headline */}
+        {/* Hero — full-bleed video behind headline; object-contain shows full frame */}
         <section
           id="top"
-          className="relative left-1/2 w-screen -translate-x-1/2 overflow-hidden border-b border-[rgba(232,224,213,0.1)] min-h-[50vh] md:min-h-[56vh]"
+          className="relative left-1/2 w-screen -translate-x-1/2 overflow-hidden border-b border-[rgba(232,224,213,0.1)] min-h-[58vh] md:min-h-[min(85vh,56.25vw)]"
         >
-          <div className="absolute inset-0 z-0 bg-[#2E0303]">
-            <HeroVideo className="h-full w-full object-cover opacity-[0.55] md:opacity-60" />
+          <div className="absolute inset-0 z-0 flex items-center justify-center bg-[#2E0303]">
+            <HeroVideo className="h-full w-full max-h-full max-w-full object-contain object-center" />
           </div>
           <div
-            className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-[#2E0303]/75 via-[#2E0303]/45 to-[#2E0303]/82"
+            className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-[#2E0303]/40 via-[#2E0303]/20 to-[#2E0303]/45"
             aria-hidden
           />
           <div
-            className="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_85%_70%_at_50%_35%,transparent_0%,#2E0303_78%)]"
+            className="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_90%_75%_at_50%_40%,transparent_35%,rgba(46,3,3,0.35)_100%)]"
             aria-hidden
           />
           <div className="relative z-10 mx-auto max-w-[780px] px-6 pb-14 pt-16 md:pb-16 md:pt-20">
