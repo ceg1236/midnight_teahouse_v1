@@ -48,7 +48,7 @@ export function HomeNewsletterForm() {
   if (status === 'ok') {
     return (
       <p className="text-base text-[rgba(200,175,140,0.9)] md:text-lg" role="status">
-        You’re on the list — check your inbox to confirm.
+        Thanks — you're on the list. If your MailerLite list uses double opt-in, check your inbox and spam for a confirmation message.
       </p>
     )
   }
