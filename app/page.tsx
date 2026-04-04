@@ -112,12 +112,14 @@ export default async function Page({
                   Tea Lounge
                 </span>
               </div>
-              <Link
-                href="/invite"
+              <a
+                href="https://www.exploratorium.edu/visit/calendar/after-dark-altered-states"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="self-center whitespace-nowrap rounded border border-[rgba(180,140,110,0.35)] px-4 py-2.5 text-xs font-medium uppercase tracking-[0.1em] text-[#d4b896] md:text-sm"
               >
                 RSVP →
-              </Link>
+              </a>
             </div>
           </div>
 
@@ -142,12 +144,14 @@ export default async function Page({
                   Tea Lounge
                 </span>
               </div>
-              <Link
-                href="/invite"
+              <a
+                href="https://www.soundmeditationpresents.com/events-1/the-sound-healing-symphony-relaxes-in-sebastapol-tix-up-soon"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="self-center whitespace-nowrap rounded border border-[rgba(180,140,110,0.35)] px-4 py-2.5 text-xs font-medium uppercase tracking-[0.1em] text-[#d4b896] md:text-sm"
               >
                 RSVP →
-              </Link>
+              </a>
             </div>
           </div>
         </section>
