@@ -12,9 +12,10 @@ export function HomeNewsletterForm() {
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    const form = e.currentTarget
     setError('')
     setStatus('sending')
-    const fd = new FormData(e.currentTarget)
+    const fd = new FormData(form)
     const payload = {
       email: String(fd.get('email') ?? ''),
       company: String(fd.get('company') ?? ''),
@@ -32,9 +33,9 @@ export function HomeNewsletterForm() {
         return
       }
       setStatus('ok')
-      e.currentTarget.reset()
+      form.reset()
     } catch (err) {
-      console.error('newsletter fetch failed:', err)
+      console.error('newsletter submit failed:', err)
       if (process.env.NODE_ENV === 'development' && err instanceof Error) {
         setError(`Could not reach the API (${err.message}). Check pnpm dev and POST ${apiPath('/api/newsletter')}.`)
       } else {

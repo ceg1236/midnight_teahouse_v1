@@ -12,9 +12,10 @@ export function PrivateInquiryForm() {
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    const form = e.currentTarget
     setError('')
     setStatus('sending')
-    const fd = new FormData(e.currentTarget)
+    const fd = new FormData(form)
     const payload = {
       name: String(fd.get('name') ?? ''),
       email: String(fd.get('email') ?? ''),
@@ -36,9 +37,9 @@ export function PrivateInquiryForm() {
         return
       }
       setStatus('ok')
-      e.currentTarget.reset()
+      form.reset()
     } catch (err) {
-      console.error('private-inquiry fetch failed:', err)
+      console.error('private-inquiry submit failed:', err)
       if (process.env.NODE_ENV === 'development' && err instanceof Error) {
         setError(
           `Could not reach the API (${err.message}). Use the same host/port as this page with pnpm dev running, and check the Network tab for POST ${apiPath('/api/private-inquiry')}.`
