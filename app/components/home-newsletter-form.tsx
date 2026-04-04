@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { apiPath } from '../../lib/client-api-url'
 
 const honeypotClass =
   'absolute -left-[9999px] h-px w-px overflow-hidden opacity-0 [clip:rect(0,0,0,0)]'
@@ -19,7 +20,7 @@ export function HomeNewsletterForm() {
       company: String(fd.get('company') ?? ''),
     }
     try {
-      const res = await fetch('/api/newsletter', {
+      const res = await fetch(apiPath('/api/newsletter'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -32,8 +33,13 @@ export function HomeNewsletterForm() {
       }
       setStatus('ok')
       e.currentTarget.reset()
-    } catch {
-      setError('Network error. Please try again.')
+    } catch (err) {
+      console.error('newsletter fetch failed:', err)
+      if (process.env.NODE_ENV === 'development' && err instanceof Error) {
+        setError(`Could not reach the API (${err.message}). Check pnpm dev and POST ${apiPath('/api/newsletter')}.`)
+      } else {
+        setError('Could not reach the server. Check your connection and try again.')
+      }
       setStatus('err')
     }
   }

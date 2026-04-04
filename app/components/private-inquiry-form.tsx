@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { apiPath } from '../../lib/client-api-url'
 
 const honeypotClass =
   'absolute -left-[9999px] h-px w-px overflow-hidden opacity-0 [clip:rect(0,0,0,0)]'
@@ -23,7 +24,7 @@ export function PrivateInquiryForm() {
       company: String(fd.get('company') ?? ''),
     }
     try {
-      const res = await fetch('/api/private-inquiry', {
+      const res = await fetch(apiPath('/api/private-inquiry'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -36,8 +37,15 @@ export function PrivateInquiryForm() {
       }
       setStatus('ok')
       e.currentTarget.reset()
-    } catch {
-      setError('Network error. Please try again.')
+    } catch (err) {
+      console.error('private-inquiry fetch failed:', err)
+      if (process.env.NODE_ENV === 'development' && err instanceof Error) {
+        setError(
+          `Could not reach the API (${err.message}). Use the same host/port as this page with pnpm dev running, and check the Network tab for POST ${apiPath('/api/private-inquiry')}.`
+        )
+      } else {
+        setError('Could not reach the server. Check your connection and try again.')
+      }
       setStatus('err')
     }
   }

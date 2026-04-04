@@ -22,6 +22,15 @@ function trimField(v: unknown, max: number): string {
  * Anti-spam: honeypot field must be empty; basic validation; HTML-escaped body.
  */
 export async function POST(req: Request) {
+  try {
+    return await handlePrivateInquiry(req)
+  } catch (err) {
+    console.error('private-inquiry: unexpected error', err)
+    return NextResponse.json({ error: 'Server error. Please try again later.' }, { status: 500 })
+  }
+}
+
+async function handlePrivateInquiry(req: Request): Promise<NextResponse> {
   let body: {
     name?: string
     email?: string
@@ -109,3 +118,4 @@ export async function POST(req: Request) {
 
   return NextResponse.json({ ok: true })
 }
+
