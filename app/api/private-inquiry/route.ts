@@ -3,7 +3,14 @@ import { Resend } from 'resend'
 import { escapeHtml } from '../../../lib/escape-html'
 
 const INQUIRY_TO = process.env.PRIVATE_INQUIRY_TO ?? 'midnight.teahouse.sf@gmail.com'
-const MAX_LEN = { name: 200, email: 320, eventType: 200, eventDate: 120, message: 8000 }
+const MAX_LEN = { name: 200, email: 320, eventType: 200, isoDate: 10, message: 8000 }
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/
+
+function parseIsoDate(s: string): number | null {
+  if (!ISO_DATE.test(s)) return null
+  const t = Date.parse(`${s}T12:00:00.000Z`)
+  return Number.isNaN(t) ? null : t
+}
 
 function trimField(v: unknown, max: number): string {
   if (typeof v !== 'string') return ''
@@ -19,7 +26,8 @@ export async function POST(req: Request) {
     name?: string
     email?: string
     eventType?: string
-    eventDate?: string
+    eventDateStart?: string
+    eventDateEnd?: string
     message?: string
     /** Honeypot — bots often fill this; humans never see it */
     company?: string
@@ -38,8 +46,30 @@ export async function POST(req: Request) {
   const name = trimField(body.name, MAX_LEN.name)
   const email = trimField(body.email, MAX_LEN.email)
   const eventType = trimField(body.eventType, MAX_LEN.eventType)
-  const eventDate = trimField(body.eventDate, MAX_LEN.eventDate)
+  const eventDateStart = trimField(body.eventDateStart, MAX_LEN.isoDate)
+  const eventDateEnd = trimField(body.eventDateEnd, MAX_LEN.isoDate)
   const message = trimField(body.message, MAX_LEN.message)
+
+  if (eventDateStart && !parseIsoDate(eventDateStart)) {
+    return NextResponse.json({ error: 'Please use a valid start date.' }, { status: 400 })
+  }
+  if (eventDateEnd && !parseIsoDate(eventDateEnd)) {
+    return NextResponse.json({ error: 'Please use a valid end date.' }, { status: 400 })
+  }
+  const startT = eventDateStart ? parseIsoDate(eventDateStart) : null
+  const endT = eventDateEnd ? parseIsoDate(eventDateEnd) : null
+  if (startT != null && endT != null && endT < startT) {
+    return NextResponse.json({ error: 'End date must be on or after the start date.' }, { status: 400 })
+  }
+
+  let eventDateRange = ''
+  if (eventDateStart && eventDateEnd) {
+    eventDateRange = eventDateStart === eventDateEnd ? eventDateStart : `${eventDateStart} – ${eventDateEnd}`
+  } else if (eventDateStart) {
+    eventDateRange = `${eventDateStart} (start)`
+  } else if (eventDateEnd) {
+    eventDateRange = `${eventDateEnd} (end)`
+  }
 
   if (!name || !email || !message) {
     return NextResponse.json(
@@ -65,7 +95,7 @@ export async function POST(req: Request) {
   const safeName = escapeHtml(name)
   const safeEmail = escapeHtml(email)
   const safeType = escapeHtml(eventType)
-  const safeDate = escapeHtml(eventDate)
+  const safeDate = escapeHtml(eventDateRange)
   const safeMessage = escapeHtml(message).replace(/\r?\n/g, '<br/>')
 
   const html = `
@@ -76,7 +106,7 @@ export async function POST(req: Request) {
     <tr><td style="padding: 4px 12px 4px 0;"><strong>Name</strong></td><td>${safeName}</td></tr>
     <tr><td style="padding: 4px 12px 4px 0;"><strong>Email</strong></td><td>${safeEmail}</td></tr>
     <tr><td style="padding: 4px 12px 4px 0;"><strong>Event type</strong></td><td>${safeType || '—'}</td></tr>
-    <tr><td style="padding: 4px 12px 4px 0;"><strong>Date</strong></td><td>${safeDate || '—'}</td></tr>
+    <tr><td style="padding: 4px 12px 4px 0;"><strong>Date range</strong></td><td>${safeDate || '—'}</td></tr>
   </table>
   <p><strong>Message</strong></p>
   <p style="white-space: pre-wrap;">${safeMessage}</p>
