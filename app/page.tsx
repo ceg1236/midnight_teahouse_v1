@@ -1,7 +1,9 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { HeroVideo } from './components/hero-video'
+import { HomeNewsletterForm } from './components/home-newsletter-form'
 import { HomeSiteHeader } from './components/home-site-header'
+import { PrivateInquiryForm } from './components/private-inquiry-form'
 
 export const dynamic = 'force-dynamic'
 
@@ -31,11 +33,9 @@ export default async function Page({
   }
 
   return (
-    <>
-      {/* Outside .carrd-page so overflow-x:hidden does not break sticky/fixed on mobile */}
+    <div className="carrd-page min-h-[100dvh] text-[#e8e0d5] max-md:pt-[calc(4.25rem+env(safe-area-inset-top,0px))] md:min-h-screen md:pt-0">
       <HomeSiteHeader />
-      <div className="carrd-page min-h-[100dvh] text-[#e8e0d5] md:min-h-screen">
-        <main className="mx-auto max-w-[780px]">
+      <main className="mx-auto max-w-[780px]">
         {/* Hero — mobile: 16:9 video strip on top, copy below; md+: full-bleed video + centered overlay */}
         <section
           id="top"
@@ -72,16 +72,10 @@ export default async function Page({
               </p>
               <div className="flex flex-wrap gap-3">
                 <Link
-                  href="/invite"
+                  href="#gatherings"
                   className="inline-flex items-center justify-center border border-[rgba(180,140,110,0.55)] bg-[rgba(46,3,3,0.55)] px-7 py-3 text-sm font-normal uppercase tracking-[0.1em] text-[#f5ead8] backdrop-blur-sm md:px-8 md:text-base"
                 >
                   Reserve Your Seat
-                </Link>
-                <Link
-                  href="/our-story"
-                  className="inline-flex items-center justify-center border border-[rgba(232,224,213,0.4)] bg-[rgba(46,3,3,0.35)] px-7 py-3 text-sm font-normal uppercase tracking-[0.1em] text-[rgba(248,242,232,0.96)] backdrop-blur-sm md:px-8 md:text-base"
-                >
-                  Our story
                 </Link>
               </div>
             </div>
@@ -190,62 +184,7 @@ export default async function Page({
             tell us about your event
           </p>
 
-          <div className="rounded border border-[rgba(180,140,110,0.25)] bg-[rgba(180,140,110,0.06)] p-7 md:p-8">
-            <div className="grid gap-3 md:grid-cols-2">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs uppercase tracking-[0.14em] text-[rgba(200,175,140,0.75)] md:text-sm">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  placeholder="Your name"
-                  className="rounded border border-[rgba(180,140,110,0.3)] bg-[rgba(180,140,110,0.08)] px-3 py-2.5 text-base text-[#d4b896] outline-none md:px-4"
-                />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs uppercase tracking-[0.14em] text-[rgba(200,175,140,0.75)] md:text-sm">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  placeholder="your@email.com"
-                  className="rounded border border-[rgba(180,140,110,0.3)] bg-[rgba(180,140,110,0.08)] px-3 py-2.5 text-base text-[#d4b896] outline-none md:px-4"
-                />
-              </div>
-            </div>
-            <div className="mt-3 grid gap-3 md:grid-cols-2">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs uppercase tracking-[0.14em] text-[rgba(200,175,140,0.75)] md:text-sm">
-                  Event type
-                </label>
-                <input
-                  type="text"
-                  placeholder="Wedding, corporate, party..."
-                  className="rounded border border-[rgba(180,140,110,0.3)] bg-[rgba(180,140,110,0.08)] px-3 py-2.5 text-base text-[#d4b896] outline-none md:px-4"
-                />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs uppercase tracking-[0.14em] text-[rgba(200,175,140,0.75)] md:text-sm">
-                  Date
-                </label>
-                <input
-                  type="text"
-                  placeholder="Approximate date"
-                  className="rounded border border-[rgba(180,140,110,0.3)] bg-[rgba(180,140,110,0.08)] px-3 py-2.5 text-base text-[#d4b896] outline-none md:px-4"
-                />
-              </div>
-            </div>
-            <textarea
-              placeholder="Tell us a little about your event — guest count, location, vision..."
-              className="mt-3 h-28 w-full resize-none rounded border border-[rgba(180,140,110,0.3)] bg-[rgba(180,140,110,0.08)] px-3 py-2.5 text-base leading-relaxed text-[#d4b896] outline-none md:px-4"
-            />
-            <button
-              type="button"
-              className="mt-4 inline-flex items-center justify-center border border-[rgba(180,140,110,0.45)] bg-[rgba(180,140,110,0.18)] px-6 py-2.5 text-sm font-normal uppercase tracking-[0.1em] text-[#e8d4b8]"
-            >
-              Send inquiry
-            </button>
-          </div>
+          <PrivateInquiryForm />
         </section>
 
         {/* Our story teaser */}
@@ -285,19 +224,7 @@ export default async function Page({
               New gatherings, behind-the-scenes notes, and the occasional love letter about tea.
             </p>
           </div>
-          <form className="flex min-w-[220px] flex-1 items-center gap-2">
-            <input
-              type="email"
-              placeholder="your@email.com"
-              className="flex-1 rounded border border-[rgba(180,140,110,0.35)] bg-[rgba(180,140,110,0.08)] px-3 py-2.5 text-base text-[#d4b896] outline-none md:px-4"
-            />
-            <button
-              type="submit"
-              className="inline-flex items-center justify-center border border-[rgba(180,140,110,0.45)] bg-[rgba(180,140,110,0.18)] px-5 py-2.5 text-sm font-normal uppercase tracking-[0.1em] text-[#e8d4b8]"
-            >
-              Join
-            </button>
-          </form>
+          <HomeNewsletterForm />
         </section>
       </main>
 
@@ -307,15 +234,11 @@ export default async function Page({
         </div>
         <div className="flex gap-5">
           <a href="https://instagram.com/midnight_teahouse" target="_blank" rel="noreferrer">
-            Instagram
-          </a>
-          <a href="https://instagram.com/midnight_teahouse" target="_blank" rel="noreferrer">
             @midnight_teahouse
           </a>
-          <a href="mailto:hello@midnighttea.house">Contact</a>
+          <a href="mailto:midnight.teahouse.sf@gmail.com">Contact</a>
         </div>
       </footer>
-      </div>
-    </>
+    </div>
   )
 }
