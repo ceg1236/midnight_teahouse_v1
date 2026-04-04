@@ -757,9 +757,26 @@ html::-webkit-scrollbar {
   height: 100dvh;
   pointer-events: none;
 }
-.carrd-page > * {
+/* Exclude site header so mobile can use position:fixed; everything else stays above ::before */
+.carrd-page > *:not(.home-site-header) {
   position: relative;
   z-index: 1;
+}
+.carrd-page > .home-site-header {
+  z-index: 60;
+}
+/* Marketing home: keep mobile bar pinned (Tailwind + any load-order quirks) */
+@media (max-width: 767px) {
+  .carrd-page > .home-site-header {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+    box-sizing: border-box;
+    z-index: 500 !important;
+  }
 }
 /* Corner link (Our Story / Home) must stay fixed above page content */
 .carrd-corner-link {

@@ -8,6 +8,10 @@ export function HeroVideo({ className }: { className?: string }) {
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
+    video.muted = true
+    video.defaultMuted = true
+    video.setAttribute('playsinline', '')
+    video.setAttribute('webkit-playsinline', '')
     const tryPlay = () => video.play().catch(() => {})
     const observer = new IntersectionObserver(
       (entries) => {
