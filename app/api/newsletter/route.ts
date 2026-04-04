@@ -8,7 +8,8 @@ function trimEmail(v: unknown): string {
 }
 
 /**
- * Add email to MailerLite group (double opt-in / compliance handled in MailerLite).
+ * Create/upsert subscriber via MailerLite (see https://developers.mailerlite.com/docs/subscribers.html#create-upsert-subscriber).
+ * `groups` is optional in the API; we only send it when MAILERLITE_GROUP_ID is set.
  * Anti-spam: honeypot field must be empty.
  */
 export async function POST(req: Request) {
@@ -30,10 +31,15 @@ export async function POST(req: Request) {
   }
 
   const apiKey = process.env.MAILERLITE_API_KEY
-  const groupId = process.env.MAILERLITE_GROUP_ID
-  if (!apiKey || !groupId) {
-    console.error('newsletter: MAILERLITE_API_KEY or MAILERLITE_GROUP_ID not set')
+  if (!apiKey) {
+    console.error('newsletter: MAILERLITE_API_KEY not set')
     return NextResponse.json({ error: 'Newsletter signup is not configured yet.' }, { status: 503 })
+  }
+
+  const groupId = process.env.MAILERLITE_GROUP_ID?.trim()
+  const payload: { email: string; groups?: string[] } = { email }
+  if (groupId) {
+    payload.groups = [groupId]
   }
 
   const res = await fetch(MAILERLITE_URL, {
@@ -43,23 +49,16 @@ export async function POST(req: Request) {
       'Content-Type': 'application/json',
       Accept: 'application/json',
     },
-    body: JSON.stringify({
-      email,
-      groups: [groupId],
-    }),
+    body: JSON.stringify(payload),
   })
 
+  // 200 = updated existing subscriber; 201 = created (per MailerLite docs)
   if (res.ok || res.status === 201) {
     return NextResponse.json({ ok: true })
   }
 
   const text = await res.text()
   console.error('newsletter mailerlite:', res.status, text)
-
-  // Treat "already exists" style responses as success for UX
-  if (res.status === 409 || res.status === 422) {
-    return NextResponse.json({ ok: true })
-  }
 
   return NextResponse.json({ error: 'Could not subscribe right now. Please try again later.' }, { status: 502 })
 }
