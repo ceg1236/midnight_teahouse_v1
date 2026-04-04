@@ -8,7 +8,6 @@ const honeypotClass =
 export function PrivateInquiryForm() {
   const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'err'>('idle')
   const [error, setError] = useState('')
-  const [eventRangeStart, setEventRangeStart] = useState('')
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -19,8 +18,7 @@ export function PrivateInquiryForm() {
       name: String(fd.get('name') ?? ''),
       email: String(fd.get('email') ?? ''),
       eventType: String(fd.get('eventType') ?? ''),
-      eventDateStart: String(fd.get('eventDateStart') ?? ''),
-      eventDateEnd: String(fd.get('eventDateEnd') ?? ''),
+      approximateDate: String(fd.get('approximateDate') ?? ''),
       message: String(fd.get('message') ?? ''),
       company: String(fd.get('company') ?? ''),
     }
@@ -37,7 +35,6 @@ export function PrivateInquiryForm() {
         return
       }
       setStatus('ok')
-      setEventRangeStart('')
       e.currentTarget.reset()
     } catch {
       setError('Network error. Please try again.')
@@ -110,44 +107,20 @@ export function PrivateInquiryForm() {
             className="rounded border border-[rgba(180,140,110,0.3)] bg-[rgba(180,140,110,0.08)] px-3 py-2.5 text-base text-[#d4b896] outline-none md:px-4"
           />
         </div>
-        <fieldset className="flex min-w-0 flex-col gap-2 border-0 p-0">
-          <legend className="mb-0.5 w-full text-xs uppercase tracking-[0.14em] text-[rgba(200,175,140,0.75)] md:text-sm">
-            Date range
-          </legend>
-          <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-end sm:gap-3">
-            <div className="flex min-w-0 flex-1 flex-col gap-1">
-              <label
-                htmlFor="home-inquiry-event-date-start"
-                className="text-[11px] uppercase tracking-[0.12em] text-[rgba(200,175,140,0.6)] md:text-xs"
-              >
-                Start
-              </label>
-              <input
-                id="home-inquiry-event-date-start"
-                name="eventDateStart"
-                type="date"
-                value={eventRangeStart}
-                onChange={(e) => setEventRangeStart(e.target.value)}
-                className="min-h-[2.75rem] w-full rounded border border-[rgba(180,140,110,0.3)] bg-[rgba(180,140,110,0.08)] px-3 py-2 text-base text-[#d4b896] outline-none [color-scheme:dark] md:min-h-0 md:px-4 md:py-2.5"
-              />
-            </div>
-            <div className="flex min-w-0 flex-1 flex-col gap-1">
-              <label
-                htmlFor="home-inquiry-event-date-end"
-                className="text-[11px] uppercase tracking-[0.12em] text-[rgba(200,175,140,0.6)] md:text-xs"
-              >
-                End
-              </label>
-              <input
-                id="home-inquiry-event-date-end"
-                name="eventDateEnd"
-                type="date"
-                min={eventRangeStart || undefined}
-                className="min-h-[2.75rem] w-full rounded border border-[rgba(180,140,110,0.3)] bg-[rgba(180,140,110,0.08)] px-3 py-2 text-base text-[#d4b896] outline-none [color-scheme:dark] md:min-h-0 md:px-4 md:py-2.5"
-              />
-            </div>
-          </div>
-        </fieldset>
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="home-inquiry-approximate-date"
+            className="text-xs uppercase tracking-[0.14em] text-[rgba(200,175,140,0.75)] md:text-sm"
+          >
+            Approximate Date
+          </label>
+          <input
+            id="home-inquiry-approximate-date"
+            name="approximateDate"
+            type="date"
+            className="min-h-[2.75rem] w-full rounded border border-[rgba(180,140,110,0.3)] bg-[rgba(180,140,110,0.08)] px-3 py-2 text-base text-[#d4b896] outline-none [color-scheme:dark] md:min-h-0 md:px-4 md:py-2.5"
+          />
+        </div>
       </div>
       <textarea
         name="message"

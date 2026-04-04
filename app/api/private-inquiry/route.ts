@@ -26,8 +26,7 @@ export async function POST(req: Request) {
     name?: string
     email?: string
     eventType?: string
-    eventDateStart?: string
-    eventDateEnd?: string
+    approximateDate?: string
     message?: string
     /** Honeypot — bots often fill this; humans never see it */
     company?: string
@@ -46,29 +45,11 @@ export async function POST(req: Request) {
   const name = trimField(body.name, MAX_LEN.name)
   const email = trimField(body.email, MAX_LEN.email)
   const eventType = trimField(body.eventType, MAX_LEN.eventType)
-  const eventDateStart = trimField(body.eventDateStart, MAX_LEN.isoDate)
-  const eventDateEnd = trimField(body.eventDateEnd, MAX_LEN.isoDate)
+  const approximateDate = trimField(body.approximateDate, MAX_LEN.isoDate)
   const message = trimField(body.message, MAX_LEN.message)
 
-  if (eventDateStart && !parseIsoDate(eventDateStart)) {
-    return NextResponse.json({ error: 'Please use a valid start date.' }, { status: 400 })
-  }
-  if (eventDateEnd && !parseIsoDate(eventDateEnd)) {
-    return NextResponse.json({ error: 'Please use a valid end date.' }, { status: 400 })
-  }
-  const startT = eventDateStart ? parseIsoDate(eventDateStart) : null
-  const endT = eventDateEnd ? parseIsoDate(eventDateEnd) : null
-  if (startT != null && endT != null && endT < startT) {
-    return NextResponse.json({ error: 'End date must be on or after the start date.' }, { status: 400 })
-  }
-
-  let eventDateRange = ''
-  if (eventDateStart && eventDateEnd) {
-    eventDateRange = eventDateStart === eventDateEnd ? eventDateStart : `${eventDateStart} – ${eventDateEnd}`
-  } else if (eventDateStart) {
-    eventDateRange = `${eventDateStart} (start)`
-  } else if (eventDateEnd) {
-    eventDateRange = `${eventDateEnd} (end)`
+  if (approximateDate && !parseIsoDate(approximateDate)) {
+    return NextResponse.json({ error: 'Please use a valid approximate date.' }, { status: 400 })
   }
 
   if (!name || !email || !message) {
@@ -95,7 +76,7 @@ export async function POST(req: Request) {
   const safeName = escapeHtml(name)
   const safeEmail = escapeHtml(email)
   const safeType = escapeHtml(eventType)
-  const safeDate = escapeHtml(eventDateRange)
+  const safeApproxDate = escapeHtml(approximateDate)
   const safeMessage = escapeHtml(message).replace(/\r?\n/g, '<br/>')
 
   const html = `
@@ -106,7 +87,7 @@ export async function POST(req: Request) {
     <tr><td style="padding: 4px 12px 4px 0;"><strong>Name</strong></td><td>${safeName}</td></tr>
     <tr><td style="padding: 4px 12px 4px 0;"><strong>Email</strong></td><td>${safeEmail}</td></tr>
     <tr><td style="padding: 4px 12px 4px 0;"><strong>Event type</strong></td><td>${safeType || '—'}</td></tr>
-    <tr><td style="padding: 4px 12px 4px 0;"><strong>Date range</strong></td><td>${safeDate || '—'}</td></tr>
+    <tr><td style="padding: 4px 12px 4px 0;"><strong>Approximate date</strong></td><td>${safeApproxDate || '—'}</td></tr>
   </table>
   <p><strong>Message</strong></p>
   <p style="white-space: pre-wrap;">${safeMessage}</p>
