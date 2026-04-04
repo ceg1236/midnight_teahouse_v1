@@ -48,7 +48,7 @@ export function HomeNewsletterForm() {
   if (status === 'ok') {
     return (
       <p className="text-base text-[rgba(200,175,140,0.9)] md:text-lg" role="status">
-        Thanks — you're on the list.
+        Thank you and welcome to the teahouse.
       </p>
     )
   }
