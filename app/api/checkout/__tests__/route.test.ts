@@ -11,7 +11,7 @@ vi.mock('stripe', () => {
 })
 
 vi.mock('../../../../lib/sheets-availability', () => ({
-  getAvailability: vi.fn(),
+  getAvailabilityForDates: vi.fn(),
 }))
 
 vi.mock('../../../../lib/admin-token', () => ({
@@ -20,7 +20,7 @@ vi.mock('../../../../lib/admin-token', () => ({
 
 import { POST } from '../route'
 import { verifyToken } from '../../../../lib/admin-token'
-import { getAvailability } from '../../../../lib/sheets-availability'
+import { getAvailabilityForDates } from '../../../../lib/sheets-availability'
 
 const validBody = {
   dateId: 'mar-18',
@@ -50,7 +50,7 @@ describe('POST /api/checkout', () => {
     vi.resetModules()
     process.env = { ...env, STRIPE_SECRET_KEY: 'sk_test_xxx' }
     vi.mocked(verifyToken).mockReturnValue(null)
-    vi.mocked(getAvailability).mockResolvedValue([
+    vi.mocked(getAvailabilityForDates).mockResolvedValue([
       { dateId: 'mar-18', label: 'Wednesday, March 18', sold: 0, capacity: 45, soldOut: false },
       { dateId: 'mar-19', label: 'Thursday, March 19', sold: 0, capacity: 45, soldOut: false },
       { dateId: 'mar-20', label: 'Friday, March 20', sold: 0, capacity: 45, soldOut: false },
@@ -145,7 +145,7 @@ describe('POST /api/checkout', () => {
   })
 
   it('returns 409 when date is sold out', async () => {
-    vi.mocked(getAvailability).mockResolvedValue([
+    vi.mocked(getAvailabilityForDates).mockResolvedValue([
       { dateId: 'mar-18', label: 'Wednesday, March 18', sold: 45, capacity: 45, soldOut: true },
       { dateId: 'mar-19', label: 'Thursday, March 19', sold: 0, capacity: 45, soldOut: false },
       { dateId: 'mar-20', label: 'Friday, March 20', sold: 0, capacity: 45, soldOut: false },
@@ -157,7 +157,7 @@ describe('POST /api/checkout', () => {
   })
 
   it('returns 409 when order would exceed capacity', async () => {
-    vi.mocked(getAvailability).mockResolvedValue([
+    vi.mocked(getAvailabilityForDates).mockResolvedValue([
       { dateId: 'mar-18', label: 'Wednesday, March 18', sold: 43, capacity: 45, soldOut: false },
       { dateId: 'mar-19', label: 'Thursday, March 19', sold: 0, capacity: 45, soldOut: false },
       { dateId: 'mar-20', label: 'Friday, March 20', sold: 0, capacity: 45, soldOut: false },
@@ -169,7 +169,7 @@ describe('POST /api/checkout', () => {
   })
 
   it('bypasses capacity when valid ticket provided', async () => {
-    vi.mocked(getAvailability).mockResolvedValue([
+    vi.mocked(getAvailabilityForDates).mockResolvedValue([
       { dateId: 'mar-18', label: 'Wednesday, March 18', sold: 45, capacity: 45, soldOut: true },
       { dateId: 'mar-19', label: 'Thursday, March 19', sold: 0, capacity: 45, soldOut: false },
       { dateId: 'mar-20', label: 'Friday, March 20', sold: 0, capacity: 45, soldOut: false },
