@@ -49,6 +49,13 @@ Pre-launch checklist and monitoring guide before announcing ticket sales to gues
 - [ ] **`SPREADSHEET_ID`** – Target Google Sheet ID.
 - [ ] **`GOOGLE_CREDENTIALS_JSON`** – Service account JSON (single line, no newlines).
 
+### 2b. Local Stripe/Test Sheet Mode (optional, recommended before launch)
+- [ ] Set `PAYMENT_ENV=test` in local `.env.local` to force server APIs to use `TEST_*` payment vars.
+- [ ] Add `TEST_STRIPE_SECRET_KEY` and `TEST_STRIPE_WEBHOOK_SECRET` for local Stripe CLI and test checkout.
+- [ ] Add `TEST_SPREADSHEET_ID` (and optional `TEST_SPREADSHEET_SHEET_NAME`) so test orders never hit production sheets.
+- [ ] Add `TEST_GOOGLE_CREDENTIALS_JSON` (or `TEST_GOOGLE_APPLICATION_CREDENTIALS`) if test sheet permissions differ from prod.
+- [ ] Keep `RESEND_API_KEY` / `RESEND_FROM` unchanged unless you intentionally want a separate email sender in test mode.
+
 ### 3. Resend
 - [ ] **Domain** – `mail.midnighttea.house` (or your chosen domain) verified in Resend.
 - [ ] **From address** – Matches the verified domain.

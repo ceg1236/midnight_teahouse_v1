@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { signToken } from '../../../../lib/admin-token'
-import { eventDates, eventTiers } from '../../../../content/event-invite.config'
+import { getEventConfig } from '../../../../lib/event-registry'
 
 function getBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL
@@ -9,14 +9,15 @@ function getBaseUrl(): string {
 }
 
 export async function POST(req: NextRequest) {
-  let body: { password?: string; dateId?: string; tierId?: string; door?: boolean }
+  let body: { password?: string; dateId?: string; tierId?: string; door?: boolean; eventSlug?: string }
   try {
     body = await req.json()
   } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const { password, dateId, tierId, door } = body
+  const { password, dateId, tierId, door, eventSlug } = body
+  const event = getEventConfig(eventSlug)
   const expected = process.env.ADMIN_PASSWORD
   if (!expected || !password || password !== expected) {
     return NextResponse.json({ error: 'Invalid password' }, { status: 401 })
@@ -33,8 +34,8 @@ export async function POST(req: NextRequest) {
     let token: string
     if (door) {
       token = signToken({ door: true })
-    } else if (dateId && eventDates.some((d) => d.id === dateId)) {
-      const tierIdValid = !tierId || eventTiers.some((t) => t.id === tierId)
+    } else if (dateId && event.dates.some((d) => d.id === dateId)) {
+      const tierIdValid = !tierId || event.tiers.some((t) => t.id === tierId)
       token = signToken({
         dateId,
         ...(tierIdValid && tierId ? { tierId } : {}),
@@ -44,7 +45,7 @@ export async function POST(req: NextRequest) {
     }
 
     const baseUrl = getBaseUrl()
-    const url = `${baseUrl}/invite?ticket=${encodeURIComponent(token)}`
+    const url = `${baseUrl}${event.invitePath}?ticket=${encodeURIComponent(token)}`
     return NextResponse.json({ url })
   } catch (err) {
     console.error('Admin generate-link error:', err)

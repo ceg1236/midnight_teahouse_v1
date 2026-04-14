@@ -1,20 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { google } from 'googleapis'
-import { eventDates, eventTiers } from '../../../../content/event-invite.config'
 import { sendConfirmationEmail } from '../../../../lib/confirmation-email'
 import { applyRefundToSheet } from '../../../../lib/sheets-refund'
+import { getEventConfig } from '../../../../lib/event-registry'
+import { getSheetsConfig, getStripeSecretKey, getStripeWebhookSecret } from '../../../../lib/payment-env'
 
-const TIER_LABELS: Record<string, string> = Object.fromEntries(
-  eventTiers.map((t) => [t.id, t.label])
-)
-
-function formatTicketType(orderStr: string): string {
+function formatTicketType(orderStr: string, tierLabels: Record<string, string>): string {
   const parts: string[] = []
   for (const pair of orderStr.split(',')) {
     const [tierId] = pair.split(':')
     if (!tierId) continue
-    const label = TIER_LABELS[tierId] ?? tierId
+    const label = tierLabels[tierId] ?? tierId
     parts.push(label)
   }
   return Array.from(new Set(parts)).join(', ') || ''
@@ -115,8 +112,8 @@ async function handleChargeRefunded(
 }
 
 export async function POST(req: NextRequest) {
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
-  const secretKey = process.env.STRIPE_SECRET_KEY
+  const webhookSecret = getStripeWebhookSecret()
+  const secretKey = getStripeSecretKey()
   if (!webhookSecret || !secretKey) {
     console.error('STRIPE_WEBHOOK_SECRET or STRIPE_SECRET_KEY is not set')
     return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 })
@@ -153,7 +150,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid session metadata' }, { status: 400 })
   }
 
-  const date = eventDates.find((d) => d.id === metadata.dateId)
+  const eventConfig = getEventConfig(metadata?.eventSlug)
+  const tierLabels: Record<string, string> = Object.fromEntries(
+    eventConfig.tiers.map((t) => [t.id, t.label])
+  )
+  const date = eventConfig.dates.find((d) => d.id === metadata.dateId)
   const ticketDate = (date?.label ?? metadata.dateId).replace(/\n/g, ' ')
 
   const amountPaid =
@@ -180,7 +181,7 @@ export async function POST(req: NextRequest) {
   const qty = String(totalQty)
   const ticketType =
     metadata.order && typeof metadata.order === 'string'
-      ? formatTicketType(metadata.order)
+      ? formatTicketType(metadata.order, tierLabels)
       : ''
   const row = [
     new Date().toISOString(),
@@ -197,10 +198,7 @@ export async function POST(req: NextRequest) {
     '', // Refund Notes (L) - empty for new sales
   ]
 
-  const spreadsheetId = process.env.SPREADSHEET_ID
-  const credentialsJson = process.env.GOOGLE_CREDENTIALS_JSON
-  const credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS
-  const sheetName = process.env.SPREADSHEET_SHEET_NAME || 'Sheet1'
+  const { spreadsheetId, credentialsJson, credentialsPath, sheetName } = getSheetsConfig()
   if (!spreadsheetId) {
     console.error('SPREADSHEET_ID not set')
     return NextResponse.json(

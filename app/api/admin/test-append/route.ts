@@ -8,7 +8,8 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { google } from 'googleapis'
-import { eventDates } from '../../../../content/event-invite.config'
+import { getEventConfig } from '../../../../lib/event-registry'
+import { getSheetsConfig } from '../../../../lib/payment-env'
 
 export async function POST(req: NextRequest) {
   if (process.env.NODE_ENV === 'production') {
@@ -27,10 +28,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const spreadsheetId = process.env.SPREADSHEET_ID
-  const credentialsJson = process.env.GOOGLE_CREDENTIALS_JSON
-  const credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS
-  const sheetName = process.env.SPREADSHEET_SHEET_NAME || 'Sheet1'
+  const { spreadsheetId, credentialsJson, credentialsPath, sheetName } = getSheetsConfig()
 
   if (!spreadsheetId || (!credentialsJson && !credentialsPath)) {
     return NextResponse.json({ error: 'Sheets not configured' }, { status: 500 })
@@ -50,7 +48,7 @@ export async function POST(req: NextRequest) {
   const sheets = google.sheets({ version: 'v4', auth })
 
   const testId = `pi_test_${Date.now()}`
-  const date = eventDates[0]
+  const date = getEventConfig().dates[0]
   const row = [
     new Date().toISOString(),
     'Test User',

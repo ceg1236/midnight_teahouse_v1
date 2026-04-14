@@ -7,12 +7,13 @@
 import path from 'path'
 import { google } from 'googleapis'
 import { eventDates } from '../content/event-invite.config'
+import type { EventDate } from '../content/event-schema'
+import { getSheetsConfig } from './payment-env'
 
 const CONFIG_SHEET_NAME = 'Config'
 
 function getSheetsClient() {
-  const credentialsJson = process.env.GOOGLE_CREDENTIALS_JSON
-  const credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS
+  const { credentialsJson, credentialsPath } = getSheetsConfig()
   if (credentialsJson) {
     return google.sheets({
       version: 'v4',
@@ -35,9 +36,9 @@ function getSheetsClient() {
 }
 
 /** Default capacity from event-invite.config */
-export function getDefaultCapacity(): Record<string, number> {
+export function getDefaultCapacity(dates: readonly EventDate[] = eventDates): Record<string, number> {
   return Object.fromEntries(
-    eventDates.map((d) => [
+    dates.map((d) => [
       d.id,
       typeof (d as { capacity?: number }).capacity === 'number'
         ? (d as { capacity: number }).capacity
@@ -50,7 +51,7 @@ export function getDefaultCapacity(): Record<string, number> {
  * Read capacity from Config sheet. Returns null if Config not found (use defaults).
  */
 export async function getCapacityFromSheet(): Promise<Record<string, number> | null> {
-  const spreadsheetId = process.env.SPREADSHEET_ID
+  const { spreadsheetId } = getSheetsConfig()
   if (!spreadsheetId) return null
 
   const sheets = getSheetsClient()

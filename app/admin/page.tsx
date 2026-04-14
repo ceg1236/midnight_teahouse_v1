@@ -2,7 +2,12 @@
 
 import { useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
-import { eventDates, eventTiers } from '../../content/event-invite.config'
+import { getEventConfig } from '../../lib/event-registry'
+
+const EVENT_OPTIONS = [
+  getEventConfig('crossing-into-spring'),
+  getEventConfig('special-event'),
+]
 
 export default function AdminPage() {
   const [password, setPassword] = useState('')
@@ -70,6 +75,7 @@ export default function AdminPage() {
 }
 
 function LinkTab({ password }: { password: string }) {
+  const [eventSlug, setEventSlug] = useState(EVENT_OPTIONS[0].slug)
   const [dateId, setDateId] = useState('')
   const [tierId, setTierId] = useState('')
   const [door, setDoor] = useState(false)
@@ -86,6 +92,7 @@ function LinkTab({ password }: { password: string }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         password,
+        eventSlug,
         door,
         ...(dateId && { dateId }),
         ...(tierId && { tierId }),
@@ -99,6 +106,8 @@ function LinkTab({ password }: { password: string }) {
     setGeneratedUrl(data.url)
   }
 
+  const selectedEvent = EVENT_OPTIONS.find((e) => e.slug === eventSlug) ?? EVENT_OPTIONS[0]
+
   const handleCopy = async () => {
     if (!generatedUrl) return
     await navigator.clipboard.writeText(generatedUrl)
@@ -111,6 +120,25 @@ function LinkTab({ password }: { password: string }) {
       <h1 className="text-xl font-semibold text-[#FAEBD4]">Generate Purchase Link</h1>
 
       <form onSubmit={handleGenerate} className="space-y-4">
+        <label className="block">
+          <span className="text-sm text-[#D9D0BF]">Event</span>
+          <select
+            value={eventSlug}
+            onChange={(e) => {
+              setEventSlug(e.target.value)
+              setDateId('')
+              setTierId('')
+            }}
+            className="mt-1 block w-full rounded-lg border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] focus:border-[#FAE0B9] focus:outline-none"
+          >
+            {EVENT_OPTIONS.map((event) => (
+              <option key={event.slug} value={event.slug}>
+                {event.title}
+              </option>
+            ))}
+          </select>
+        </label>
+
         <label className="flex items-center gap-2 text-[#FAEBD4] cursor-pointer">
           <input
             type="checkbox"
@@ -134,7 +162,7 @@ function LinkTab({ password }: { password: string }) {
                 className="mt-1 block w-full rounded-lg border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] focus:border-[#FAE0B9] focus:outline-none"
               >
                 <option value="">Any (guest chooses)</option>
-                {eventDates.map((d) => (
+                {selectedEvent.dates.map((d) => (
                   <option key={d.id} value={d.id}>
                     {d.label}
                   </option>
@@ -150,7 +178,7 @@ function LinkTab({ password }: { password: string }) {
                   className="mt-1 block w-full rounded-lg border border-[#FAE0B9]/50 bg-[#2E0303]/50 px-4 py-3 text-[#FAEBD4] focus:border-[#FAE0B9] focus:outline-none"
                 >
                   <option value="">Any (guest chooses)</option>
-                  {eventTiers.map((t) => (
+                  {selectedEvent.tiers.map((t) => (
                     <option key={t.id} value={t.id}>
                       {t.label}
                     </option>

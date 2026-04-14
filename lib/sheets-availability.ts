@@ -7,6 +7,8 @@
 import { google } from 'googleapis'
 import { eventDates } from '../content/event-invite.config'
 import { getCapacityFromSheet, getDefaultCapacity } from './sheets-capacity'
+import type { EventDate } from '../content/event-schema'
+import { getSheetsConfig } from './payment-env'
 
 export type DateAvailability = {
   dateId: string
@@ -17,8 +19,7 @@ export type DateAvailability = {
 }
 
 function getSheetsClient() {
-  const credentialsJson = process.env.GOOGLE_CREDENTIALS_JSON
-  const credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS
+  const { credentialsJson, credentialsPath } = getSheetsConfig()
   if (!credentialsJson && !credentialsPath) return null
 
   const auth = new google.auth.GoogleAuth(
@@ -39,7 +40,14 @@ function getSheetsClient() {
  * Return mock availability for UI testing. Use with /invite?mock=soldOut:mar-18,mar-19 (dev only)
  */
 export function getMockAvailability(soldOutDateIds: string[]): DateAvailability[] {
-  return eventDates.map((d) => {
+  return getMockAvailabilityForDates(eventDates, soldOutDateIds)
+}
+
+export function getMockAvailabilityForDates(
+  dates: readonly EventDate[],
+  soldOutDateIds: string[]
+): DateAvailability[] {
+  return dates.map((d) => {
     const capacity = typeof (d as { capacity?: number }).capacity === 'number'
       ? (d as { capacity: number }).capacity
       : 45
@@ -60,8 +68,13 @@ export function getMockAvailability(soldOutDateIds: string[]): DateAvailability[
  * Returns null if Sheets not configured (caller should treat all dates as available).
  */
 export async function getAvailability(): Promise<DateAvailability[] | null> {
-  const spreadsheetId = process.env.SPREADSHEET_ID
-  const sheetName = process.env.SPREADSHEET_SHEET_NAME || 'Sheet1'
+  return getAvailabilityForDates(eventDates)
+}
+
+export async function getAvailabilityForDates(
+  dates: readonly EventDate[]
+): Promise<DateAvailability[] | null> {
+  const { spreadsheetId, sheetName } = getSheetsConfig()
   if (!spreadsheetId) return null
 
   const sheets = getSheetsClient()
@@ -89,9 +102,9 @@ export async function getAvailability(): Promise<DateAvailability[] | null> {
       }
     }
 
-    const capacityByDateId = (await getCapacityFromSheet()) ?? getDefaultCapacity()
+    const capacityByDateId = (await getCapacityFromSheet()) ?? getDefaultCapacity(dates)
 
-    return eventDates.map((d) => {
+    return dates.map((d) => {
       const capacity = capacityByDateId[d.id] ?? 999
       const sold = soldByLabel[d.label] ?? 0
       const soldOut = capacity > 0 && sold >= capacity

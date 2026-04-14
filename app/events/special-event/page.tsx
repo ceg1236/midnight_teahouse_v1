@@ -1,7 +1,7 @@
-import { CarrdStylePage } from '../components/carrd-style-page'
-import { getEventInviteContentBySlug } from '../../content/parse'
-import { getAvailabilityForDates, getMockAvailabilityForDates } from '../../lib/sheets-availability'
-import { getEventConfig } from '../../lib/event-registry'
+import { CarrdStylePage } from '../../components/carrd-style-page'
+import { getEventInviteContentBySlug } from '../../../content/parse'
+import { getAvailabilityForDates, getMockAvailabilityForDates } from '../../../lib/sheets-availability'
+import { getEventConfig } from '../../../lib/event-registry'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,12 +10,12 @@ function firstString(v: string | string[] | undefined): string | undefined {
   return Array.isArray(v) ? v[0] : v
 }
 
-export default async function InvitePage({
+export default async function SpecialEventPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
-  const eventConfig = getEventConfig('crossing-into-spring')
+  const eventConfig = getEventConfig('special-event')
   const welcomeContent = getEventInviteContentBySlug(eventConfig.welcomeContentSlug)
   const params = await searchParams
 
