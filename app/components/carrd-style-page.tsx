@@ -357,7 +357,7 @@ export function CarrdStylePage({
             </div>
             {showCountdown && (
               <div className="flex justify-center py-6" style={{ transform: 'scale(1.3)' }}>
-                <CountdownTimer target={countdownTarget} length={3} />
+                <CountdownTimer targetTimestamp={countdownTarget} length={3} />
               </div>
             )}
             <section className="w-full flex flex-col items-center gap-10 text-center">
@@ -622,7 +622,7 @@ export function CarrdStylePage({
         {/* Countdown */}
         {showCountdown && (
           <div className="flex justify-center py-6" style={{ transform: 'scale(1.3)' }}>
-            <CountdownTimer target={countdownTarget} length={3} />
+            <CountdownTimer targetTimestamp={countdownTarget} length={3} />
           </div>
         )}
 
