@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import React, { useEffect, useRef, useState } from 'react'
 import { CountdownTimer } from './countdown-timer'
-import type { eventDates, eventTiers } from '../../content/event-invite.config'
+import type { EventDate, EventTier } from '../../content/event-schema'
 import { decodeTokenPayload } from '../../lib/admin-token-decode'
 import { resolveDoorDate } from '../../lib/door-date'
 import { HeroVideo } from './hero-video'
@@ -12,19 +12,28 @@ import { SiteFooter } from './site-footer'
 const STORAGE_KEY = 'teahouse_reservation'
 
 type CarrdStylePageProps = {
+  eventSlug: string
+  eventTitle: string
   welcomeContent: string
-  dates: readonly (typeof eventDates)[number][]
-  tiers: readonly (typeof eventTiers)[number][]
-  /** Unix timestamp for countdown (first event at 7pm) */
+  dates: readonly EventDate[]
+  tiers: readonly EventTier[]
+  /** Unix  for countdown (first event at 7pm) */
   countdownTarget: number
+  showCountdown?: boolean
+  dateRangeLabel: string
+  timeLabel: string
+  locationLabel: string
   /** dateId -> soldOut; used to disable and style sold-out dates */
   soldOutByDateId?: Record<string, boolean>
+  /** dateId -> remaining seats; used for low-inventory messaging */
+  remainingByDateId?: Record<string, number>
   /** Admin/door token – bypasses sold-out, pre-fills date/tier */
   initialTicket?: string
 }
 
 const SCROLL_DURATION = 1200
 const SCROLL_OFFSET_TOP = 48
+const NO_MORE_TICKETS_MSG = 'No more tickets left'
 
 const BOOKING_NOTES: Array<string | React.ReactNode> = [
   'Doors open at 7pm and close at 11pm. Join us anytime in this window.',
@@ -114,7 +123,21 @@ function savePersisted(
   }
 }
 
-export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, soldOutByDateId = {}, initialTicket }: CarrdStylePageProps) {
+export function CarrdStylePage({
+  eventSlug,
+  eventTitle,
+  welcomeContent,
+  dates,
+  tiers,
+  countdownTarget,
+  showCountdown = true,
+  dateRangeLabel,
+  timeLabel,
+  locationLabel,
+  soldOutByDateId = {},
+  remainingByDateId = {},
+  initialTicket,
+}: CarrdStylePageProps) {
   const tokenPayload = initialTicket ? decodeTokenPayload(initialTicket) : null
   const bypassSoldOut = !!tokenPayload
   const effectiveSoldOut = bypassSoldOut ? {} : soldOutByDateId
@@ -127,6 +150,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
   const [deviceType, setDeviceType] = useState<'mobile' | 'tablet' | 'desktop'>('desktop')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
+  const [ticketLimitError, setTicketLimitError] = useState<string | null>(null)
   const [hydrated, setHydrated] = useState(false)
   const [expandedBlurbId, setExpandedBlurbId] = useState<string | null>(null)
   const [expandedPricingNote, setExpandedPricingNote] = useState(false)
@@ -239,6 +263,18 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
 
   const hasSelection = Object.values(selections).some((q) => q > 0)
   const totalQuantity = Object.values(selections).reduce((s, q) => s + q, 0)
+  const selectedDateRemaining = selectedDate ? remainingByDateId[selectedDate] : undefined
+  const maxSelectableTickets = bypassSoldOut
+    ? 4
+    : typeof selectedDateRemaining === 'number'
+      ? Math.max(0, Math.min(4, selectedDateRemaining))
+      : 4
+  useEffect(() => {
+    if (!ticketLimitError) return
+    if (totalQuantity < maxSelectableTickets) {
+      setTicketLimitError(null)
+    }
+  }, [ticketLimitError, totalQuantity, maxSelectableTickets])
   const hasValidSupportedPrice = (() => {
     const v = parseInt(supportedPriceInput, 10)
     return !isNaN(v) && v >= 20 && v <= 40
@@ -263,8 +299,14 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
       if (q > 0) {
         const next = { ...prev }
         delete next[tierId]
+        setTicketLimitError(null)
         return next
       }
+      if (maxSelectableTickets <= 0) {
+        setTicketLimitError(NO_MORE_TICKETS_MSG)
+        return prev
+      }
+      setTicketLimitError(null)
       return { [tierId]: 1 }
     })
   }
@@ -272,12 +314,19 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
   const handleQuantityChange = (tierId: string, delta: number) => {
     setSelections((prev) => {
       const q = prev[tierId] ?? 0
+      const prevTotal = Object.values(prev).reduce((s, n) => s + n, 0)
       if (delta === -1 && q <= 1) {
         const next = { ...prev }
         delete next[tierId]
+        setTicketLimitError(null)
         return next
       }
+      if (delta === 1 && prevTotal >= maxSelectableTickets) {
+        setTicketLimitError(NO_MORE_TICKETS_MSG)
+        return prev
+      }
       if (delta === 1 && q >= 4) return prev
+      setTicketLimitError(null)
       return { [tierId]: q + delta }
     })
   }
@@ -306,12 +355,14 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
                 <HeroVideo className="w-full h-full object-cover" />
               </div>
             </div>
-            <div className="flex justify-center py-6" style={{ transform: 'scale(1.3)' }}>
-              <CountdownTimer targetTimestamp={countdownTarget} length={3} />
-            </div>
+            {showCountdown && (
+              <div className="flex justify-center py-6" style={{ transform: 'scale(1.3)' }}>
+                <CountdownTimer target={countdownTarget} length={3} />
+              </div>
+            )}
             <section className="w-full flex flex-col items-center gap-10 text-center">
               <div className="flex flex-col items-center gap-[1em] w-full">
-                <h2 className="carrd-font-heading text-[0.96rem] italic" style={{ letterSpacing: '-2px' }}>Crossing into Spring</h2>
+                <h2 className="carrd-font-heading text-[0.96rem] italic" style={{ letterSpacing: '-2px' }}>{eventTitle}</h2>
                 <div className="carrd-font-body text-left space-y-4 w-full max-w-[650px]">
                   {welcomeContent.split(/\n\n+/).map((para, i) => (
                     <p key={i} className="whitespace-pre-line">{para}</p>
@@ -322,14 +373,14 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
                 <div className="space-y-2">
                   <p className="carrd-font-label text-[1.3125rem]">Date</p>
                   <div className="space-y-0.5">
-                    <p className="carrd-font-body">March 18-20, 2026</p>
-                    <p className="carrd-font-body">7-11pm</p>
+                    <p className="carrd-font-body">{dateRangeLabel}</p>
+                    <p className="carrd-font-body">{timeLabel}</p>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <p className="carrd-font-label text-[1.3125rem]">Location</p>
                   <div className="space-y-0.5">
-                    <p className="carrd-font-body">SoMA, SF</p>
+                    <p className="carrd-font-body">{locationLabel}</p>
                   </div>
                 </div>
               </div>
@@ -389,6 +440,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
                       const musicianLine = d.musicians[0] ?? ''
                       const isSelected = selectedDate === d.id
                       const soldOut = effectiveSoldOut[d.id]
+                      const remaining = remainingByDateId[d.id]
                       return (
                         <div
                           key={d.id}
@@ -410,6 +462,9 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
                             ) : (
                               <p className="text-[#D9D0BF]/90 text-lg italic mt-0.5">{musicianLine}</p>
                             )}
+                            {!soldOut && typeof remaining === 'number' && remaining > 0 && remaining < 5 ? (
+                              <p className="text-[#FAE0B9] text-base mt-1">Only {remaining} tickets remaining</p>
+                            ) : null}
                           </div>
                           <span className={`shrink-0 self-center ${soldOut ? 'text-[#D9D0BF]/70 italic' : isSelected ? 'carrd-mobile-pill-select carrd-mobile-pill-select--selected' : 'carrd-mobile-pill-select'}`}>{soldOut ? 'Sold Out' : 'Select'}</span>
                         </div>
@@ -437,7 +492,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
                             <div className="flex items-center justify-center gap-2">
                               <button type="button" onClick={() => handleQuantityChange(t.id, -1)} className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg" aria-label={`Decrease ${t.label}`}>−</button>
                               <span className="w-8 text-center text-lg tabular-nums text-[#FAEBD4]">{qty}</span>
-                              <button type="button" onClick={() => handleQuantityChange(t.id, 1)} disabled={totalQuantity >= 4} className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg disabled:opacity-40" aria-label={`Increase ${t.label}`}>+</button>
+                              <button type="button" onClick={() => handleQuantityChange(t.id, 1)} disabled={totalQuantity >= maxSelectableTickets} className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg disabled:opacity-40" aria-label={`Increase ${t.label}`}>+</button>
                             </div>
                           ) : null}
                           {qty === 0 && (
@@ -466,7 +521,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
                             <div className="flex items-center justify-center gap-2">
                               <button type="button" onClick={() => handleQuantityChange('supported', -1)} className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg" aria-label="Decrease Supported">−</button>
                               <span className="w-8 text-center text-lg tabular-nums text-[#FAEBD4]">{selections['supported'] ?? 0}</span>
-                              <button type="button" onClick={() => handleQuantityChange('supported', 1)} disabled={totalQuantity >= 4} className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg disabled:opacity-40" aria-label="Increase Supported">+</button>
+                              <button type="button" onClick={() => handleQuantityChange('supported', 1)} disabled={totalQuantity >= maxSelectableTickets} className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg disabled:opacity-40" aria-label="Increase Supported">+</button>
                             </div>
                           </div>
                         ) : null}
@@ -485,6 +540,9 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
                           Our city and community span a wide range of financial situations. Our tiered pricing helps us balance making the teahouse both financially sustainable and accessible. We invite you to choose the level that feels right for you — one that honors your own capacity while helping us keep this space open, welcoming and alive.
                         </p>
                       </div>
+                    )}
+                    {ticketLimitError && (
+                      <p className="carrd-font-body text-base text-[#FAE0B9]">{ticketLimitError}</p>
                     )}
                   </div>
                   <button type="button" onClick={() => setReservationStep(3)} disabled={!hasSelection} className="carrd-btn px-8 py-4 disabled:opacity-50 disabled:cursor-not-allowed">Continue</button>
@@ -524,7 +582,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
                       setIsSubmitting(true); setCheckoutError(null)
                       try {
                         const items = Object.entries(selections).filter(([, q]) => q > 0).map(([tierId, qty]) => ({ tierId, quantity: qty, ...(tierId === 'supported' && { supportedPrice }) }))
-                        const res = await fetch('/api/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dateId: selectedDate, items, supportedPrice: (selections['supported'] ?? 0) > 0 ? supportedPrice : undefined, name: formData.name.trim(), email: formData.email.trim(), notes: formData.notes.trim(), device: deviceType, ...(initialTicket && { ticket: initialTicket }) }) })
+                        const res = await fetch('/api/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ eventSlug, dateId: selectedDate, items, supportedPrice: (selections['supported'] ?? 0) > 0 ? supportedPrice : undefined, name: formData.name.trim(), email: formData.email.trim(), notes: formData.notes.trim(), device: deviceType, ...(initialTicket && { ticket: initialTicket }) }) })
                         const data = await res.json()
                         if (!res.ok) { setCheckoutError(data.error ?? 'Something went wrong'); return }
                         if (data.url) window.location.href = data.url
@@ -562,15 +620,17 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
         </div>
 
         {/* Countdown */}
-        <div className="flex justify-center py-6" style={{ transform: 'scale(1.3)' }}>
-          <CountdownTimer targetTimestamp={countdownTarget} length={3} />
-        </div>
+        {showCountdown && (
+          <div className="flex justify-center py-6" style={{ transform: 'scale(1.3)' }}>
+            <CountdownTimer target={countdownTarget} length={3} />
+          </div>
+        )}
 
         {/* March Gatherings */}
         <section className="w-full flex flex-col items-center gap-10 text-center">
           <div className="flex flex-col items-center gap-[1em] w-full">
-            <h2 className="carrd-font-heading text-[0.96rem] md:text-3xl italic" style={{ letterSpacing: '-2px' }}>
-              Crossing into Spring
+              <h2 className="carrd-font-heading text-[0.96rem] md:text-3xl italic" style={{ letterSpacing: '-2px' }}>
+              {eventTitle}
             </h2>
             <div className="carrd-font-body text-left space-y-4 w-full max-w-[650px]">
             {welcomeContent.split(/\n\n+/).map((para, i) => (
@@ -587,10 +647,10 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
               </p>
               <div className="space-y-0.5">
                 <p className="carrd-font-body">
-                  March 18-20, 2026
+                  {dateRangeLabel}
                 </p>
                 <p className="carrd-font-body">
-                  7-11pm
+                  {timeLabel}
                 </p>
               </div>
             </div>
@@ -600,7 +660,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
               </p>
               <div className="space-y-0.5">
                 <p className="carrd-font-body">
-                  SoMA, SF
+                  {locationLabel}
                 </p>
               </div>
             </div>
@@ -685,6 +745,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
                   const musicianLine = d.musicians[0] ?? ''
                   const isSelected = selectedDate === d.id
                   const soldOut = effectiveSoldOut[d.id]
+                  const remaining = remainingByDateId[d.id]
                   return (
                     <div
                       key={d.id}
@@ -723,6 +784,9 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
                         ) : (
                           <p className="text-[#D9D0BF]/90 text-[0.9375rem] italic mt-0.5">{musicianLine}</p>
                         )}
+                        {!soldOut && typeof remaining === 'number' && remaining > 0 && remaining < 5 ? (
+                          <p className="text-[#FAE0B9] text-sm mt-1">Only {remaining} tickets remaining</p>
+                        ) : null}
                       </div>
                       <span className={`shrink-0 self-center ${soldOut ? 'text-[#D9D0BF]/70 italic' : isSelected ? 'carrd-mobile-pill-select carrd-mobile-pill-select--selected' : 'carrd-mobile-pill-select'}`}>
                         {soldOut ? 'Sold Out' : 'Select'}
@@ -735,6 +799,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
               <div className="hidden md:block w-full max-w-[650px] space-y-6">
                 {dates.map((d) => {
                   const soldOut = effectiveSoldOut[d.id]
+                  const remaining = remainingByDateId[d.id]
                   return (
                   <div
                     key={d.id}
@@ -747,6 +812,9 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
                           {line}
                         </p>
                       ))}
+                      {!soldOut && typeof remaining === 'number' && remaining > 0 && remaining < 5 ? (
+                        <p className="text-[#FAE0B9] text-base mt-1">Only {remaining} tickets remaining</p>
+                      ) : null}
                     </div>
                     <button
                       type="button"
@@ -866,7 +934,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
                               type="button"
                               onClick={() => handleQuantityChange(t.id, 1)}
                               className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg transition-colors hover:bg-[#FAE0B9]/25 active:bg-[#FAE0B9]/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#D9D0BF]/20"
-                              disabled={totalQuantity >= 4}
+                              disabled={totalQuantity >= maxSelectableTickets}
                               aria-label={`Increase ${t.label} quantity`}
                             >
                               +
@@ -955,7 +1023,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
                               type="button"
                               onClick={() => handleQuantityChange('supported', 1)}
                               className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg transition-colors hover:bg-[#FAE0B9]/25 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#D9D0BF]/20"
-                              disabled={totalQuantity >= 4}
+                              disabled={totalQuantity >= maxSelectableTickets}
                               aria-label="Increase Supported quantity"
                             >
                               +
@@ -1024,7 +1092,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
                                 type="button"
                                 onClick={() => handleQuantityChange(t.id, 1)}
                                 className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-sm transition-colors hover:bg-[#FAE0B9]/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                                disabled={totalQuantity >= 4}
+                                disabled={totalQuantity >= maxSelectableTickets}
                                 aria-label={`Increase ${t.label} quantity`}
                               >
                                 +
@@ -1127,7 +1195,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
                             type="button"
                             onClick={() => handleQuantityChange('supported', 1)}
                             className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-sm transition-colors hover:bg-[#FAE0B9]/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                            disabled={totalQuantity >= 4}
+                            disabled={totalQuantity >= maxSelectableTickets}
                             aria-label="Increase Supported quantity"
                           >
                             +
@@ -1168,6 +1236,9 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
                       Our city and community span a wide range of financial situations. Our tiered pricing helps us balance making the teahouse both financially sustainable and accessible. We invite you to choose the level that feels right for you — one that honors your own capacity while helping us keep this space open, welcoming and alive.
                     </p>
                   </div>
+                )}
+                {ticketLimitError && (
+                  <p className="carrd-font-body text-base text-[#FAE0B9]">{ticketLimitError}</p>
                 )}
               </div>
               <div className="flex flex-wrap items-center justify-center gap-4 w-full max-w-[650px]">
@@ -1328,6 +1399,7 @@ export function CarrdStylePage({ welcomeContent, dates, tiers, countdownTarget, 
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
+                          eventSlug,
                           dateId: selectedDate,
                           items,
                           supportedPrice: (selections['supported'] ?? 0) > 0 ? supportedPrice : undefined,

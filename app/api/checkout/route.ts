@@ -1,22 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { eventDates, eventTiers } from '../../../content/event-invite.config'
 import { verifyToken } from '../../../lib/admin-token'
 import { checkRateLimit } from '../../../lib/rate-limit'
-import { getAvailability } from '../../../lib/sheets-availability'
+import { getAvailabilityForDates } from '../../../lib/sheets-availability'
+import { getEventConfig } from '../../../lib/event-registry'
+import { getStripeSecretKey } from '../../../lib/payment-env'
+import type { EventTier } from '../../../content/event-schema'
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const NAME_MAX_LEN = 200
 const NOTES_MAX_LEN = 1000
 
-function getBaseUrl(): string {
+function getRequestBaseUrl(req: NextRequest): string {
   if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL
+
+  const forwardedHost = req.headers.get('x-forwarded-host')?.split(',')[0]?.trim()
+  const host = forwardedHost || req.headers.get('host')?.split(',')[0]?.trim()
+  const forwardedProto = req.headers.get('x-forwarded-proto')?.split(',')[0]?.trim()
+  if (host) {
+    const proto = forwardedProto || req.nextUrl.protocol.replace(':', '') || 'https'
+    return `${proto}://${host}`
+  }
+
+  if (req.nextUrl?.origin) return req.nextUrl.origin
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
   return 'http://localhost:3000'
 }
 
 export async function POST(req: NextRequest) {
-  if (!process.env.STRIPE_SECRET_KEY) {
+  const stripeSecretKey = getStripeSecretKey()
+  if (!stripeSecretKey) {
     return NextResponse.json(
       { error: 'Stripe is not configured' },
       { status: 500 }
@@ -32,6 +45,7 @@ export async function POST(req: NextRequest) {
   }
 
   let body: {
+    eventSlug?: string
     dateId?: string
     items?: Array<{ tierId: string; quantity: number; supportedPrice?: number }>
     supportedPrice?: number
@@ -47,7 +61,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
   }
 
-  const { dateId, items = [], supportedPrice, name, email, notes = '', device = 'desktop', ticket } = body
+  const {
+    eventSlug,
+    dateId,
+    items = [],
+    supportedPrice,
+    name,
+    email,
+    notes = '',
+    device = 'desktop',
+    ticket,
+  } = body
+  const event = getEventConfig(eventSlug)
 
   // Bypass capacity if valid admin/door token
   const tokenPayload = ticket ? verifyToken(ticket) : null
@@ -62,15 +87,15 @@ export async function POST(req: NextRequest) {
       : 'desktop'
 
   // Validate date
-  const date = eventDates.find((d) => d.id === dateId)
+  const date = event.dates.find((d) => d.id === dateId)
   if (!date) {
     return NextResponse.json({ error: 'Invalid date' }, { status: 400 })
   }
 
   // Validate items
-  const lineItems: Array<{ tier: (typeof eventTiers)[number]; quantity: number; unitAmount: number }> = []
+  const lineItems: Array<{ tier: EventTier; quantity: number; unitAmount: number }> = []
   for (const item of items) {
-    const tier = eventTiers.find((t) => t.id === item.tierId)
+    const tier = event.tiers.find((t) => t.id === item.tierId)
     if (!tier || !item.quantity || item.quantity < 1 || item.quantity > 4) continue
     const unitAmount =
       item.tierId === 'supported' && typeof (item.supportedPrice ?? supportedPrice) === 'number'
@@ -88,7 +113,7 @@ export async function POST(req: NextRequest) {
 
   // Capacity check (skip if valid admin/door token)
   if (!bypassCapacity) {
-    const availability = await getAvailability()
+    const availability = await getAvailabilityForDates(event.dates)
     if (availability) {
       const dateAvail = availability.find((a) => a.dateId === dateId)
       if (dateAvail?.soldOut) {
@@ -128,16 +153,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Notes are too long' }, { status: 400 })
   }
 
-  const baseUrl = getBaseUrl()
+  const baseUrl = getRequestBaseUrl(req)
   const successUrl =
-    `${baseUrl}/invite/success?session_id={CHECKOUT_SESSION_ID}` +
+    `${baseUrl}${event.successPath}?session_id={CHECKOUT_SESSION_ID}` +
     `&date_id=${encodeURIComponent(date.id)}` +
     `&name=${encodeURIComponent(trimmedName)}`
-  const cancelUrl = `${baseUrl}`
+  const cancelUrl = `${baseUrl}${event.invitePath}`
 
   const orderStr = lineItems.map((li) => `${li.tier.id}:${li.quantity}`).join(',')
   const supportedInOrder = lineItems.find((li) => li.tier.id === 'supported')
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+  const stripe = new Stripe(stripeSecretKey)
   try {
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
@@ -146,13 +171,14 @@ export async function POST(req: NextRequest) {
           currency: 'usd',
           product_data: {
             name: `${date.label} · ${li.tier.label}`,
-            description: `Crossing into Spring – ${li.tier.label} tier`,
+            description: `${event.stripeDescriptionLabel} - ${li.tier.label} tier`,
           },
           unit_amount: li.unitAmount * 100, // cents
         },
         quantity: li.quantity,
       })),
       metadata: {
+        eventSlug: event.slug,
         dateId: date.id,
         order: orderStr,
         name: trimmedName,
@@ -163,6 +189,7 @@ export async function POST(req: NextRequest) {
       },
       payment_intent_data: {
         metadata: {
+          eventSlug: event.slug,
           dateId: date.id,
           name: trimmedName,
           email: trimmedEmail,

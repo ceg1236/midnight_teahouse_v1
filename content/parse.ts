@@ -52,6 +52,18 @@ export function getEventInviteContent(): string {
   return raw.replace(/^#\s*Welcome\s*\n+/i, '').trim()
 }
 
+export function getEventInviteContentBySlug(slug: string): string {
+  const fallback = getEventInviteContent()
+  const filename = slug.endsWith('.md') ? slug : `${slug}.md`
+  const filePath = path.join(process.cwd(), 'content', filename)
+  try {
+    const raw = fs.readFileSync(filePath, 'utf-8')
+    return raw.replace(/^#\s*Welcome\s*\n+/i, '').trim()
+  } catch {
+    return fallback
+  }
+}
+
 export function getIconModalContent(slotId: string): string {
   const filePath = path.join(process.cwd(), 'content', 'modals', `${slotId}.md`)
   try {

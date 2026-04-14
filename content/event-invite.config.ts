@@ -3,14 +3,16 @@
  * capacity: max tickets per date; if omitted, no limit (sold out never shown).
  */
 
+import type { EventDate, EventTier } from './event-schema'
+
 export const eventDates = [
   { id: 'mar-18', day: 'Wednesday', dateTime: 'March 18, 7-11pm', label: 'Wednesday, March 18', value: '2026-03-18', capacity: 45, musicians: ['Music by Daniel Berkman, Kora'], blurb: 'Daniel Berkman is a San Francisco–based composer and multi-instrumentalist known for his work on the kora, the 21-stringed West African harp.\n\nFor over three decades, he has explored the instrument\'s expressive range, weaving intricate, cascading patterns with spacious, meditative passages.\n\nDaniel brings a deep sensitivity to collaboration and live improvisation. Join us for an evening of luminous strings, quiet attention, and unfolding sound.', spotifyUrl: 'https://open.spotify.com/artist/61alTpjryjk7OUyNFGxrzV', spotifyLabel: "Listen to Daniel's music" },
   { id: 'mar-19', day: 'Thursday', dateTime: 'March 19, 7-11pm', label: 'Thursday, March 19', value: '2026-03-19', capacity: 45, musicians: ['Music by Sasha Bayan, Sitar'], blurb: 'Sasha Bayan is a multifaceted musician known for his introspective songwriting and global musical influences. With a deep background in classical and world music, Sasha\'s work, including his album "enough", explores themes of love, loss, and self-discovery.\n\nAs the bandleader and sitar player for High Tide, he fuses world music elements with contemporary composition, creating immersive musical experiences. Sasha\'s rich musical tapestry reflects his studies in guitar and composition at Northwestern University and his exploration of Flamenco, Brazilian, and Indian Classical music.\n\nJoin us for a unique and heartfelt journey through the human experience with Sasha.', spotifyUrl: 'https://open.spotify.com/artist/2cwKhNJE0AFNVtYKhHAgMc', spotifyLabel: "Listen to Sasha's music" },
   { id: 'mar-20', day: 'Friday', dateTime: 'March 20, 7-11pm', label: 'Friday, March 20', value: '2026-03-20', capacity: 45, musicians: ['Music by Kedar & Val'], blurb: 'Kedar and Val are medicine musicians whose collaboration creates intimate, improvisational soundscapes rooted in diverse traditions. Kedar grew up studying Carnatic (South Indian classical) music and has since woven that foundation with jazz, flamenco, Brazilian music, and medicine music, an ever-evolving tapestry shaped by decades of exploration. Valerie brings folk songwriting, lullabies, dynamic harmonies, and sound healing into the mix, her voice carrying a whimsical warmth that invites listeners to soften and arrive.\n\nWhen they play together, something tender and expansive opens up. Their music is meditative yet alive, a sonic space designed for presence, connection, and remembering. Whether in ceremony or concert, they invite audiences to slow down, breathe, and feel what it\'s like to be held by sound.', spotifyUrl: 'https://open.spotify.com/artist/0YgW45SdVn4411YVObp24v?si=6VID0tJeQD-Zs4KSONnCdQ', spotifyLabel: "Listen to Kedar & Val's music" },
-] as const
+] as const satisfies readonly EventDate[]
 
 export const eventTiers = [
   { id: 'supported', label: 'Supported', mainLine: 'Supported $20+', blurb: 'For guests who need financial support', price: 20 },
   { id: 'community', label: 'Community', mainLine: 'For most of our guests', blurb: 'This is our standard price to keep the teahouse financially sustainable.', price: 40 },
   { id: 'patron', label: 'Supporter', mainLine: 'For guests with additional capacity', blurb: 'If you are willing and able, please consider supporting our guests who would like supported tickets.', price: 60 },
-] as const
+] as const satisfies readonly EventTier[]

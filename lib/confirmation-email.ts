@@ -1,8 +1,10 @@
 import { Resend } from 'resend'
-import { eventDates, eventTiers } from '../content/event-invite.config'
+import { getEventConfig } from './event-registry'
+import { getAddressMapUrl, getEventPracticalNotes } from './event-messaging'
 
 export type SendConfirmationParams = {
   to: string
+  eventSlug: string
   name: string
   ticketDate: string
   amountPaid: string
@@ -11,6 +13,7 @@ export type SendConfirmationParams = {
 }
 
 function buildOrderSummary(metadata: Record<string, string | undefined>): string {
+  const event = getEventConfig(metadata.eventSlug)
   const order = metadata.order
   if (!order || typeof order !== 'string') {
     return metadata.quantity ? `${metadata.quantity} ticket(s)` : '1 ticket'
@@ -20,7 +23,7 @@ function buildOrderSummary(metadata: Record<string, string | undefined>): string
     const [tierId, qStr] = pair.split(':')
     const q = parseInt(qStr ?? '1', 10)
     if (!tierId || isNaN(q) || q < 1) continue
-    const tier = eventTiers.find((t) => t.id === tierId)
+    const tier = event.tiers.find((t) => t.id === tierId)
     const label = tier?.label ?? tierId
     const price =
       tierId === 'supported' && metadata.supportedPrice
@@ -34,7 +37,18 @@ function buildOrderSummary(metadata: Record<string, string | undefined>): string
 }
 
 function buildHtml(params: SendConfirmationParams): string {
-  const { name, ticketDate, amountPaid, quantity, orderSummary } = params
+  const { eventSlug, name, ticketDate, amountPaid, quantity, orderSummary } = params
+  const event = getEventConfig(eventSlug)
+  const notes = getEventPracticalNotes(event.slug)
+  const mapUrl = getAddressMapUrl(event.address)
+  const notesHtml = notes
+    .map((n) => {
+      if (n.label === 'Where') {
+        return `<li><strong>${n.label}:</strong> <a href="${mapUrl}" style="color: #2E0303; text-decoration: underline;">${n.text}</a>.</li>`
+      }
+      return `<li><strong>${n.label}:</strong> ${n.text}</li>`
+    })
+    .join('\n    ')
   return `
 <!DOCTYPE html>
 <html>
@@ -44,7 +58,7 @@ function buildHtml(params: SendConfirmationParams): string {
 </head>
 <body style="font-family: Georgia, serif; line-height: 1.6; color: #333; max-width: 560px; margin: 0 auto; padding: 24px;">
   <p>Hi ${name},</p>
-  <p>Thank you for reserving a seat at our teahouse! We're very excited to share this evening with you – to slow down together, enjoy tea and music, settle into the night.</p>
+  <p>Thank you for reserving a seat at ${event.title}! We're very excited to share this evening with you - to slow down together, enjoy tea and music, settle into the night.</p>
   <div style="background: #f8f6f2; padding: 16px; border-radius: 8px; margin: 24px 0;">
     <p style="margin: 0 0 8px 0;"><strong>${ticketDate}</strong></p>
     <p style="margin: 0 0 8px 0;">${orderSummary}</p>
@@ -52,13 +66,7 @@ function buildHtml(params: SendConfirmationParams): string {
   </div>
   <p>A few practical notes for your visit:</p>
   <ul style="margin: 16px 0; padding-left: 20px;">
-    <li><strong>When:</strong> Doors open at 7pm, and the teahouse will remain open until 11pm.</li>
-    <li><strong>Where:</strong> <a href="https://www.google.com/maps/search/?api=1&query=54+Washburn+St,+San+Francisco" style="color: #2E0303; text-decoration: underline;">54 Washburn St, San Francisco</a>.</li>
-    <li><strong>Reservation:</strong> One reservation is for one person. If you made a reservation for someone else, please share this email with them.</li>
-    <li><strong>Phones:</strong> We invite you to keep phones and laptops tucked away for the evening.</li>
-    <li><strong>Shoes:</strong> The teahouse is a shoes-free space. Bring cozy socks.</li>
-    <li><strong>Rooftop:</strong> There is a beautiful rooftop. If you're interested, bring a warm jacket or blanket!</li>
-    <li><strong>Tea & food:</strong> We will be serving caffeinated and non-caffeinated teas, and some light snacks.</li>
+    ${notesHtml}
   </ul>
   <p>Thanks again for joining us in this experiment. See you soon.</p>
   <p style="margin-top: 24px;">The Midnight Teahouse Team</p>
@@ -71,6 +79,7 @@ function buildHtml(params: SendConfirmationParams): string {
 export function getPreviewHtml(overrides?: Partial<SendConfirmationParams>): string {
   const params: SendConfirmationParams = {
     to: 'test@example.com',
+    eventSlug: 'crossing-into-spring',
     name: 'Alex',
     ticketDate: 'Wednesday, March 18',
     amountPaid: '$40',
@@ -96,7 +105,8 @@ export async function sendConfirmationEmail(
   const name = metadata.name ?? 'there'
   if (!to) return { ok: false, error: 'No recipient email' }
 
-  const date = eventDates.find((d) => d.id === metadata.dateId)
+  const event = getEventConfig(metadata.eventSlug)
+  const date = event.dates.find((d) => d.id === metadata.dateId)
   const ticketDate = (date?.label ?? metadata.dateId ?? '').replace(/\n/g, ' ')
   const orderSummary = buildOrderSummary(metadata)
 
@@ -116,9 +126,10 @@ export async function sendConfirmationEmail(
     from,
     to: [to],
     ...(replyTo && { replyTo }),
-    subject: 'Confirmation: Your Midnight Teahouse reservation',
+    subject: `Confirmation: Your ${event.title} reservation`,
     html: buildHtml({
       to,
+      eventSlug: event.slug,
       name,
       ticketDate,
       amountPaid,

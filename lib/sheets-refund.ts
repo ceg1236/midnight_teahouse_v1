@@ -4,6 +4,7 @@
  */
 
 import { google } from 'googleapis'
+import { getSheetsConfig } from './payment-env'
 
 export type ApplyRefundResult =
   | { ok: true; row: number }
@@ -13,10 +14,7 @@ export async function applyRefundToSheet(
   paymentId: string,
   refundNotes: string
 ): Promise<ApplyRefundResult> {
-  const spreadsheetId = process.env.SPREADSHEET_ID
-  const credentialsJson = process.env.GOOGLE_CREDENTIALS_JSON
-  const credentialsPath = process.env.GOOGLE_APPLICATION_CREDENTIALS
-  const sheetName = process.env.SPREADSHEET_SHEET_NAME || 'Sheet1'
+  const { spreadsheetId, credentialsJson, credentialsPath, sheetName } = getSheetsConfig()
 
   if (!spreadsheetId || (!credentialsJson && !credentialsPath)) {
     return { ok: false, error: 'Sheets not configured' }

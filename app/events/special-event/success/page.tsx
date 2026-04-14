@@ -3,8 +3,8 @@
 import Link from 'next/link'
 import { Suspense, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { getEventConfig } from '../../../lib/event-registry'
-import { getCalendarDescription } from '../../../lib/event-messaging'
+import { getEventConfig } from '../../../../lib/event-registry'
+import { getCalendarDescription } from '../../../../lib/event-messaging'
 
 const STORAGE_KEY = 'teahouse_reservation'
 
@@ -15,7 +15,6 @@ function getGoogleCalendarUrl(
   details: string,
   location: string
 ): string {
-  // dateValue = "2026-03-18"; 7pm–11pm Pacific = 02:00–06:00 UTC next day
   const [y, m, d] = dateValue.split('-').map(Number)
   const next = new Date(Date.UTC(y, m - 1, d + 1))
   const y2 = next.getUTCFullYear()
@@ -37,10 +36,8 @@ function getFirstName(name: string): string {
   return trimmed ? trimmed.split(/\s+/)[0] ?? trimmed : ''
 }
 
-const ADDRESS = '54 Washburn st, San Francisco'
-
-function InviteSuccessContent() {
-  const event = getEventConfig('crossing-into-spring')
+function SpecialEventSuccessContent() {
+  const event = getEventConfig('special-event')
   const searchParams = useSearchParams()
   const name = searchParams.get('name') ?? ''
   const dateId = searchParams.get('date_id') ?? ''
@@ -75,47 +72,14 @@ function InviteSuccessContent() {
               Location
             </p>
             <p className="text-[18.4px] font-medium text-[#FAE0B9] font-cursive">
-              {event.address || ADDRESS}
-            </p>
-          </div>
-          <svg
-            viewBox="0 0 160 32"
-            className="w-full max-w-[200px] mx-auto opacity-70"
-            aria-hidden
-          >
-            <path
-              d="M0 16 C40 4, 80 28, 120 16 C140 10, 150 14, 160 16"
-              fill="none"
-              stroke="#D9D0BF"
-              strokeWidth="0.8"
-              strokeLinecap="round"
-            />
-            <path
-              d="M0 18 C40 10, 80 30, 120 18 C140 14, 150 16, 160 18"
-              fill="none"
-              stroke="#D9D0BF"
-              strokeWidth="0.4"
-              strokeLinecap="round"
-              opacity="0.7"
-            />
-            <circle cx="80" cy="16" r="1.5" fill="#D9D0BF" opacity="0.8" />
-          </svg>
-          <div className="flex flex-col gap-2">
-            <p className="text-[16px] leading-[1.55] text-[#FAEBD4]">
-              Thank you for reserving your spot.
-            </p>
-            <p className="text-[16px] leading-[1.55] text-[#FAEBD4]">
-              We are excited to share an evening with you.
-            </p>
-            <p className="text-[16px] leading-[1.55] text-[#FAEBD4]">
-              We&apos;ve sent a confirmation email with your ticket details and venue info. Please check your inbox — and your Promotions folder if you use Gmail — so you have everything you need.
+              {event.address}
             </p>
           </div>
         </div>
         <div className="flex flex-col items-center gap-4">
           <a
             href={getGoogleCalendarUrl(
-              selectedDate?.value ?? event.dates[0]?.value ?? '2026-03-18',
+              selectedDate?.value ?? event.dates[0]?.value ?? '2026-04-21',
               event.calendarTitle,
               getCalendarDescription(event.slug),
               event.address
@@ -138,14 +102,14 @@ function InviteSuccessContent() {
   )
 }
 
-export default function InviteSuccessPage() {
+export default function SpecialEventSuccessPage() {
   return (
     <Suspense fallback={
       <div className="carrd-page flex min-h-[100dvh] flex-col items-center justify-center px-6 md:min-h-screen">
         <div className="carrd-font-body text-[#FAEBD4]">Loading...</div>
       </div>
     }>
-      <InviteSuccessContent />
+      <SpecialEventSuccessContent />
     </Suspense>
   )
 }
