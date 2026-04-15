@@ -160,7 +160,6 @@ export function CarrdStylePage({
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
   const [ticketLimitError, setTicketLimitError] = useState<string | null>(null)
   const [hydrated, setHydrated] = useState(false)
-  const [expandedBlurbId, setExpandedBlurbId] = useState<string | null>(null)
   const [expandedPricingNote, setExpandedPricingNote] = useState(false)
   /** On mobile: true when Reserve Your Seat clicked (whole screen slides to reservation) */
   const [showReservationView, setShowReservationView] = useState(false)
@@ -345,6 +344,7 @@ export function CarrdStylePage({
       <p className="carrd-font-body">{hostSectionDescription}</p>
     </section>
   ) : null
+  const sharedMusicBlurb = dates.flatMap((d) => d.musicians).find((line) => line?.trim()) ?? ''
 
   return (
     <div className="carrd-page flex flex-col items-center min-h-screen overflow-x-hidden pt-8">
@@ -386,6 +386,7 @@ export function CarrdStylePage({
                     <p key={i} className="whitespace-pre-line">{para}</p>
                   ))}
                 </div>
+                {hostSection}
               </div>
               <div className="w-full max-w-[650px] flex flex-col items-center justify-center gap-16 text-center pt-2">
                 <div className="space-y-2">
@@ -413,7 +414,6 @@ export function CarrdStylePage({
                 Reserve Your Seat
               </button>
             </section>
-            {hostSection}
             <SiteFooter variant="main" />
           </div>
         ) : (
@@ -456,7 +456,6 @@ export function CarrdStylePage({
                     {dates.map((d) => {
                       const [datePart, timePart] = d.dateTime.includes(', ') ? d.dateTime.split(', ') : [d.dateTime, '']
                       const headerRest = timePart ? `${datePart}, ${timePart.toUpperCase()}` : datePart
-                      const musicianLine = d.musicians[0] ?? ''
                       const isSelected = selectedDate === d.id
                       const soldOut = effectiveSoldOut[d.id]
                       const remaining = remainingByDateId[d.id]
@@ -474,13 +473,6 @@ export function CarrdStylePage({
                               <span className="text-[#C4AF86] font-medium">{d.day}</span>
                               <span className="text-[#FAEBD4]/90 font-normal">, {headerRest}</span>
                             </p>
-                            {d.spotifyUrl ? (
-                              <a href={d.spotifyUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-lg text-[#D9D0BF]/90 italic underline hover:text-[#FAEBD4] focus:outline-none focus:underline mt-0.5 block">
-                                {musicianLine}
-                              </a>
-                            ) : (
-                              <p className="text-[#D9D0BF]/90 text-lg italic mt-0.5">{musicianLine}</p>
-                            )}
                             {!soldOut && typeof remaining === 'number' && remaining > 0 && remaining < 5 ? (
                               <p className="text-[#FAE0B9] text-base mt-1">Only {remaining} tickets remaining</p>
                             ) : null}
@@ -490,6 +482,9 @@ export function CarrdStylePage({
                       )
                     })}
                   </div>
+                  {sharedMusicBlurb ? (
+                    <p className="carrd-font-body text-center italic text-[#D9D0BF]/90">{sharedMusicBlurb}</p>
+                  ) : null}
                 </div>
                 <div className="carrd-font-body flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full">
                   <h2 className="carrd-font-heading carrd-font-h2 text-2xl">2. Choose Your Ticket</h2>
@@ -615,7 +610,6 @@ export function CarrdStylePage({
                 </div>
               </div>
             </section>
-            {hostSection}
             <SiteFooter variant="main" />
           </div>
         )}
@@ -662,6 +656,7 @@ export function CarrdStylePage({
               </p>
             ))}
             </div>
+            {hostSection}
           </div>
           <div className="w-full max-w-[650px] flex flex-col md:flex-row items-center md:items-start justify-center gap-16 md:gap-28 text-center pt-2">
             <div className="space-y-2">
@@ -765,7 +760,6 @@ export function CarrdStylePage({
                 {dates.map((d) => {
                   const [datePart, timePart] = d.dateTime.includes(', ') ? d.dateTime.split(', ') : [d.dateTime, '']
                   const headerRest = timePart ? `${datePart}, ${timePart.toUpperCase()}` : datePart
-                  const musicianLine = d.musicians[0] ?? ''
                   const isSelected = selectedDate === d.id
                   const soldOut = effectiveSoldOut[d.id]
                   const remaining = remainingByDateId[d.id]
@@ -794,19 +788,6 @@ export function CarrdStylePage({
                           <span className="text-[#C4AF86] font-medium">{d.day}</span>
                           <span className="text-[#FAEBD4]/90 font-normal">, {headerRest}</span>
                         </p>
-                        {d.spotifyUrl ? (
-                          <a
-                            href={d.spotifyUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
-                            className="text-[0.9375rem] text-[#D9D0BF]/90 italic underline hover:text-[#FAEBD4] focus:outline-none focus:underline mt-0.5 block"
-                          >
-                            {musicianLine}
-                          </a>
-                        ) : (
-                          <p className="text-[#D9D0BF]/90 text-[0.9375rem] italic mt-0.5">{musicianLine}</p>
-                        )}
                         {!soldOut && typeof remaining === 'number' && remaining > 0 && remaining < 5 ? (
                           <p className="text-[#FAE0B9] text-sm mt-1">Only {remaining} tickets remaining</p>
                         ) : null}
@@ -826,15 +807,21 @@ export function CarrdStylePage({
                   return (
                   <div
                     key={d.id}
-                    className={`carrd-reservation-card flex flex-col gap-2 md:grid md:grid-cols-[6rem_1fr_auto] md:grid-rows-[auto_auto] md:gap-x-6 md:gap-y-1 md:items-start ${soldOut ? 'opacity-60' : ''}`}
+                    className={`carrd-reservation-card flex items-start justify-between gap-4 ${soldOut ? 'opacity-60' : ''}`}
                   >
-                    <p className="carrd-font-body carrd-accent-color font-medium text-[1.625rem]">{d.day}</p>
-                    <div className="carrd-font-body carrd-accent-color min-w-0 space-y-0 text-[1.625rem]">
-                      {d.musicians.map((line, i) => (
-                        <p key={i} className="font-medium italic">
-                          {line}
-                        </p>
-                      ))}
+                    <div className="min-w-0">
+                      <p className="carrd-font-body carrd-accent-color font-medium text-[1.625rem]">{d.day}</p>
+                      <p className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0 mt-1">
+                        {d.dateTime.includes(', ') ? (
+                          <>
+                            {d.dateTime.split(', ')[0]}
+                            <br />
+                            {d.dateTime.split(', ')[1] ?? ''}
+                          </>
+                        ) : (
+                          d.dateTime
+                        )}
+                      </p>
                       {!soldOut && typeof remaining === 'number' && remaining > 0 && remaining < 5 ? (
                         <p className="text-[#FAE0B9] text-base mt-1">Only {remaining} tickets remaining</p>
                       ) : null}
@@ -846,73 +833,21 @@ export function CarrdStylePage({
                         setSelectedDate(d.id)
                         setReservationStep(2)
                       }}
-                      className={`carrd-btn px-8 py-4 flex-shrink-0 row-span-2 self-start order-last md:order-none md:ml-4 disabled:opacity-70 disabled:cursor-not-allowed ${
+                      className={`carrd-btn px-8 py-4 flex-shrink-0 self-start disabled:opacity-70 disabled:cursor-not-allowed ${
                         selectedDate === d.id ? 'bg-[#FAE0B9]/20' : ''
                       }`}
                     >
                       {soldOut ? 'Sold Out' : 'Select'}
                     </button>
-                    <p className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0">
-                      {d.dateTime.includes(', ') ? (
-                        <>
-                          {d.dateTime.split(', ')[0]}
-                          <br />
-                          {d.dateTime.split(', ')[1] ?? ''}
-                        </>
-                      ) : (
-                        d.dateTime
-                      )}
-                    </p>
-                    {d.blurb ? (
-                      <div className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0">
-                        {expandedBlurbId === d.id ? (
-                          <>
-                            <p className="carrd-table-row-2 whitespace-pre-line">{d.blurb}</p>
-                            {d.spotifyUrl ? (
-                              <a
-                                href={d.spotifyUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="mt-2 inline-block italic text-[#D9D0BF] underline hover:text-[#FAEBD4] focus:outline-none focus:underline"
-                              >
-                                {d.spotifyLabel}
-                              </a>
-                            ) : null}
-                            <button
-                              type="button"
-                              onClick={() => setExpandedBlurbId(null)}
-                              className="mt-1 block italic text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer"
-                            >
-                              ...less
-                            </button>
-                          </>
-                        ) : (
-                          <p className="carrd-table-row-2 min-w-0 w-full">
-                            {d.blurb.length > 90 ? (
-                              <>
-                                {d.blurb.slice(0, 90)}
-                                {' '}
-                                <button
-                                  type="button"
-                                  onClick={() => setExpandedBlurbId(d.id)}
-                                  className="inline italic text-[#D9D0BF] hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer p-0 m-0 align-baseline"
-                                >
-                                  ...more
-                                </button>
-                              </>
-                            ) : (
-                              d.blurb
-                            )}
-                          </p>
-                        )}
-                      </div>
-                    ) : (
-                      <div />
-                    )}
                   </div>
                   )
                 })}
               </div>
+              {sharedMusicBlurb ? (
+                <p className="carrd-font-body text-center italic text-[#D9D0BF]/90 w-full max-w-[650px]">
+                  {sharedMusicBlurb}
+                </p>
+              ) : null}
             </div>
 
             {/* Panel 2: Choose your ticket */}
@@ -1454,7 +1389,6 @@ export function CarrdStylePage({
             </div>
           </div>
         </section>
-        {hostSection}
       </div>
       <SiteFooter variant="main" className="hidden md:flex" />
     </div>
