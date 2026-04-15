@@ -61,7 +61,7 @@ const EVENTS: Record<string, EventConfig> = {
     stripeDescriptionLabel: 'Midnight Teahouse at Erstwhere',
     hostSectionTitle: 'About our host',
     hostSectionDescription:
-      'Erstwhile is a budding hub for artists in Haight-Ashbury—a guesthouse for traveling artists and a gathering space for local creatives. Its beautiful corridors serve as a bridge between the worlds within and beyond our city.',
+      'Erstwhere is a budding hub for artists in Haight-Ashbury—a guesthouse for traveling artists and a gathering space for local creatives. Its beautiful corridors serve as a bridge between the worlds within and beyond our city.',
     dates: specialEventDates,
     tiers: specialEventTiers,
   },
