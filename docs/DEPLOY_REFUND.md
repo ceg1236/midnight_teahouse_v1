@@ -18,7 +18,7 @@ Pre-deploy checklist for the refund processing feature.
 - [ ] **Header row** – K1: "Refunded", L1: "Refund Notes"
 - [ ] **Existing refunded rows** – Manually add refund date (YYYY-MM-DD) to column K for rows already refunded
 - [ ] **Summary formulas** – Add `, Sheet1!$K:$K, ""` to all SUMIFS/COUNTIFS that should exclude refunded rows
-- [ ] **Sheet tab name** – Matches `SPREADSHEET_SHEET_NAME` in Vercel (default `Sheet1`)
+- [ ] **Sheet tab name** – Matches `PAYMENTS_SHEET_NAME` in Vercel (default `Sheet1`)
 
 ---
 
@@ -33,7 +33,7 @@ Pre-deploy checklist for the refund processing feature.
 
 ## 3. Vercel Environment Variables
 
-- [ ] **`SPREADSHEET_SHEET_NAME`** – Set if your data sheet tab is not named "Sheet1"
+- [ ] **`PAYMENTS_SHEET_NAME`** – Set if your data sheet tab is not named "Sheet1"
 - [ ] All existing vars unchanged (STRIPE_*, SPREADSHEET_ID, GOOGLE_CREDENTIALS_JSON, etc.)
 
 ---
