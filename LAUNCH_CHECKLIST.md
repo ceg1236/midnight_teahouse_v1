@@ -52,7 +52,7 @@ Pre-launch checklist and monitoring guide before announcing ticket sales to gues
 ### 2b. Local Stripe/Test Sheet Mode (optional, recommended before launch)
 - [ ] Set `PAYMENT_ENV=test` in local `.env.local` to force server APIs to use `TEST_*` payment vars.
 - [ ] Add `TEST_STRIPE_SECRET_KEY` and `TEST_STRIPE_WEBHOOK_SECRET` for local Stripe CLI and test checkout.
-- [ ] Add `TEST_SPREADSHEET_ID` (and optional `TEST_SPREADSHEET_SHEET_NAME`) so test orders never hit production sheets.
+- [ ] Add `TEST_SPREADSHEET_ID` (and optional `TEST_PAYMENTS_SHEET_NAME`) so test orders never hit production sheets.
 - [ ] Add `TEST_GOOGLE_CREDENTIALS_JSON` (or `TEST_GOOGLE_APPLICATION_CREDENTIALS`) if test sheet permissions differ from prod.
 - [ ] Keep `RESEND_API_KEY` / `RESEND_FROM` unchanged unless you intentionally want a separate email sender in test mode.
 
@@ -63,7 +63,7 @@ Pre-launch checklist and monitoring guide before announcing ticket sales to gues
 ### 4. Google Sheets
 - [ ] **Sheet** – Sheet exists and has headers in row 1: Timestamp, Name, Email, Ticket date, Ticket type, Amount paid, Quantity, Notes, Device, Stripe Payment ID, Refunded, Refund Notes.
 - [ ] **Permissions** – Service account has edit access to the spreadsheet.
-- [ ] **Tab name** – Matches `SPREADSHEET_SHEET_NAME` (default `Sheet1`).
+- [ ] **Tab name** – Matches `PAYMENTS_SHEET_NAME` (default `Sheet1`).
 - [ ] **Guestlist tab (optional)** – If using door ops tab, set `GUESTLIST_SHEET_NAME` and create headers:
   - A: Timestamp
   - B: Name
