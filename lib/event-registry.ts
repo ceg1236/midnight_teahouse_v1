@@ -17,6 +17,8 @@ export type EventConfig = {
   calendarDetails: string
   welcomeContentSlug: string
   stripeDescriptionLabel: string
+  hostSectionTitle?: string
+  hostSectionDescription?: string
   dates: readonly EventDate[]
   tiers: readonly EventTier[]
 }
@@ -57,6 +59,9 @@ const EVENTS: Record<string, EventConfig> = {
     calendarDetails: '',
     welcomeContentSlug: 'special-event-invite',
     stripeDescriptionLabel: 'Midnight Teahouse at Erstwhere',
+    hostSectionTitle: 'About our host',
+    hostSectionDescription:
+      'Erstwhile is a budding hub for artists in Haight-Ashbury—a guesthouse for traveling artists and a gathering space for local creatives. Its beautiful corridors serve as a bridge between the worlds within and beyond our city.',
     dates: specialEventDates,
     tiers: specialEventTiers,
   },

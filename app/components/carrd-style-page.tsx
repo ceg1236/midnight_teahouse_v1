@@ -33,6 +33,8 @@ type CarrdStylePageProps = {
   remainingByDateId?: Record<string, number>
   /** Admin/door token – bypasses sold-out, pre-fills date/tier */
   initialTicket?: string
+  hostSectionTitle?: string
+  hostSectionDescription?: string
 }
 
 const SCROLL_DURATION = 1200
@@ -141,6 +143,8 @@ export function CarrdStylePage({
   soldOutByDateId = {},
   remainingByDateId = {},
   initialTicket,
+  hostSectionTitle,
+  hostSectionDescription,
 }: CarrdStylePageProps) {
   const tokenPayload = initialTicket ? decodeTokenPayload(initialTicket) : null
   const bypassSoldOut = !!tokenPayload
@@ -335,6 +339,13 @@ export function CarrdStylePage({
     })
   }
 
+  const hostSection = hostSectionTitle && hostSectionDescription ? (
+    <section className="w-full max-w-[650px] text-center space-y-4 pt-8">
+      <h3 className="carrd-font-heading carrd-font-h2 italic">{hostSectionTitle}</h3>
+      <p className="carrd-font-body">{hostSectionDescription}</p>
+    </section>
+  ) : null
+
   return (
     <div className="carrd-page flex flex-col items-center min-h-screen overflow-x-hidden pt-8">
       {/* Top-right link block (scrolls with page, not sticky) */}
@@ -402,6 +413,7 @@ export function CarrdStylePage({
                 Reserve Your Seat
               </button>
             </section>
+            {hostSection}
             <SiteFooter variant="main" />
           </div>
         ) : (
@@ -443,7 +455,7 @@ export function CarrdStylePage({
                   <div className="w-full max-w-full min-w-0 flex flex-col gap-3 break-words">
                     {dates.map((d) => {
                       const [datePart, timePart] = d.dateTime.includes(', ') ? d.dateTime.split(', ') : [d.dateTime, '']
-                      const headerRest = timePart ? `${datePart} ${timePart.toUpperCase()}` : datePart
+                      const headerRest = timePart ? `${datePart}, ${timePart.toUpperCase()}` : datePart
                       const musicianLine = d.musicians[0] ?? ''
                       const isSelected = selectedDate === d.id
                       const soldOut = effectiveSoldOut[d.id]
@@ -603,6 +615,7 @@ export function CarrdStylePage({
                 </div>
               </div>
             </section>
+            {hostSection}
             <SiteFooter variant="main" />
           </div>
         )}
@@ -751,7 +764,7 @@ export function CarrdStylePage({
               <div className="md:hidden w-full max-w-full flex flex-col gap-5 break-words">
                 {dates.map((d) => {
                   const [datePart, timePart] = d.dateTime.includes(', ') ? d.dateTime.split(', ') : [d.dateTime, '']
-                  const headerRest = timePart ? `${datePart} ${timePart.toUpperCase()}` : datePart
+                  const headerRest = timePart ? `${datePart}, ${timePart.toUpperCase()}` : datePart
                   const musicianLine = d.musicians[0] ?? ''
                   const isSelected = selectedDate === d.id
                   const soldOut = effectiveSoldOut[d.id]
@@ -1441,6 +1454,7 @@ export function CarrdStylePage({
             </div>
           </div>
         </section>
+        {hostSection}
       </div>
       <SiteFooter variant="main" className="hidden md:flex" />
     </div>
