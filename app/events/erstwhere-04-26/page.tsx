@@ -51,6 +51,8 @@ export default async function Erstwhere0426EventPage({
       dateRangeLabel={eventConfig.dateRangeLabel}
       timeLabel={eventConfig.timeLabel}
       locationLabel={eventConfig.locationLabel}
+      hostSectionTitle={eventConfig.hostSectionTitle}
+      hostSectionDescription={eventConfig.hostSectionDescription}
       soldOutByDateId={soldOutByDateId}
       remainingByDateId={remainingByDateId}
       initialTicket={ticket ?? undefined}
