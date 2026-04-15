@@ -3,8 +3,8 @@
 import Link from 'next/link'
 import { Suspense, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { getEventConfig } from '../../../../lib/event-registry'
-import { getCalendarDescription } from '../../../../lib/event-messaging'
+import { getEventConfig } from '../../../lib/event-registry'
+import { getCalendarDescription } from '../../../lib/event-messaging'
 
 const STORAGE_KEY = 'teahouse_reservation'
 
@@ -36,7 +36,7 @@ function getFirstName(name: string): string {
   return trimmed ? trimmed.split(/\s+/)[0] ?? trimmed : ''
 }
 
-function Erstwhere0426EventSuccessContent() {
+function ErstwhereEventSuccessContent() {
   const event = getEventConfig('special-event')
   const searchParams = useSearchParams()
   const name = searchParams.get('name') ?? ''
@@ -102,14 +102,14 @@ function Erstwhere0426EventSuccessContent() {
   )
 }
 
-export default function Erstwhere0426EventSuccessPage() {
+export default function ErstwhereEventSuccessPage() {
   return (
     <Suspense fallback={
       <div className="carrd-page flex min-h-[100dvh] flex-col items-center justify-center px-6 md:min-h-screen">
         <div className="carrd-font-body text-[#FAEBD4]">Loading...</div>
       </div>
     }>
-      <Erstwhere0426EventSuccessContent />
+      <ErstwhereEventSuccessContent />
     </Suspense>
   )
 }
