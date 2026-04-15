@@ -452,6 +452,9 @@ export function CarrdStylePage({
                 {/* Mobile reservation reuses same panel structure - content is in desktop flow below, we need inline copy */}
                 <div className="carrd-font-body flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full">
                   <h2 className="carrd-font-heading carrd-font-h2 text-2xl">1. Choose Your Evening</h2>
+                  {sharedMusicBlurb ? (
+                    <p className="carrd-font-body text-center italic text-[#D9D0BF]/90 px-1">{sharedMusicBlurb}</p>
+                  ) : null}
                   <div className="w-full max-w-full min-w-0 flex flex-col gap-3 break-words">
                     {dates.map((d) => {
                       const [datePart, timePart] = d.dateTime.includes(', ') ? d.dateTime.split(', ') : [d.dateTime, '']
@@ -755,6 +758,11 @@ export function CarrdStylePage({
               <h2 className="carrd-font-heading carrd-font-h2">
                 1. Choose Your Evening
               </h2>
+              {sharedMusicBlurb ? (
+                <p className="carrd-font-body text-center italic text-[#D9D0BF]/90 w-full max-w-[650px] px-2">
+                  {sharedMusicBlurb}
+                </p>
+              ) : null}
               {/* Mobile: date cards (2-line, succinct) */}
               <div className="md:hidden w-full max-w-full flex flex-col gap-5 break-words">
                 {dates.map((d) => {

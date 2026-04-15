@@ -47,8 +47,8 @@ const EVENTS: Record<string, EventConfig> = {
   'special-event': {
     slug: 'special-event',
     title: 'Midnight Teahouse at Erstwhere',
-    invitePath: '/events/erstwhere-04-26',
-    successPath: '/events/erstwhere-04-26/success',
+    invitePath: '/erstwhere',
+    successPath: '/erstwhere/success',
     countdownTarget: Math.floor(new Date('2026-04-21T19:00:00-07:00').getTime() / 1000),
     showCountdown: false,
     dateRangeLabel: 'April 21 - 23, 2026',
