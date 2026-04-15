@@ -82,7 +82,7 @@ async function appendGuestlistRow({
 }) {
   const existing = await sheets.spreadsheets.values.get({
     spreadsheetId,
-    range: `${guestlistSheetName}!H2:H`,
+    range: `${guestlistSheetName}!J2:J`,
   })
   const paymentIds = (existing.data.values ?? []).flat()
   if (paymentIds.includes(paymentId)) {
@@ -99,7 +99,7 @@ async function appendGuestlistRow({
 
   const appendRes = await sheets.spreadsheets.values.append({
     spreadsheetId,
-    range: `${guestlistSheetName}!A2:M`,
+    range: `${guestlistSheetName}!A2:O`,
     valueInputOption: 'USER_ENTERED',
     insertDataOption: 'INSERT_ROWS',
     requestBody: { values: [row] },
@@ -107,7 +107,35 @@ async function appendGuestlistRow({
 
   const appendedRow = getAppendedRowNumber(appendRes.data?.updates?.updatedRange)
   if (appendedRow != null) {
-    await applyWhiteRowBackground(sheets, spreadsheetId, guestlistSheetName, appendedRow, 13)
+    await applyWhiteRowBackground(sheets, spreadsheetId, guestlistSheetName, appendedRow, 15)
+    const meta = await sheets.spreadsheets.get({ spreadsheetId })
+    const sheet = meta.data.sheets?.find(
+      (s) => (s.properties?.title ?? '').trim() === guestlistSheetName.trim()
+    )
+    const sheetId = sheet?.properties?.sheetId ?? 0
+    await sheets.spreadsheets.batchUpdate({
+      spreadsheetId,
+      requestBody: {
+        requests: [
+          {
+            setDataValidation: {
+              range: {
+                sheetId,
+                startRowIndex: appendedRow - 1,
+                endRowIndex: appendedRow,
+                startColumnIndex: 12, // M = Checked in
+                endColumnIndex: 13,
+              },
+              rule: {
+                condition: { type: 'BOOLEAN' },
+                strict: true,
+                showCustomUi: true,
+              },
+            },
+          },
+        ],
+      },
+    })
   }
 
   console.log(
@@ -139,10 +167,10 @@ async function updateGuestlistRefundStatus(paymentId: string, refundNotes: strin
   const piTrimmed = paymentId.trim()
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId,
-    range: `${guestlistSheetName}!A2:M`,
+    range: `${guestlistSheetName}!A2:O`,
   })
   const rows = (res.data.values ?? []) as string[][]
-  const rowIndex = rows.findIndex((row) => (row[7] ?? '').trim() === piTrimmed)
+  const rowIndex = rows.findIndex((row) => (row[9] ?? '').trim() === piTrimmed)
   if (rowIndex < 0) {
     console.log(
       JSON.stringify({
@@ -158,7 +186,7 @@ async function updateGuestlistRefundStatus(paymentId: string, refundNotes: strin
   const refundDate = new Date().toISOString().split('T')[0]
   await sheets.spreadsheets.values.update({
     spreadsheetId,
-    range: `${guestlistSheetName}!L${dataRow}:M${dataRow}`,
+    range: `${guestlistSheetName}!K${dataRow}:L${dataRow}`,
     valueInputOption: 'USER_ENTERED',
     requestBody: { values: [[refundDate, refundNotes]] },
   })
@@ -500,14 +528,16 @@ export async function POST(req: NextRequest) {
       String(metadata.email),
       String(ticketDate),
       String(ticketType),
-      String(qty),
       String(amountPaid),
+      String(qty),
+      String(metadata.notes ?? ''),
+      String(metadata.device ?? 'desktop'),
       String(paymentId),
-      '', // Checked in
-      '', // Checked-in at
-      '', // Door notes
       '', // Refunded
       '', // Refund notes
+      'FALSE', // Checked in (checkbox)
+      '', // Checked-in at
+      '', // Checked-in notes
     ]
 
     try {

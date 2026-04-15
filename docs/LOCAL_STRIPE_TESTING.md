@@ -41,7 +41,7 @@ Copy the `whsec_...` shown by Stripe CLI into `TEST_STRIPE_WEBHOOK_SECRET`.
 
 Open:
 
-- `http://localhost:3000/events/special-event` (new event path), or
+- `http://localhost:3000/events/erstwhere-04-26` (new event path), or
 - `http://localhost:3000/invite` (legacy event path).
 
 Complete checkout with Stripe test card `4242 4242 4242 4242`.
