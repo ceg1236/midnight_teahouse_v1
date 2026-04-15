@@ -8,7 +8,7 @@ export const specialEventDates = [
     label: 'Tuesday, April 21',
     value: '2026-04-21',
     capacity: 45,
-    musicians: ['Roving musicians will bring sonic delight from room to room throughout the house.'],
+    musicians: ['Roving musicians will bring sonic delight from room to room, hallway to entryway.'],
   },
   {
     id: 'apr-22',
@@ -17,7 +17,7 @@ export const specialEventDates = [
     label: 'Wednesday, April 22',
     value: '2026-04-22',
     capacity: 45,
-    musicians: ['Roving musicians will bring sonic delight from room to room throughout the house.'],
+    musicians: ['Roving musicians will bring sonic delight from room to room, hallway to entryway.'],
   },
   {
     id: 'apr-23',
@@ -26,7 +26,7 @@ export const specialEventDates = [
     label: 'Thursday, April 23',
     value: '2026-04-23',
     capacity: 45,
-    musicians: ['Roving musicians will bring sonic delight from room to room throughout the house.'],
+    musicians: ['Roving musicians will bring sonic delight from room to room, hallway to entryway.'],
   },
 ] as const satisfies readonly EventDate[]
 

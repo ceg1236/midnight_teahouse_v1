@@ -2,8 +2,24 @@
 
 import { useEffect, useRef } from 'react'
 
+type HeroVideoSource = {
+  src: string
+  type: string
+}
+
+const DEFAULT_SOURCES: HeroVideoSource[] = [
+  { src: '/images/midnight_site_vid_hi_res.mp4', type: 'video/mp4' },
+  { src: '/images/midnight_site_vid_hi_res.mov', type: 'video/quicktime' },
+]
+
 /** Autoplays when visible — same behavior as invite carrd page (iOS / mobile first-load). */
-export function HeroVideo({ className }: { className?: string }) {
+export function HeroVideo({
+  className,
+  sources = DEFAULT_SOURCES,
+}: {
+  className?: string
+  sources?: HeroVideoSource[]
+}) {
   const videoRef = useRef<HTMLVideoElement>(null)
   useEffect(() => {
     const video = videoRef.current
@@ -40,8 +56,9 @@ export function HeroVideo({ className }: { className?: string }) {
       preload="auto"
       className={className}
     >
-      <source src="/images/midnight_site_vid_hi_res.mp4" type="video/mp4" />
-      <source src="/images/midnight_site_vid_hi_res.mov" type="video/quicktime" />
+      {sources.map((source) => (
+        <source key={`${source.src}-${source.type}`} src={source.src} type={source.type} />
+      ))}
     </video>
   )
 }

@@ -64,6 +64,22 @@ Pre-launch checklist and monitoring guide before announcing ticket sales to gues
 - [ ] **Sheet** – Sheet exists and has headers in row 1: Timestamp, Name, Email, Ticket date, Ticket type, Amount paid, Quantity, Notes, Device, Stripe Payment ID, Refunded, Refund Notes.
 - [ ] **Permissions** – Service account has edit access to the spreadsheet.
 - [ ] **Tab name** – Matches `SPREADSHEET_SHEET_NAME` (default `Sheet1`).
+- [ ] **Guestlist tab (optional)** – If using door ops tab, set `GUESTLIST_SHEET_NAME` and create headers:
+  - A: Timestamp
+  - B: Name
+  - C: Email
+  - D: Ticket date
+  - E: Ticket type
+  - F: Amount paid
+  - G: Quantity
+  - H: Notes
+  - I: Device
+  - J: Stripe Payment ID
+  - K: Refunded
+  - L: Refund notes
+  - M: Checked in (checkbox)
+  - N: Checked-in at
+  - O: Checked-in notes
 
 ### 5. Content
 - [ ] **Dates** – `content/event-invite.config.ts` has correct dates and labels.
