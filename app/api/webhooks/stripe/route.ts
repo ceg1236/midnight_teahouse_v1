@@ -17,6 +17,161 @@ function formatTicketType(orderStr: string, tierLabels: Record<string, string>):
   return Array.from(new Set(parts)).join(', ') || ''
 }
 
+function getAppendedRowNumber(updatedRange?: string | null): number | null {
+  if (!updatedRange) return null
+  const rowMatch = updatedRange.match(/!A(\d+):/)
+  return rowMatch ? parseInt(rowMatch[1], 10) : null
+}
+
+async function applyWhiteRowBackground(
+  sheets: ReturnType<typeof google.sheets>,
+  spreadsheetId: string,
+  sheetName: string,
+  appendedRow: number,
+  endColumnIndex: number
+) {
+  const meta = await sheets.spreadsheets.get({ spreadsheetId })
+  const sheet = meta.data.sheets?.find(
+    (s) => (s.properties?.title ?? '').trim() === sheetName.trim()
+  )
+  const sheetId = sheet?.properties?.sheetId ?? 0
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId,
+    requestBody: {
+      requests: [
+        {
+          repeatCell: {
+            range: {
+              sheetId,
+              startRowIndex: appendedRow - 1,
+              endRowIndex: appendedRow,
+              startColumnIndex: 0,
+              endColumnIndex,
+            },
+            cell: {
+              userEnteredFormat: {
+                backgroundColor: {
+                  red: 1,
+                  green: 1,
+                  blue: 1,
+                },
+              },
+            },
+            fields: 'userEnteredFormat.backgroundColor',
+          },
+        },
+      ],
+    },
+  })
+}
+
+async function appendGuestlistRow({
+  sheets,
+  spreadsheetId,
+  guestlistSheetName,
+  paymentId,
+  row,
+  sessionId,
+}: {
+  sheets: ReturnType<typeof google.sheets>
+  spreadsheetId: string
+  guestlistSheetName: string
+  paymentId: string
+  row: string[]
+  sessionId: string
+}) {
+  const existing = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: `${guestlistSheetName}!H2:H`,
+  })
+  const paymentIds = (existing.data.values ?? []).flat()
+  if (paymentIds.includes(paymentId)) {
+    console.log(
+      JSON.stringify({
+        event: 'webhook_guestlist_duplicate',
+        sessionId,
+        paymentId,
+        message: 'Payment already in guestlist, skipped',
+      })
+    )
+    return
+  }
+
+  const appendRes = await sheets.spreadsheets.values.append({
+    spreadsheetId,
+    range: `${guestlistSheetName}!A2:M`,
+    valueInputOption: 'USER_ENTERED',
+    insertDataOption: 'INSERT_ROWS',
+    requestBody: { values: [row] },
+  })
+
+  const appendedRow = getAppendedRowNumber(appendRes.data?.updates?.updatedRange)
+  if (appendedRow != null) {
+    await applyWhiteRowBackground(sheets, spreadsheetId, guestlistSheetName, appendedRow, 13)
+  }
+
+  console.log(
+    JSON.stringify({
+      event: 'webhook_guestlist_success',
+      sessionId,
+      paymentId,
+      guestlistSheetName,
+    })
+  )
+}
+
+async function updateGuestlistRefundStatus(paymentId: string, refundNotes: string): Promise<void> {
+  const { spreadsheetId, credentialsJson, credentialsPath, guestlistSheetName } = getSheetsConfig()
+  if (!spreadsheetId || !guestlistSheetName || (!credentialsJson && !credentialsPath)) return
+
+  const auth = new google.auth.GoogleAuth(
+    credentialsJson
+      ? {
+          credentials: JSON.parse(credentialsJson) as object,
+          scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+        }
+      : {
+          keyFile: credentialsPath,
+          scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+        }
+  )
+  const sheets = google.sheets({ version: 'v4', auth })
+  const piTrimmed = paymentId.trim()
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: `${guestlistSheetName}!A2:M`,
+  })
+  const rows = (res.data.values ?? []) as string[][]
+  const rowIndex = rows.findIndex((row) => (row[7] ?? '').trim() === piTrimmed)
+  if (rowIndex < 0) {
+    console.log(
+      JSON.stringify({
+        event: 'refund_guestlist_not_found',
+        paymentIntentId: piTrimmed,
+        guestlistSheetName,
+      })
+    )
+    return
+  }
+
+  const dataRow = rowIndex + 2
+  const refundDate = new Date().toISOString().split('T')[0]
+  await sheets.spreadsheets.values.update({
+    spreadsheetId,
+    range: `${guestlistSheetName}!L${dataRow}:M${dataRow}`,
+    valueInputOption: 'USER_ENTERED',
+    requestBody: { values: [[refundDate, refundNotes]] },
+  })
+  console.log(
+    JSON.stringify({
+      event: 'refund_guestlist_updated',
+      paymentIntentId: piTrimmed,
+      row: dataRow,
+      guestlistSheetName,
+    })
+  )
+}
+
 async function handleChargeRefunded(
   event: Stripe.Event,
   stripe: Stripe
@@ -82,6 +237,18 @@ async function handleChargeRefunded(
           message: result.error,
         })
       )
+      try {
+        await updateGuestlistRefundStatus(piTrimmed, refundNotes)
+      } catch (guestErr) {
+        const guestMsg = guestErr instanceof Error ? guestErr.message : String(guestErr)
+        console.error(
+          JSON.stringify({
+            event: 'refund_guestlist_update_failed',
+            paymentIntentId: piTrimmed,
+            error: guestMsg,
+          })
+        )
+      }
       return NextResponse.json({ received: true })
     }
     console.log(
@@ -105,6 +272,19 @@ async function handleChargeRefunded(
     return NextResponse.json(
       { error: 'Failed to update sheet for refund' },
       { status: 500 }
+    )
+  }
+
+  try {
+    await updateGuestlistRefundStatus(piTrimmed, refundNotes)
+  } catch (guestErr) {
+    const guestMsg = guestErr instanceof Error ? guestErr.message : String(guestErr)
+    console.error(
+      JSON.stringify({
+        event: 'refund_guestlist_update_failed',
+        paymentIntentId: piTrimmed,
+        error: guestMsg,
+      })
     )
   }
 
@@ -198,7 +378,7 @@ export async function POST(req: NextRequest) {
     '', // Refund Notes (L) - empty for new sales
   ]
 
-  const { spreadsheetId, credentialsJson, credentialsPath, sheetName } = getSheetsConfig()
+  const { spreadsheetId, credentialsJson, credentialsPath, sheetName, guestlistSheetName } = getSheetsConfig()
   if (!spreadsheetId) {
     console.error('SPREADSHEET_ID not set')
     return NextResponse.json(
@@ -228,7 +408,8 @@ export async function POST(req: NextRequest) {
   )
   const sheets = google.sheets({ version: 'v4', auth })
 
-  // Idempotency: skip if we've already processed this payment (payment ID in column J)
+  // Idempotency on payments sheet (payment ID in column J)
+  let paymentAlreadyWritten = false
   try {
     const existing = await sheets.spreadsheets.values.get({
       spreadsheetId,
@@ -236,6 +417,7 @@ export async function POST(req: NextRequest) {
     })
     const paymentIds = (existing.data.values ?? []).flat()
     if (paymentIds.includes(paymentId)) {
+      paymentAlreadyWritten = true
       console.log(
         JSON.stringify({
           event: 'webhook_sheet_duplicate',
@@ -244,7 +426,6 @@ export async function POST(req: NextRequest) {
           message: 'Payment already in sheet, skipped',
         })
       )
-      return NextResponse.json({ received: true })
     }
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)
@@ -262,110 +443,134 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // Append to data rows (A2:L) - includes Refunded and Refund Notes
-  const range = `${sheetName}!A2:L`
-  try {
-    const appendRes = await sheets.spreadsheets.values.append({
-      spreadsheetId,
-      range,
-      valueInputOption: 'USER_ENTERED',
-      insertDataOption: 'INSERT_ROWS',
-      requestBody: { values: [row] },
-    })
-    const updatedRange = appendRes.data?.updates?.updatedRange
-    if (updatedRange) {
-      const rowMatch = updatedRange.match(/!A(\d+):/)
-      const appendedRow = rowMatch ? parseInt(rowMatch[1], 10) : null
+  if (!paymentAlreadyWritten) {
+    // Append to data rows (A2:L) - includes Refunded and Refund Notes
+    try {
+      const appendRes = await sheets.spreadsheets.values.append({
+        spreadsheetId,
+        range: `${sheetName}!A2:L`,
+        valueInputOption: 'USER_ENTERED',
+        insertDataOption: 'INSERT_ROWS',
+        requestBody: { values: [row] },
+      })
+      const appendedRow = getAppendedRowNumber(appendRes.data?.updates?.updatedRange)
       if (appendedRow != null) {
-        const meta = await sheets.spreadsheets.get({ spreadsheetId })
-        const sheet = meta.data.sheets?.find(
-          (s) => (s.properties?.title ?? '').trim() === sheetName.trim()
-        )
-        const sheetId = sheet?.properties?.sheetId ?? 0
-        await sheets.spreadsheets.batchUpdate({
-          spreadsheetId,
-          requestBody: {
-            requests: [
-              {
-                repeatCell: {
-                  range: {
-                    sheetId,
-                    startRowIndex: appendedRow - 1,
-                    endRowIndex: appendedRow,
-                    startColumnIndex: 0,
-                    endColumnIndex: 12,
-                  },
-                  cell: {
-                    userEnteredFormat: {
-                      backgroundColor: {
-                        red: 1,
-                        green: 1,
-                        blue: 1,
-                      },
-                    },
-                  },
-                  fields: 'userEnteredFormat.backgroundColor',
-                },
-              },
-            ],
-          },
-        })
+        await applyWhiteRowBackground(sheets, spreadsheetId, sheetName, appendedRow, 12)
       }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err)
+      const details = err && typeof err === 'object' && 'response' in err
+        ? JSON.stringify((err as { response?: unknown }).response)
+        : ''
+      console.error(
+        JSON.stringify({
+          event: 'webhook_sheet_write_failed',
+          sessionId: session.id,
+          paymentId,
+          name: metadata.name,
+          email: metadata.email,
+          error: msg,
+          details,
+        })
+      )
+      return NextResponse.json(
+        { error: 'Failed to write to sheet' },
+        { status: 500 }
+      )
     }
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err)
-    const details = err && typeof err === 'object' && 'response' in err
-      ? JSON.stringify((err as { response?: unknown }).response)
-      : ''
-    console.error(
+
+    console.log(
       JSON.stringify({
-        event: 'webhook_sheet_write_failed',
+        event: 'webhook_sheet_success',
         sessionId: session.id,
         paymentId,
         name: metadata.name,
         email: metadata.email,
-        error: msg,
-        details,
+        ticketDate,
+        amountPaid,
+        quantity: qty,
       })
-    )
-    return NextResponse.json(
-      { error: 'Failed to write to sheet' },
-      { status: 500 }
     )
   }
 
-  console.log(
-    JSON.stringify({
-      event: 'webhook_sheet_success',
-      sessionId: session.id,
-      paymentId,
-      name: metadata.name,
-      email: metadata.email,
-      ticketDate,
-      amountPaid,
-      quantity: qty,
-    })
-  )
+  if (guestlistSheetName) {
+    const guestlistRow = [
+      new Date().toISOString(),
+      String(metadata.name),
+      String(metadata.email),
+      String(ticketDate),
+      String(ticketType),
+      String(qty),
+      String(amountPaid),
+      String(paymentId),
+      '', // Checked in
+      '', // Checked-in at
+      '', // Door notes
+      '', // Refunded
+      '', // Refund notes
+    ]
 
-  // Send confirmation email (non-blocking; don't fail webhook if email fails)
-  const emailResult = await sendConfirmationEmail(metadata as Record<string, string | undefined>, amountPaid, qty)
-  if (emailResult.ok) {
+    try {
+      await appendGuestlistRow({
+        sheets,
+        spreadsheetId,
+        guestlistSheetName,
+        paymentId,
+        row: guestlistRow,
+        sessionId: session.id,
+      })
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err)
+      const details = err && typeof err === 'object' && 'response' in err
+        ? JSON.stringify((err as { response?: unknown }).response)
+        : ''
+      console.error(
+        JSON.stringify({
+          event: 'webhook_guestlist_write_failed',
+          sessionId: session.id,
+          paymentId,
+          name: metadata.name,
+          email: metadata.email,
+          error: msg,
+          details,
+        })
+      )
+      return NextResponse.json(
+        { error: 'Failed to write to guestlist sheet' },
+        { status: 500 }
+      )
+    }
+  }
+
+  if (!paymentAlreadyWritten) {
+    // Send confirmation email (non-blocking; don't fail webhook if email fails)
+    const emailResult = await sendConfirmationEmail(metadata as Record<string, string | undefined>, amountPaid, qty)
+    if (emailResult.ok) {
+      console.log(
+        JSON.stringify({
+          event: 'webhook_confirmation_email_sent',
+          sessionId: session.id,
+          paymentId,
+          to: metadata.email,
+        })
+      )
+    } else {
+      console.error(
+        JSON.stringify({
+          event: 'webhook_confirmation_email_failed',
+          sessionId: session.id,
+          paymentId,
+          to: metadata.email,
+          error: emailResult.error,
+        })
+      )
+    }
+  } else {
     console.log(
       JSON.stringify({
-        event: 'webhook_confirmation_email_sent',
+        event: 'webhook_confirmation_email_skipped_duplicate',
         sessionId: session.id,
         paymentId,
-        to: metadata.email,
-      })
-    )
-  } else {
-    console.error(
-      JSON.stringify({
-        event: 'webhook_confirmation_email_failed',
-        sessionId: session.id,
-        paymentId,
-        to: metadata.email,
-        error: emailResult.error,
       })
     )
   }

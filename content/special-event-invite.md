@@ -1,9 +1,14 @@
 # Welcome
 
-This series is our next chapter: three nights of tea, music, and spacious connection at the teahouse.
+Hi friends! With spring in full bloom, we are tending to new growth at the teahouse—an upward and outward movement, from the soil toward the sun.
 
-You are invited to step out of the city's pace and into a softer rhythm. We'll be serving tea, sharing sound, and opening corners for reflection, conversation, and play.
+Join us for three evenings of tea salon, nestled in the creative parlors at the foot of Buena Vista Park.
 
-To keep each evening intimate, seats are limited and available by reservation.
+Our teahouse is a space to slow down and settle in—an evening shaped by tea, live music, and the people in the room. Each night is unique, and you will find:
 
-We look forward to welcoming you.
+🍵 Gongfu-style tea service
+🎻 Live music
+🎨 Art making
+🕯️ Cozy corners for connection & reflection
+
+Come alone or with a friend—for rest, play, and discovery. We can’t wait to see you.

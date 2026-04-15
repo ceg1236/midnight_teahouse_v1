@@ -25,6 +25,7 @@ export function getSheetsConfig() {
   return {
     spreadsheetId: getScoped('SPREADSHEET_ID'),
     sheetName: getScoped('SPREADSHEET_SHEET_NAME') || 'Sheet1',
+    guestlistSheetName: getScoped('GUESTLIST_SHEET_NAME'),
     credentialsJson: getScoped('GOOGLE_CREDENTIALS_JSON'),
     credentialsPath: getScoped('GOOGLE_APPLICATION_CREDENTIALS'),
   }

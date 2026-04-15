@@ -10,6 +10,10 @@ import { HeroVideo } from './hero-video'
 import { SiteFooter } from './site-footer'
 
 const STORAGE_KEY = 'teahouse_reservation'
+const EVENT_HERO_VIDEO_SOURCES = [
+  { src: '/images/fire_tea_pouring.mp4', type: 'video/mp4' },
+  { src: '/images/fire_tea_pouring.mov', type: 'video/quicktime' },
+]
 
 type CarrdStylePageProps = {
   eventSlug: string
@@ -352,7 +356,10 @@ export function CarrdStylePage({
             </div>
             <div className="carrd-video-fade w-full py-6 overflow-hidden">
               <div className="aspect-video overflow-hidden">
-                <HeroVideo className="w-full h-full object-cover" />
+                <HeroVideo
+                  className="w-full h-full object-cover"
+                  sources={EVENT_HERO_VIDEO_SOURCES}
+                />
               </div>
             </div>
             {showCountdown && (
@@ -615,7 +622,10 @@ export function CarrdStylePage({
         {/* Video */}
         <div className="carrd-video-fade w-full py-6 overflow-hidden">
           <div className="aspect-video overflow-hidden">
-            <HeroVideo className="w-full h-full object-cover" />
+            <HeroVideo
+              className="w-full h-full object-cover"
+              sources={EVENT_HERO_VIDEO_SOURCES}
+            />
           </div>
         </div>
 
