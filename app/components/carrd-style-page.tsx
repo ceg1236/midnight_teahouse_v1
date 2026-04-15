@@ -485,6 +485,9 @@ export function CarrdStylePage({
                       )
                     })}
                   </div>
+                  {sharedMusicBlurb ? (
+                    <p className="carrd-font-body text-center italic text-[#D9D0BF]/90">{sharedMusicBlurb}</p>
+                  ) : null}
                 </div>
                 <div className="carrd-font-body flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full">
                   <h2 className="carrd-font-heading carrd-font-h2 text-2xl">2. Choose Your Ticket</h2>
@@ -848,6 +851,11 @@ export function CarrdStylePage({
                   )
                 })}
               </div>
+              {sharedMusicBlurb ? (
+                <p className="carrd-font-body text-center italic text-[#D9D0BF]/90 w-full max-w-[650px]">
+                  {sharedMusicBlurb}
+                </p>
+              ) : null}
             </div>
 
             {/* Panel 2: Choose your ticket */}
