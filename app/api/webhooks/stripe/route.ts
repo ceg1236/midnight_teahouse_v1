@@ -17,6 +17,11 @@ function formatTicketType(orderStr: string, tierLabels: Record<string, string>):
   return Array.from(new Set(parts)).join(', ') || ''
 }
 
+function normalizeTicketDateLabel(value: string): string {
+  // Guard against accidental trailing punctuation in config labels.
+  return value.replace(/\s*,+\s*$/, '').trim()
+}
+
 function getAppendedRowNumber(updatedRange?: string | null): number | null {
   if (!updatedRange) return null
   const rowMatch = updatedRange.match(/!A(\d+):/)
@@ -363,7 +368,7 @@ export async function POST(req: NextRequest) {
     eventConfig.tiers.map((t) => [t.id, t.label])
   )
   const date = eventConfig.dates.find((d) => d.id === metadata.dateId)
-  const ticketDate = (date?.label ?? metadata.dateId).replace(/\n/g, ' ')
+  const ticketDate = normalizeTicketDateLabel((date?.label ?? metadata.dateId).replace(/\n/g, ' '))
 
   const amountPaid =
     session.amount_total != null ? `$${Math.round(session.amount_total / 100)}` : ''
