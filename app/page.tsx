@@ -218,8 +218,11 @@ export default async function Page({
           </div>
         </section>
 
-        {/* Mailing list — after Our story */}
-        <section className="border-b border-[rgba(232,224,213,0.08)] flex flex-wrap items-center gap-9 px-6 py-11">
+        {/* Mailing list — after Our story; link with /#newsletter */}
+        <section
+          id="newsletter"
+          className="scroll-mt-24 border-b border-[rgba(232,224,213,0.08)] flex flex-wrap items-center gap-9 px-6 py-11"
+        >
           <div className="min-w-[200px] flex-1">
             <h2 className="mb-2 font-serif text-[1.65rem] italic leading-tight text-[#f2ebe0] md:text-3xl">
               Stay in the loop
