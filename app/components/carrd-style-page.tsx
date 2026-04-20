@@ -476,6 +476,9 @@ export function CarrdStylePage({
                               <span className="text-[#C4AF86] font-medium">{d.day}</span>
                               <span className="text-[#FAEBD4]/90 font-normal">, {headerRest}</span>
                             </p>
+                            {d.blurb ? (
+                              <p className="text-[#D9D0BF]/90 text-base leading-snug mt-1 whitespace-pre-line">{d.blurb}</p>
+                            ) : null}
                             {!soldOut && typeof remaining === 'number' && remaining > 0 && remaining < 5 ? (
                               <p className="text-[#FAE0B9] text-base mt-1">Only {remaining} tickets remaining</p>
                             ) : null}
@@ -485,9 +488,6 @@ export function CarrdStylePage({
                       )
                     })}
                   </div>
-                  {sharedMusicBlurb ? (
-                    <p className="carrd-font-body text-center italic text-[#D9D0BF]/90">{sharedMusicBlurb}</p>
-                  ) : null}
                 </div>
                 <div className="carrd-font-body flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full">
                   <h2 className="carrd-font-heading carrd-font-h2 text-2xl">2. Choose Your Ticket</h2>
@@ -796,6 +796,9 @@ export function CarrdStylePage({
                           <span className="text-[#C4AF86] font-medium">{d.day}</span>
                           <span className="text-[#FAEBD4]/90 font-normal">, {headerRest}</span>
                         </p>
+                        {d.blurb ? (
+                          <p className="text-[#D9D0BF]/90 text-[0.9375rem] leading-snug mt-1 whitespace-pre-line">{d.blurb}</p>
+                        ) : null}
                         {!soldOut && typeof remaining === 'number' && remaining > 0 && remaining < 5 ? (
                           <p className="text-[#FAE0B9] text-sm mt-1">Only {remaining} tickets remaining</p>
                         ) : null}
@@ -815,21 +818,26 @@ export function CarrdStylePage({
                   return (
                   <div
                     key={d.id}
-                    className={`carrd-reservation-card flex items-start justify-between gap-4 ${soldOut ? 'opacity-60' : ''}`}
+                    className={`carrd-reservation-card flex flex-col gap-2 md:grid md:grid-cols-[12rem_1fr_auto] md:grid-rows-[auto_auto] md:gap-x-6 md:gap-y-1 md:items-start ${soldOut ? 'opacity-60' : ''}`}
                   >
-                    <div className="min-w-0">
-                      <p className="carrd-font-body carrd-accent-color font-medium text-[1.625rem]">{d.day}</p>
-                      <p className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0 mt-1">
-                        {d.dateTime.includes(', ') ? (
-                          <>
-                            {d.dateTime.split(', ')[0]}
-                            <br />
-                            {d.dateTime.split(', ')[1] ?? ''}
-                          </>
-                        ) : (
-                          d.dateTime
-                        )}
-                      </p>
+                    <p className="carrd-font-body carrd-accent-color font-medium text-[1.625rem] md:col-start-1 md:row-start-1">{d.day}</p>
+                    <p className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0 mt-1 md:col-start-1 md:row-start-2">
+                      {d.dateTime.includes(', ') ? (
+                        <>
+                          {d.dateTime.split(', ')[0]}
+                          <br />
+                          {d.dateTime.split(', ')[1] ?? ''}
+                        </>
+                      ) : (
+                        d.dateTime
+                      )}
+                    </p>
+                    <div className="min-w-0 md:col-start-2 md:row-start-1 md:row-span-2">
+                      {d.blurb ? (
+                        <p className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0 text-[#D9D0BF]/90 whitespace-pre-line">
+                          {d.blurb}
+                        </p>
+                      ) : null}
                       {!soldOut && typeof remaining === 'number' && remaining > 0 && remaining < 5 ? (
                         <p className="text-[#FAE0B9] text-base mt-1">Only {remaining} tickets remaining</p>
                       ) : null}
@@ -841,7 +849,7 @@ export function CarrdStylePage({
                         setSelectedDate(d.id)
                         setReservationStep(2)
                       }}
-                      className={`carrd-btn px-8 py-4 flex-shrink-0 self-start disabled:opacity-70 disabled:cursor-not-allowed ${
+                      className={`carrd-btn px-8 py-4 flex-shrink-0 self-start md:col-start-3 md:row-start-1 md:row-span-2 disabled:opacity-70 disabled:cursor-not-allowed ${
                         selectedDate === d.id ? 'bg-[#FAE0B9]/20' : ''
                       }`}
                     >
@@ -851,11 +859,6 @@ export function CarrdStylePage({
                   )
                 })}
               </div>
-              {sharedMusicBlurb ? (
-                <p className="carrd-font-body text-center italic text-[#D9D0BF]/90 w-full max-w-[650px]">
-                  {sharedMusicBlurb}
-                </p>
-              ) : null}
             </div>
 
             {/* Panel 2: Choose your ticket */}
