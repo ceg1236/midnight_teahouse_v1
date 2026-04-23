@@ -9,7 +9,7 @@ export const specialEventDates = [
     value: '2026-04-21',
     capacity: 45,
     musicians: ['In the spirit of this home, our musicians will roam throughout the evening—offering intimate, acoustic sets that unfold alongside the flow of tea and the rhythm of the room.'],
-    blurb: 'Arseny – handpan\nRozhit – cello\nSasha – sitar',
+    blurb: 'Arseny – handpan\nRozhit – cello\nSasha – guitar/sitar',
   },
   {
     id: 'apr-22',
