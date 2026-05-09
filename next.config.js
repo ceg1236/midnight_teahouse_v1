@@ -3,7 +3,6 @@ const nextConfig = {
   async redirects() {
     return [
       { source: '/reservations', destination: '/', permanent: false },
-      { source: '/invite', destination: '/', permanent: false },
       {
         source: '/volunteer',
         destination: 'https://forms.gle/n63hPsV9uGhxFuyU7',

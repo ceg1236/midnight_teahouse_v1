@@ -15,6 +15,9 @@ const EVENT_HERO_VIDEO_SOURCES = [
   { src: '/images/fire_tea_pouring.mov', type: 'video/quicktime' },
 ]
 
+/** First frame of `fire_tea_pouring.mp4` — regenerate with `pnpm posters:extract`. */
+const EVENT_HERO_POSTER = '/images/fire_tea_pouring_poster.jpg'
+
 type CarrdStylePageProps = {
   eventSlug: string
   eventTitle: string
@@ -369,6 +372,7 @@ export function CarrdStylePage({
               <div className="aspect-video overflow-hidden">
                 <HeroVideo
                   className="w-full h-full object-cover"
+                  poster={EVENT_HERO_POSTER}
                   sources={EVENT_HERO_VIDEO_SOURCES}
                 />
               </div>
@@ -634,6 +638,7 @@ export function CarrdStylePage({
           <div className="aspect-video overflow-hidden">
             <HeroVideo
               className="w-full h-full object-cover"
+              poster={EVENT_HERO_POSTER}
               sources={EVENT_HERO_VIDEO_SOURCES}
             />
           </div>

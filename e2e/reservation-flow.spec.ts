@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 
 test.describe('reservation flow', () => {
   test('can open reservation and select date', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/invite')
     await page.getByRole('button', { name: /Reserve Your Seat/i }).click()
 
     await expect(page.getByRole('heading', { name: 'Reservation', exact: true })).toBeVisible({ timeout: 5000 })
@@ -13,7 +13,7 @@ test.describe('reservation flow', () => {
   })
 
   test('can select ticket and reach form', async ({ page }) => {
-    await page.goto('/')
+    await page.goto('/invite')
     await page.getByRole('button', { name: /Reserve Your Seat/i }).click()
     await page.getByRole('button', { name: 'Select' }).first().click()
 

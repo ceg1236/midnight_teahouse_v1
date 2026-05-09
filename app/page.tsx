@@ -1,38 +1,19 @@
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
 import { getUpcomingGatherings } from '../content/upcoming-gatherings.config'
 import { HeroVideo } from './components/hero-video'
 import { HomeNewsletterForm } from './components/home-newsletter-form'
 import { HomeSiteHeader } from './components/home-site-header'
 import { PrivateInquiryForm } from './components/private-inquiry-form'
 
-export const dynamic = 'force-dynamic'
-
-function firstString(v: string | string[] | undefined): string | undefined {
-  if (v == null) return undefined
-  return Array.isArray(v) ? v[0] : v
-}
+/** Regenerate so “Upcoming gatherings” stays fresh without forcing dynamic HTML every request. */
+export const revalidate = 300
 
 /**
  * Marketing home at /.
  * Full reservation flow lives at /invite.
- * Legacy ?ticket= and (dev) ?mock= on / redirect to /invite.
+ * Legacy ?ticket= and (dev) ?mock= on / → middleware redirects to /invite.
  */
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>
-}) {
-  const params = await searchParams
-  const ticket = firstString(params.ticket)
-  const mock = firstString(params.mock)
-  const qs = new URLSearchParams()
-  if (ticket) qs.set('ticket', ticket)
-  if (process.env.NODE_ENV === 'development' && mock) qs.set('mock', mock)
-  if (qs.toString()) {
-    redirect(`/invite?${qs.toString()}`)
-  }
-
+export default async function Page() {
   const upcomingGatherings = getUpcomingGatherings()
 
   return (

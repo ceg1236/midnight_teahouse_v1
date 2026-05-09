@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 import type { eventDates, eventTiers } from '../../content/event-invite.config'
+import { HeroVideo } from './hero-video'
 
 const STORAGE_KEY = 'teahouse_reservation'
 
@@ -93,16 +94,10 @@ export function EventInviteWizard({ welcomeContent, dates, tiers }: EventInviteW
       {/* Section 1: Welcome (hero with video) */}
       <section className="relative flex min-h-[100dvh] flex-col items-center justify-center px-6 pb-12 pt-16 md:min-h-screen md:pt-20">
         <div className="absolute inset-0 z-0" aria-hidden>
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 h-full w-full object-cover"
-          >
-            <source src="/images/midnight_site_vid_hi_res.mp4" type="video/mp4" />
-            <source src="/images/midnight_site_vid_hi_res.mov" type="video/quicktime" />
-          </video>
+          <HeroVideo
+            wrapperClassName="absolute inset-0 h-full w-full"
+            className="h-full w-full object-cover"
+          />
           <div className="absolute inset-0 bg-[#162143]/60" aria-hidden />
         </div>
         <div className="relative z-10 mx-auto flex max-w-4xl flex-col items-center gap-4 md:gap-5">
