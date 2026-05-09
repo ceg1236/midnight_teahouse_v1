@@ -15,6 +15,8 @@ const EVENT_HERO_VIDEO_SOURCES = [
   { src: '/images/fire_tea_pouring.mov', type: 'video/quicktime' },
 ]
 
+const EVENT_HERO_POSTER = '/images/art_tea.jpg'
+
 type CarrdStylePageProps = {
   eventSlug: string
   eventTitle: string
@@ -369,6 +371,7 @@ export function CarrdStylePage({
               <div className="aspect-video overflow-hidden">
                 <HeroVideo
                   className="w-full h-full object-cover"
+                  poster={EVENT_HERO_POSTER}
                   sources={EVENT_HERO_VIDEO_SOURCES}
                 />
               </div>
@@ -634,6 +637,7 @@ export function CarrdStylePage({
           <div className="aspect-video overflow-hidden">
             <HeroVideo
               className="w-full h-full object-cover"
+              poster={EVENT_HERO_POSTER}
               sources={EVENT_HERO_VIDEO_SOURCES}
             />
           </div>
