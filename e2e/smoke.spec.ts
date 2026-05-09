@@ -7,6 +7,11 @@ test.describe('smoke', () => {
     await expect(page.getByRole('heading', { name: /an enchanted world/i })).toBeVisible()
   })
 
+  test('legacy ?ticket= on / redirects to /invite (middleware)', async ({ page }) => {
+    await page.goto('/?ticket=e2e-token')
+    await expect(page).toHaveURL(/\/invite\?ticket=e2e-token/)
+  })
+
   test('Reserve Your Seat CTA scrolls to gatherings', async ({ page }) => {
     await page.goto('/')
     const cta = page.getByRole('link', { name: /Reserve Your Seat/i })
