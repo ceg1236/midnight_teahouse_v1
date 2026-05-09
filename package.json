@@ -6,6 +6,7 @@
     "start": "next start",
     "test": "vitest run",
     "test:watch": "vitest",
+    "posters:extract": "ffmpeg -y -ss 0 -i public/images/midnight_site_vid_hi_res.mp4 -frames:v 1 -q:v 85 -update 1 public/images/midnight_site_vid_hi_res_poster.jpg && ffmpeg -y -ss 0 -i public/images/fire_tea_pouring.mp4 -frames:v 1 -q:v 85 -update 1 public/images/fire_tea_pouring_poster.jpg",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:install": "playwright install chromium"

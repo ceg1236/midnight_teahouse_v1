@@ -12,8 +12,8 @@ export const HOME_HERO_SOURCES: HeroVideoSource[] = [
   { src: '/images/midnight_site_vid_hi_res.mov', type: 'video/quicktime' },
 ]
 
-/** Static frame until the first video frame is ready — keeps first paint light while MP4 fetches. */
-export const HOME_HERO_POSTER = '/images/lovable_hero.jpg'
+/** First frame of `midnight_site_vid_hi_res.mp4` — regenerate with `pnpm posters:extract` after replacing that video. */
+export const HOME_HERO_POSTER = '/images/midnight_site_vid_hi_res_poster.jpg'
 
 /**
  * Full-bleed looping hero video.

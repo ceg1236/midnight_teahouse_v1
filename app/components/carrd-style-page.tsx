@@ -15,7 +15,8 @@ const EVENT_HERO_VIDEO_SOURCES = [
   { src: '/images/fire_tea_pouring.mov', type: 'video/quicktime' },
 ]
 
-const EVENT_HERO_POSTER = '/images/art_tea.jpg'
+/** First frame of `fire_tea_pouring.mp4` — regenerate with `pnpm posters:extract`. */
+const EVENT_HERO_POSTER = '/images/fire_tea_pouring_poster.jpg'
 
 type CarrdStylePageProps = {
   eventSlug: string
