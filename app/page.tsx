@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import { getUpcomingGatherings } from '../content/upcoming-gatherings.config'
 import { HeroVideo } from './components/hero-video'
 import { HomeNewsletterForm } from './components/home-newsletter-form'
 import { HomeSiteHeader } from './components/home-site-header'
@@ -31,6 +32,8 @@ export default async function Page({
   if (qs.toString()) {
     redirect(`/invite?${qs.toString()}`)
   }
+
+  const upcomingGatherings = getUpcomingGatherings()
 
   return (
     <div className="carrd-page min-h-[100dvh] text-[#e8e0d5] max-md:pt-[calc(4.25rem+env(safe-area-inset-top,0px))] md:min-h-screen md:pt-0">
@@ -91,69 +94,59 @@ export default async function Page({
             Upcoming gatherings
           </h2>
 
-          <div className="border-t border-[rgba(232,224,213,0.08)] py-5">
-            <div className="flex items-start gap-5">
-              <div className="min-w-[52px] text-center md:min-w-[56px]">
-                <div className="text-[11px] uppercase tracking-[0.14em] text-[rgba(232,224,213,0.55)] md:text-xs">
-                  Apr
+          {upcomingGatherings.length === 0 ? (
+            <p className="border-t border-[rgba(232,224,213,0.08)] py-6 text-base leading-relaxed text-[rgba(232,224,213,0.55)] md:text-lg">
+              New gatherings will be posted here soon.
+            </p>
+          ) : (
+            upcomingGatherings.map((g) => {
+              const ctaClassName =
+                'self-center whitespace-nowrap rounded border border-[rgba(180,140,110,0.35)] px-4 py-2.5 text-xs font-medium uppercase tracking-[0.1em] text-[#d4b896] md:text-sm'
+              const isInternal = g.href.startsWith('/')
+              return (
+                <div
+                  key={`${g.startsAt}-${g.title}`}
+                  className="border-t border-[rgba(232,224,213,0.08)] py-5"
+                >
+                  <div className="flex items-start gap-5">
+                    <div className="min-w-[52px] text-center md:min-w-[56px]">
+                      <div className="text-[11px] uppercase tracking-[0.14em] text-[rgba(232,224,213,0.55)] md:text-xs">
+                        {g.monthShort}
+                      </div>
+                      <div className="font-serif text-[34px] font-light leading-none text-[#c9a87a] md:text-[38px]">
+                        {g.dayNum}
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="mb-1.5 font-serif text-[1.35rem] font-normal leading-snug text-[#f0e8dd] md:text-2xl">
+                        {g.title}
+                      </div>
+                      <div className="mb-2 text-sm leading-relaxed text-[rgba(232,224,213,0.62)] md:text-base">
+                        {g.detailLine}
+                      </div>
+                      <span className="inline-block border border-[rgba(180,140,110,0.35)] px-2.5 py-1 text-[11px] uppercase tracking-[0.12em] text-[rgba(200,175,140,0.9)] md:text-xs">
+                        {g.badge}
+                      </span>
+                    </div>
+                    {isInternal ? (
+                      <Link href={g.href} className={ctaClassName}>
+                        {g.ctaLabel}
+                      </Link>
+                    ) : (
+                      <a
+                        href={g.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={ctaClassName}
+                      >
+                        {g.ctaLabel}
+                      </a>
+                    )}
+                  </div>
                 </div>
-                <div className="font-serif text-[34px] font-light leading-none text-[#c9a87a] md:text-[38px]">
-                  16
-                </div>
-              </div>
-              <div className="flex-1">
-                <div className="mb-1.5 font-serif text-[1.35rem] font-normal leading-snug text-[#f0e8dd] md:text-2xl">
-                  After Dark: Altered States
-                </div>
-                <div className="mb-2 text-sm leading-relaxed text-[rgba(232,224,213,0.62)] md:text-base">
-                  6:30–9:30 pm · The Exploratorium · San Francisco
-                </div>
-                <span className="inline-block border border-[rgba(180,140,110,0.35)] px-2.5 py-1 text-[11px] uppercase tracking-[0.12em] text-[rgba(200,175,140,0.9)] md:text-xs">
-                  Tea Lounge
-                </span>
-              </div>
-              <a
-                href="https://www.exploratorium.edu/visit/calendar/after-dark-altered-states"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="self-center whitespace-nowrap rounded border border-[rgba(180,140,110,0.35)] px-4 py-2.5 text-xs font-medium uppercase tracking-[0.1em] text-[#d4b896] md:text-sm"
-              >
-                RSVP →
-              </a>
-            </div>
-          </div>
-
-          <div className="border-t border-[rgba(232,224,213,0.08)] py-5">
-            <div className="flex items-start gap-5">
-              <div className="min-w-[52px] text-center md:min-w-[56px]">
-                <div className="text-[11px] uppercase tracking-[0.14em] text-[rgba(232,224,213,0.55)] md:text-xs">
-                  May
-                </div>
-                <div className="font-serif text-[34px] font-light leading-none text-[#c9a87a] md:text-[38px]">
-                  23
-                </div>
-              </div>
-              <div className="flex-1">
-                <div className="mb-1.5 font-serif text-[1.35rem] font-normal leading-snug text-[#f0e8dd] md:text-2xl">
-                  The Sound Healing Symphony
-                </div>
-                <div className="mb-2 text-sm leading-relaxed text-[rgba(232,224,213,0.62)] md:text-base">
-                  7 pm–2 am · Sebastopol
-                </div>
-                <span className="inline-block border border-[rgba(180,140,110,0.35)] px-2.5 py-1 text-[11px] uppercase tracking-[0.12em] text-[rgba(200,175,140,0.9)] md:text-xs">
-                  Tea Lounge
-                </span>
-              </div>
-              <a
-                href="https://www.soundmeditationpresents.com/events-1/the-sound-healing-symphony-relaxes-in-sebastapol-tix-up-soon"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="self-center whitespace-nowrap rounded border border-[rgba(180,140,110,0.35)] px-4 py-2.5 text-xs font-medium uppercase tracking-[0.1em] text-[#d4b896] md:text-sm"
-              >
-                RSVP →
-              </a>
-            </div>
-          </div>
+              )
+            })
+          )}
         </section>
 
         {/* Private events teaser + inquiry */}
