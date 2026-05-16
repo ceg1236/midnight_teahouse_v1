@@ -22,7 +22,7 @@ export function getEventPracticalNotes(eventSlug?: string): PracticalNote[] {
     { label: 'Shoes', text: 'The teahouse is a shoes-free space. Bring cozy socks.' },
   ]
 
-  if (event.slug !== 'special-event') {
+  if (event.slug !== 'special-event' && event.slug !== 'turby-event') {
     notes.push({
       label: 'Rooftop',
       text: "There is a beautiful rooftop. If you're interested, bring a warm jacket or blanket!",

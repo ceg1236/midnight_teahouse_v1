@@ -7,6 +7,7 @@ import { getEventConfig } from '../../lib/event-registry'
 const EVENT_OPTIONS = [
   getEventConfig('crossing-into-spring'),
   getEventConfig('special-event'),
+  getEventConfig('turby-event'),
 ]
 
 export default function AdminPage() {

@@ -1,5 +1,6 @@
 import { eventDates, eventTiers } from '../content/event-invite.config'
 import { specialEventDates, specialEventTiers } from '../content/special-event.config'
+import { turbyEventDates, turbyEventTiers } from '../content/turby-event.config'
 import type { EventDate, EventTier } from '../content/event-schema'
 
 export type EventConfig = {
@@ -64,6 +65,27 @@ const EVENTS: Record<string, EventConfig> = {
       'Erstwhere is a budding hub for artists in Haight-Ashbury—a guesthouse for traveling artists and a gathering space for local creatives. Its beautiful corridors serve as a bridge between the worlds within and beyond our city.',
     dates: specialEventDates,
     tiers: specialEventTiers,
+  },
+  'turby-event': {
+    slug: 'turby-event',
+    title: 'Midnight Teahouse at Turby',
+    invitePath: '/turby',
+    successPath: '/turby/success',
+    countdownTarget: Math.floor(new Date('2026-06-13T19:00:00-07:00').getTime() / 1000),
+    showCountdown: false,
+    dateRangeLabel: 'June 13 - 15, 2026',
+    timeLabel: '7-11pm',
+    locationLabel: 'San Francisco',
+    address: 'Address TBA, San Francisco',
+    calendarTitle: 'Midnight Teahouse at Turby',
+    calendarDetails: '',
+    welcomeContentSlug: 'turby-invite',
+    stripeDescriptionLabel: 'Midnight Teahouse at Turby',
+    hostSectionTitle: 'About our host',
+    hostSectionDescription:
+      'Turby is our host for this pop-up—a welcoming space for tea, music, and creative gathering in the city.',
+    dates: turbyEventDates,
+    tiers: turbyEventTiers,
   },
 }
 
