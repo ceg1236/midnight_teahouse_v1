@@ -1,6 +1,8 @@
 # Welcome
-Join us for three evenings of gong-fu tea salon at Turby—a cozy gathering shaped by live music, art, and unhurried conversation.
+Join us for a daytime outdoor café at Turby—gong-fu tea, light bites, and unhurried conversation in the garden.
 
-Our teahouse is a space to slow down and settle in. Each night is unique: tea service, roaming musicians, and quiet corners for connection and reflection.
+This is a sunlit pop-up: tables under the open sky, pots of tea passed hand to hand, and the gentle pace of a Saturday afternoon. Come for a slow hour or stay the whole session.
 
-Come alone or with a friend—for rest, play, and discovery. We can’t wait to see you.
+We’ll serve caffeinated and non-caffeinated teas alongside simple café fare. Bring a friend, a book, or just yourself.
+
+We can’t wait to share this bright corner of the teahouse with you.

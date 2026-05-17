@@ -5,6 +5,15 @@ import { getEventConfig } from '../../lib/event-registry'
 
 export const dynamic = 'force-dynamic'
 
+const TURBY_HERO_IMAGE = '/images/xf_flowers_tea/xf_teacup.jpg'
+
+const TURBY_BOOKING_NOTES = [
+  'We’re open from 11am to 3pm. Join us anytime in this window.',
+  'Reservation includes unlimited tea and light café bites.',
+  'We invite you to keep phones and laptops tucked away while you’re with us.',
+  'This is an outdoor garden café—dress for the weather.',
+]
+
 function firstString(v: string | string[] | undefined): string | undefined {
   if (v == null) return undefined
   return Array.isArray(v) ? v[0] : v
@@ -56,6 +65,8 @@ export default async function TurbyEventPage({
       soldOutByDateId={soldOutByDateId}
       remainingByDateId={remainingByDateId}
       initialTicket={ticket ?? undefined}
+      heroImage={TURBY_HERO_IMAGE}
+      bookingNotes={TURBY_BOOKING_NOTES}
     />
   )
 }

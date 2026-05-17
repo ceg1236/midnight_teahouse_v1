@@ -4,32 +4,9 @@ import Link from 'next/link'
 import { Suspense, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { getEventConfig } from '../../../lib/event-registry'
-import { getCalendarDescription } from '../../../lib/event-messaging'
+import { getCalendarDescription, getGoogleCalendarUrl } from '../../../lib/event-messaging'
 
 const STORAGE_KEY = 'teahouse_reservation'
-
-/** Build Google Calendar add-event URL for 7–11pm Pacific on the given date */
-function getGoogleCalendarUrl(
-  dateValue: string,
-  title: string,
-  details: string,
-  location: string
-): string {
-  const [y, m, d] = dateValue.split('-').map(Number)
-  const next = new Date(Date.UTC(y, m - 1, d + 1))
-  const y2 = next.getUTCFullYear()
-  const m2 = String(next.getUTCMonth() + 1).padStart(2, '0')
-  const d2 = String(next.getUTCDate()).padStart(2, '0')
-  const start = `${y2}${m2}${d2}T020000Z`
-  const end = `${y2}${m2}${d2}T060000Z`
-  return (
-    'https://calendar.google.com/calendar/render?action=TEMPLATE' +
-    `&text=${encodeURIComponent(title)}` +
-    `&dates=${start}/${end}` +
-    `&details=${encodeURIComponent(details)}` +
-    `&location=${encodeURIComponent(location)}`
-  )
-}
 
 function getFirstName(name: string): string {
   const trimmed = name.trim()
@@ -79,10 +56,11 @@ function TurbyEventSuccessContent() {
         <div className="flex flex-col items-center gap-4">
           <a
             href={getGoogleCalendarUrl(
-              selectedDate?.value ?? event.dates[0]?.value ?? '2026-06-13',
+              selectedDate?.value ?? event.dates[0]?.value ?? '2026-05-30',
               event.calendarTitle,
               getCalendarDescription(event.slug),
-              event.address
+              event.address,
+              event.slug
             )}
             target="_blank"
             rel="noopener noreferrer"

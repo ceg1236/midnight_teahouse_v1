@@ -18,6 +18,28 @@ const EVENT_HERO_VIDEO_SOURCES = [
 /** First frame of `fire_tea_pouring.mp4` — regenerate with `pnpm posters:extract`. */
 const EVENT_HERO_POSTER = '/images/fire_tea_pouring_poster.jpg'
 
+function EventHero({
+  className,
+  heroImage,
+}: {
+  className?: string
+  heroImage?: string
+}) {
+  if (heroImage) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={heroImage} alt="" className={className} />
+    )
+  }
+  return (
+    <HeroVideo
+      className={className}
+      poster={EVENT_HERO_POSTER}
+      sources={EVENT_HERO_VIDEO_SOURCES}
+    />
+  )
+}
+
 type CarrdStylePageProps = {
   eventSlug: string
   eventTitle: string
@@ -38,6 +60,10 @@ type CarrdStylePageProps = {
   initialTicket?: string
   hostSectionTitle?: string
   hostSectionDescription?: string
+  /** Static hero image instead of looping video (e.g. daytime events). */
+  heroImage?: string
+  /** Overrides default evening booking notes at checkout. */
+  bookingNotes?: readonly (string | React.ReactNode)[]
 }
 
 const SCROLL_DURATION = 1200
@@ -148,6 +174,8 @@ export function CarrdStylePage({
   initialTicket,
   hostSectionTitle,
   hostSectionDescription,
+  heroImage,
+  bookingNotes = BOOKING_NOTES,
 }: CarrdStylePageProps) {
   const tokenPayload = initialTicket ? decodeTokenPayload(initialTicket) : null
   const bypassSoldOut = !!tokenPayload
@@ -370,11 +398,7 @@ export function CarrdStylePage({
             </div>
             <div className="carrd-video-fade w-full py-6 overflow-hidden">
               <div className="aspect-video overflow-hidden">
-                <HeroVideo
-                  className="w-full h-full object-cover"
-                  poster={EVENT_HERO_POSTER}
-                  sources={EVENT_HERO_VIDEO_SOURCES}
-                />
+                <EventHero className="w-full h-full object-cover" heroImage={heroImage} />
               </div>
             </div>
             {showCountdown && (
@@ -589,7 +613,7 @@ export function CarrdStylePage({
                   <div className="w-full max-w-full min-w-0 text-left px-4 md:px-0">
                     <p className="carrd-font-body text-base font-medium mb-1.5">A few things to note before booking:</p>
                     <ul className="carrd-font-body text-base space-y-1.5 list-none pl-0 leading-snug">
-                      {BOOKING_NOTES.map((item, i) => (
+                      {bookingNotes.map((item, i) => (
                         <li key={i} className="flex items-center gap-2"><span className="text-[#D9D0BF] w-1.5 h-1.5 rounded-full bg-[#D9D0BF] shrink-0" aria-hidden /><span className="flex-1 min-w-0 text-[#D9D0BF]/95">{item}</span></li>
                       ))}
                     </ul>
@@ -636,11 +660,7 @@ export function CarrdStylePage({
         {/* Video */}
         <div className="carrd-video-fade w-full py-6 overflow-hidden">
           <div className="aspect-video overflow-hidden">
-            <HeroVideo
-              className="w-full h-full object-cover"
-              poster={EVENT_HERO_POSTER}
-              sources={EVENT_HERO_VIDEO_SOURCES}
-            />
+            <EventHero className="w-full h-full object-cover" heroImage={heroImage} />
           </div>
         </div>
 
@@ -1345,7 +1365,7 @@ export function CarrdStylePage({
               <div className="w-full max-w-[650px] text-left mt-6 px-4 md:px-0">
                 <p className="carrd-font-body text-sm font-medium mb-1.5">A few things to note before booking:</p>
                 <ul className="carrd-font-body text-base space-y-1 list-none pl-0 leading-tight">
-                  {BOOKING_NOTES.map((item, i) => (
+                  {bookingNotes.map((item, i) => (
                     <li key={i} className="flex items-center gap-2">
                       <span className="text-[#D9D0BF] w-1.5 h-1.5 rounded-full bg-[#D9D0BF] shrink-0 flex-shrink-0" aria-hidden />
                       <span className="flex-1 min-w-0 text-[#D9D0BF]/95">{item}</span>
