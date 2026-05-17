@@ -8,8 +8,7 @@ export const turbyEventDates = [
     label: 'Saturday, May 30',
     value: '2026-05-30',
     capacity: 45,
-    musicians: ['Acoustic music in the garden—easy listening to accompany your tea and conversation.'],
-    blurb: 'Musicians TBA',
+    musicians: [],
   },
 ] as const satisfies readonly EventDate[]
 

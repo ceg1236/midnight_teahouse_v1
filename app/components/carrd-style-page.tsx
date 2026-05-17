@@ -177,6 +177,7 @@ export function CarrdStylePage({
   heroImage,
   bookingNotes = BOOKING_NOTES,
 }: CarrdStylePageProps) {
+  const singleDateEvent = dates.length === 1
   const tokenPayload = initialTicket ? decodeTokenPayload(initialTicket) : null
   const bypassSoldOut = !!tokenPayload
   const effectiveSoldOut = bypassSoldOut ? {} : soldOutByDateId
@@ -243,10 +244,13 @@ export function CarrdStylePage({
       if (date && hasSelection) setReservationStep(3)
       else if (date) setReservationStep(2)
       else setReservationStep(1)
-    } else if (date) {
+    } else if (date || singleDateEvent) {
+      if (singleDateEvent && !date && dates[0]) {
+        setSelectedDate(dates[0].id)
+      }
       setReservationStep(2)
     }
-  }, [dates, tiers, initialTicket])
+  }, [dates, tiers, initialTicket, singleDateEvent])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -376,6 +380,36 @@ export function CarrdStylePage({
     </section>
   ) : null
   const sharedMusicBlurb = dates.flatMap((d) => d.musicians).find((line) => line?.trim()) ?? ''
+  const reservationSteps = singleDateEvent ? ([2, 3] as const) : ([1, 2, 3] as const)
+  const panelCount = reservationSteps.length
+  const slideOffset = singleDateEvent ? reservationStep - 2 : reservationStep - 1
+  const panelFlexWidth = `${panelCount * 100}%`
+  const slideTransform = `translateX(-${Math.max(0, slideOffset) * (100 / panelCount)}%)`
+  const panelWidthClass = singleDateEvent ? 'w-1/2' : 'w-1/3'
+  const ticketStepLabel = singleDateEvent ? '1. Choose Your Ticket' : '2. Choose Your Ticket'
+  const formStepLabel = singleDateEvent ? '2. Complete Your Reservation' : '3. Complete Your Reservation'
+
+  const beginReservation = () => {
+    if (singleDateEvent && dates[0]) {
+      setSelectedDate(dates[0].id)
+      setReservationStep(2)
+    } else {
+      setReservationStep(1)
+    }
+    setShowReservationView(true)
+  }
+
+  const handleReservationBack = () => {
+    if (singleDateEvent && reservationStep === 2) {
+      setShowReservationView(false)
+      return
+    }
+    if (reservationStep === 1) {
+      setShowReservationView(false)
+      return
+    }
+    setReservationStep((s) => (s - 1) as 1 | 2 | 3)
+  }
 
   return (
     <div className="carrd-page flex flex-col items-center min-h-screen overflow-x-hidden pt-8">
@@ -433,10 +467,7 @@ export function CarrdStylePage({
               </div>
               <button
                 type="button"
-                onClick={() => {
-                  setReservationStep(1)
-                  setShowReservationView(true)
-                }}
+                onClick={beginReservation}
                 className="carrd-btn px-10 py-4"
               >
                 Reserve Your Seat
@@ -448,7 +479,7 @@ export function CarrdStylePage({
           <div ref={mobileReservationPanelRef} className="carrd-mobile-reservation flex flex-col items-center px-4 py-4 gap-3 min-w-0 w-full max-w-full overflow-x-hidden">
             <div className="w-full flex flex-col items-center gap-1 shrink-0">
               <div className="flex justify-center gap-2" aria-hidden>
-                {([1, 2, 3] as const).map((step) => (
+                {reservationSteps.map((step) => (
                   <span key={step} className={`w-2 h-2 rounded-full transition-colors duration-300 ${reservationStep === step ? 'bg-[#FAE0B9]' : 'bg-[#D9D0BF]/40'}`} />
                 ))}
               </div>
@@ -456,10 +487,7 @@ export function CarrdStylePage({
                 <div className="flex-1 flex justify-start min-w-0">
                   <button
                     type="button"
-                    onClick={() => {
-                      if (reservationStep === 1) setShowReservationView(false)
-                      else setReservationStep((s) => (s - 1) as 1 | 2 | 3)
-                    }}
+                    onClick={handleReservationBack}
                     className="carrd-font-body text-lg text-[#D9D0BF] hover:text-[#FAEBD4] underline focus:outline-none cursor-pointer"
                   >
                     ← Back
@@ -473,12 +501,13 @@ export function CarrdStylePage({
               <div
                 className="flex transition-transform duration-500 ease-in-out min-w-0"
                 style={{
-                  width: '300%',
-                  transform: `translateX(-${(reservationStep - 1) * (100 / 3)}%)`,
+                  width: panelFlexWidth,
+                  transform: slideTransform,
                 }}
               >
                 {/* Mobile reservation reuses same panel structure - content is in desktop flow below, we need inline copy */}
-                <div className="carrd-font-body flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full">
+                {!singleDateEvent ? (
+                <div className={`carrd-font-body flex-shrink-0 ${panelWidthClass} flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full`}>
                   <h2 className="carrd-font-heading carrd-font-h2 text-2xl">1. Choose Your Evening</h2>
                   {sharedMusicBlurb ? (
                     <p className="carrd-font-body text-center italic text-[#D9D0BF]/90 px-1">{sharedMusicBlurb}</p>
@@ -517,8 +546,9 @@ export function CarrdStylePage({
                     })}
                   </div>
                 </div>
-                <div className="carrd-font-body flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full">
-                  <h2 className="carrd-font-heading carrd-font-h2 text-2xl">2. Choose Your Ticket</h2>
+                ) : null}
+                <div className={`carrd-font-body flex-shrink-0 ${panelWidthClass} flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full`}>
+                  <h2 className="carrd-font-heading carrd-font-h2 text-2xl">{ticketStepLabel}</h2>
                   <div className="w-full max-w-full min-w-0 flex flex-col gap-3 break-words">
                     {tiers.filter((t) => t.id === 'community' || t.id === 'patron').map((t) => {
                       const qty = selections[t.id] ?? 0
@@ -592,8 +622,8 @@ export function CarrdStylePage({
                   </div>
                   <button type="button" onClick={() => setReservationStep(3)} disabled={!hasSelection} className="carrd-btn px-8 py-4 disabled:opacity-50 disabled:cursor-not-allowed">Continue</button>
                 </div>
-                <div ref={mobileFormRef} className="carrd-font-body flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full">
-                  <h2 className="carrd-font-heading carrd-font-h2 text-2xl">3. Complete Your Reservation</h2>
+                <div ref={mobileFormRef} className={`carrd-font-body flex-shrink-0 ${panelWidthClass} flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full`}>
+                  <h2 className="carrd-font-heading carrd-font-h2 text-2xl">{formStepLabel}</h2>
                   {selectedDate && hasSelection ? (
                     <div className="carrd-font-body rounded-lg bg-[#FAEBD4]/20 px-4 py-4 text-left w-full max-w-full min-w-0">
                       <div className="space-y-3">
@@ -714,8 +744,12 @@ export function CarrdStylePage({
           <button
             type="button"
             onClick={() => {
+              if (singleDateEvent && dates[0]) {
+                setSelectedDate(dates[0].id)
+                setReservationStep(2)
+              }
               if (typeof window !== 'undefined' && window.innerWidth < 768) {
-                setShowReservationView(true)
+                beginReservation()
                 joinRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
               } else {
                 scrollToSection(joinRef)
@@ -732,7 +766,7 @@ export function CarrdStylePage({
         <div className="w-full flex flex-col items-center gap-1">
           {/* Step indicator */}
           <div className="flex justify-center gap-2" aria-hidden>
-            {([1, 2, 3] as const).map((step) => (
+            {reservationSteps.map((step) => (
               <span
                 key={step}
                 className={`w-2 h-2 rounded-full transition-colors duration-300 ${
@@ -746,13 +780,7 @@ export function CarrdStylePage({
               {(reservationStep > 1 || showReservationView) && (
                 <button
                   type="button"
-                  onClick={() => {
-                    if (reservationStep === 1 && showReservationView) {
-                      setShowReservationView(false)
-                    } else if (reservationStep > 1) {
-                      setReservationStep((s) => (s - 1) as 1 | 2 | 3)
-                    }
-                  }}
+                  onClick={handleReservationBack}
                   className="carrd-font-body text-lg text-[#D9D0BF] hover:text-[#FAEBD4] underline focus:outline-none cursor-pointer"
                 >
                   ← Back
@@ -774,12 +802,13 @@ export function CarrdStylePage({
           <div
             className="flex transition-transform duration-500 ease-in-out min-w-0"
             style={{
-              width: '300%',
-              transform: `translateX(-${(reservationStep - 1) * (100 / 3)}%)`,
+              width: panelFlexWidth,
+              transform: slideTransform,
             }}
           >
             {/* Panel 1: Choose your evening */}
-            <div className="flex-shrink-0 w-1/3 min-w-0 flex flex-col items-center gap-6 px-4 md:px-6 max-w-full">
+            {!singleDateEvent ? (
+            <div className={`flex-shrink-0 ${panelWidthClass} min-w-0 flex flex-col items-center gap-6 px-4 md:px-6 max-w-full`}>
               <h2 className="carrd-font-heading carrd-font-h2">
                 1. Choose Your Evening
               </h2>
@@ -885,11 +914,12 @@ export function CarrdStylePage({
                 })}
               </div>
             </div>
+            ) : null}
 
             {/* Panel 2: Choose your ticket */}
-            <div ref={tierRef} className="flex-shrink-0 w-1/3 min-w-0 flex flex-col items-center gap-6 px-4 md:px-6 max-w-full">
+            <div ref={tierRef} className={`flex-shrink-0 ${panelWidthClass} min-w-0 flex flex-col items-center gap-6 px-4 md:px-6 max-w-full`}>
               <h2 className="carrd-font-heading carrd-font-h2">
-                2. Choose Your Ticket
+                {ticketStepLabel}
               </h2>
               {/* Mobile: cards first, then dropdown for pricing note */}
               <div className="carrd-font-body md:hidden w-full max-w-full flex flex-col gap-5 break-words">
@@ -1248,10 +1278,10 @@ export function CarrdStylePage({
             </div>
 
             {/* Panel 3: Complete your reservation (summary + form + reserve) */}
-            <div ref={formRef} className="flex-shrink-0 w-1/3 min-w-0 flex flex-col items-center gap-6 px-4 md:px-6 max-w-full">
+            <div ref={formRef} className="flex-shrink-0 ${panelWidthClass} min-w-0 flex flex-col items-center gap-6 px-4 md:px-6 max-w-full">
               <div className="inline-flex flex-col items-stretch gap-6">
                 <h2 className="carrd-font-heading carrd-font-h2">
-                  3. Complete Your Reservation
+                  {formStepLabel}
                 </h2>
               {selectedDate && hasSelection ? (
                 <>
@@ -1307,7 +1337,7 @@ export function CarrdStylePage({
                     onClick={() => setReservationStep(1)}
                     className="carrd-btn px-10 py-4"
                   >
-                    Choose evening & ticket
+                    Choose your ticket
                   </button>
                 </div>
               )}
