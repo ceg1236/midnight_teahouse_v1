@@ -23,19 +23,21 @@ TEST_GOOGLE_CREDENTIALS_JSON={"type":"service_account",...}
 
 ## 2) Start app + Stripe listener
 
-In one terminal:
+One command starts Next.js and `stripe listen` (requires [Stripe CLI](https://stripe.com/docs/stripe-cli)):
 
 ```bash
 pnpm dev
 ```
 
-In another terminal:
+Phone on the same Wi‑Fi (site must be reachable on your LAN):
 
 ```bash
-stripe listen --forward-to localhost:3000/api/webhooks/stripe
+pnpm dev:mobile
 ```
 
-Copy the `whsec_...` shown by Stripe CLI into `TEST_STRIPE_WEBHOOK_SECRET`.
+Use the LAN or `YourMac.local` URL from the terminal — not `localhost` on a physical phone (`localhost` is the phone itself). iOS Simulator on this Mac can use `http://localhost:3000`. Android over USB can use `adb reverse tcp:3000 tcp:3000` then `http://localhost:3000`.
+
+Copy the `whsec_...` shown by Stripe CLI into `TEST_STRIPE_WEBHOOK_SECRET` (first run only, or when it changes).
 
 ## 3) Run a local checkout test
 
