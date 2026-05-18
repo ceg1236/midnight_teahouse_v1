@@ -52,6 +52,18 @@ function TurbyEventSuccessContent() {
               {event.address}
             </p>
           </div>
+          <div className="flex flex-col gap-2 text-left w-full">
+            <p className="text-[16px] leading-[1.55] text-[#FAEBD4]">
+              Thank you for reserving your spot.
+            </p>
+            <p className="text-[16px] leading-[1.55] text-[#FAEBD4]">
+              We are excited to share this day with you.
+            </p>
+            <p className="text-[16px] leading-[1.55] text-[#FAEBD4]">
+              We&apos;ve sent a confirmation email with your ticket details and venue info.
+              Please check your inbox — and your Promotions folder if you use Gmail.
+            </p>
+          </div>
         </div>
         <div className="flex flex-col items-center gap-4">
           <a

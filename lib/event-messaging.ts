@@ -85,10 +85,22 @@ export function getGoogleCalendarUrl(
   )
 }
 
+/** Opening paragraph in the Resend confirmation email (HTML). */
+export function getConfirmationEmailIntro(eventSlug?: string): string {
+  const event = getEventConfig(eventSlug)
+  if (event.slug === 'turby-event') {
+    return "We're very excited to share this day with you—to slow down together, enjoy tea and light bites in the garden."
+  }
+  if (event.slug === 'special-event') {
+    return "We're very excited to share this evening with you—to slow down together, enjoy tea and music, and settle into the parlors at Erstwhere."
+  }
+  return "We're very excited to share this evening with you—to slow down together, enjoy tea and music, settle into the night."
+}
+
 export function getCalendarDescription(eventSlug?: string): string {
   const event = getEventConfig(eventSlug)
   const notes = getEventPracticalNotes(event.slug)
-  const whenPhrase = event.slug === 'turby-event' ? 'this afternoon with you' : 'this evening with you'
+  const whenPhrase = event.slug === 'turby-event' ? 'this day with you' : 'this evening with you'
   return [
     `Thank you for reserving a seat at ${event.title}.`,
     `We are excited to share ${whenPhrase}.`,
