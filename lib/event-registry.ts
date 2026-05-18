@@ -1,5 +1,6 @@
 import { eventDates, eventTiers } from '../content/event-invite.config'
 import { specialEventDates, specialEventTiers } from '../content/special-event.config'
+import { turbyEventDates, turbyEventTiers } from '../content/turby-event.config'
 import type { EventDate, EventTier } from '../content/event-schema'
 
 export type EventConfig = {
@@ -64,6 +65,27 @@ const EVENTS: Record<string, EventConfig> = {
       'Erstwhere is a budding hub for artists in Haight-Ashbury—a guesthouse for traveling artists and a gathering space for local creatives. Its beautiful corridors serve as a bridge between the worlds within and beyond our city.',
     dates: specialEventDates,
     tiers: specialEventTiers,
+  },
+  'turby-event': {
+    slug: 'turby-event',
+    title: 'Daytime Teahouse at Turby',
+    invitePath: '/turby',
+    successPath: '/turby/success',
+    countdownTarget: Math.floor(new Date('2026-05-30T11:00:00-07:00').getTime() / 1000),
+    showCountdown: false,
+    dateRangeLabel: 'Saturday, May 30, 2026',
+    timeLabel: '11am-3pm',
+    locationLabel: 'The Mission, San Francisco',
+    address: '3027 25th St, San Francisco',
+    calendarTitle: 'Daytime Teahouse at Turby',
+    calendarDetails: 'Daytime garden teahouse at Turby in the Mission.',
+    welcomeContentSlug: 'turby-invite',
+    stripeDescriptionLabel: 'Daytime Teahouse at Turby',
+    hostSectionTitle: 'About our host',
+    hostSectionDescription:
+      'Turby is a community house in the Mission that hosts various neighborhood events in their spacious backyard.',
+    dates: turbyEventDates,
+    tiers: turbyEventTiers,
   },
 }
 

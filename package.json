@@ -1,7 +1,8 @@
 {
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/dev-runner.mjs",
+    "dev:mobile": "node scripts/dev-runner.mjs --mobile",
     "build": "next build",
     "start": "next start",
     "test": "vitest run",

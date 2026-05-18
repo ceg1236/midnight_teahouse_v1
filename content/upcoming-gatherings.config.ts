@@ -40,17 +40,6 @@ const UPCOMING_GATHERINGS = [
     href: '/erstwhere',
     ctaLabel: 'Reserve →',
   },
-  {
-    startsAt: '2026-05-23T19:00:00-07:00',
-    endsAt: '2026-05-24T02:00:00-07:00',
-    monthShort: 'May',
-    dayNum: '23',
-    title: 'The Sound Healing Symphony',
-    detailLine: '7 pm–2 am · Sebastopol',
-    badge: 'Tea Lounge',
-    href: 'https://www.soundmeditationpresents.com/events-1/the-sound-healing-symphony-relaxes-in-sebastapol-tix-up-soon',
-    ctaLabel: 'RSVP →',
-  },
 ] as const satisfies readonly UpcomingGathering[]
 
 /**

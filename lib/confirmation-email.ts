@@ -1,6 +1,10 @@
 import { Resend } from 'resend'
 import { getEventConfig } from './event-registry'
-import { getAddressMapUrl, getEventPracticalNotes } from './event-messaging'
+import {
+  getAddressMapUrl,
+  getConfirmationEmailIntro,
+  getEventPracticalNotes,
+} from './event-messaging'
 
 export type SendConfirmationParams = {
   to: string
@@ -58,7 +62,7 @@ function buildHtml(params: SendConfirmationParams): string {
 </head>
 <body style="font-family: Georgia, serif; line-height: 1.6; color: #333; max-width: 560px; margin: 0 auto; padding: 24px;">
   <p>Hi ${name},</p>
-  <p>Thank you for reserving a seat at ${event.title}! We're very excited to share this evening with you - to slow down together, enjoy tea and music, settle into the night.</p>
+  <p>Thank you for reserving a seat at ${event.title}! ${getConfirmationEmailIntro(event.slug)}</p>
   <div style="background: #f8f6f2; padding: 16px; border-radius: 8px; margin: 24px 0;">
     <p style="margin: 0 0 8px 0;"><strong>${ticketDate}</strong></p>
     <p style="margin: 0 0 8px 0;">${orderSummary}</p>

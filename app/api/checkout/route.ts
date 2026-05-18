@@ -6,6 +6,7 @@ import { getAvailabilityForDates } from '../../../lib/sheets-availability'
 import { getEventConfig } from '../../../lib/event-registry'
 import { getStripeSecretKey } from '../../../lib/payment-env'
 import type { EventTier } from '../../../content/event-schema'
+import { clampSupportedPrice } from '../../../lib/supported-tier-price'
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const NAME_MAX_LEN = 200
@@ -99,7 +100,7 @@ export async function POST(req: NextRequest) {
     if (!tier || !item.quantity || item.quantity < 1 || item.quantity > 4) continue
     const unitAmount =
       item.tierId === 'supported' && typeof (item.supportedPrice ?? supportedPrice) === 'number'
-        ? Math.min(39, Math.max(20, Math.round(item.supportedPrice ?? supportedPrice ?? 20)))
+        ? clampSupportedPrice(event.tiers, item.supportedPrice ?? supportedPrice)
         : tier.price
     lineItems.push({ tier, quantity: Math.min(4, Math.max(1, Math.round(item.quantity))), unitAmount })
   }

@@ -1,11 +1,12 @@
 'use client'
 
 import Link from 'next/link'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { CountdownTimer } from './countdown-timer'
 import type { EventDate, EventTier } from '../../content/event-schema'
 import { decodeTokenPayload } from '../../lib/admin-token-decode'
 import { resolveDoorDate } from '../../lib/door-date'
+import { getSupportedPriceBounds, isSupportedPriceInRange } from '../../lib/supported-tier-price'
 import { HeroVideo } from './hero-video'
 import { SiteFooter } from './site-footer'
 
@@ -17,6 +18,28 @@ const EVENT_HERO_VIDEO_SOURCES = [
 
 /** First frame of `fire_tea_pouring.mp4` — regenerate with `pnpm posters:extract`. */
 const EVENT_HERO_POSTER = '/images/fire_tea_pouring_poster.jpg'
+
+function EventHero({
+  className,
+  heroImage,
+}: {
+  className?: string
+  heroImage?: string
+}) {
+  if (heroImage) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={heroImage} alt="" className={className} />
+    )
+  }
+  return (
+    <HeroVideo
+      className={className}
+      poster={EVENT_HERO_POSTER}
+      sources={EVENT_HERO_VIDEO_SOURCES}
+    />
+  )
+}
 
 type CarrdStylePageProps = {
   eventSlug: string
@@ -38,6 +61,10 @@ type CarrdStylePageProps = {
   initialTicket?: string
   hostSectionTitle?: string
   hostSectionDescription?: string
+  /** Static hero image instead of looping video (e.g. daytime events). */
+  heroImage?: string
+  /** Overrides default evening booking notes at checkout. */
+  bookingNotes?: readonly (string | React.ReactNode)[]
 }
 
 const SCROLL_DURATION = 1200
@@ -148,13 +175,22 @@ export function CarrdStylePage({
   initialTicket,
   hostSectionTitle,
   hostSectionDescription,
+  heroImage,
+  bookingNotes = BOOKING_NOTES,
 }: CarrdStylePageProps) {
+  const singleDateEvent = dates.length === 1
+  const { supportedMin, supportedMax } = useMemo(() => getSupportedPriceBounds(tiers), [tiers])
+  const supportedPriceRangeLabel = `${supportedMin}–${supportedMax}`
+  const supportedPriceSuffix = useMemo(() => {
+    const mainLine = tiers.find((t) => t.id === 'supported')?.mainLine
+    return mainLine ? mainLine.replace(/^Supported\s*/i, ', ') : `, $${supportedMin}+`
+  }, [tiers, supportedMin])
   const tokenPayload = initialTicket ? decodeTokenPayload(initialTicket) : null
   const bypassSoldOut = !!tokenPayload
   const effectiveSoldOut = bypassSoldOut ? {} : soldOutByDateId
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [selections, setSelections] = useState<TierSelections>({})
-  const [supportedPrice, setSupportedPrice] = useState(20)
+  const [supportedPrice, setSupportedPrice] = useState(supportedMin)
   const [supportedPriceInput, setSupportedPriceInput] = useState('')
   const [showSupportedTier, setShowSupportedTier] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', notes: '' })
@@ -206,7 +242,7 @@ export function CarrdStylePage({
     setFormData(persisted.form)
     if (Object.keys(selections).some((id) => id === 'supported')) {
       setShowSupportedTier(true)
-      setSupportedPriceInput('20')
+      setSupportedPriceInput(String(supportedMin))
     }
     setHydrated(true)
     if (payload) {
@@ -215,10 +251,13 @@ export function CarrdStylePage({
       if (date && hasSelection) setReservationStep(3)
       else if (date) setReservationStep(2)
       else setReservationStep(1)
-    } else if (date) {
+    } else if (date || singleDateEvent) {
+      if (singleDateEvent && !date && dates[0]) {
+        setSelectedDate(dates[0].id)
+      }
       setReservationStep(2)
     }
-  }, [dates, tiers, initialTicket])
+  }, [dates, tiers, initialTicket, singleDateEvent, supportedMin])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -287,7 +326,7 @@ export function CarrdStylePage({
   }, [ticketLimitError, totalQuantity, maxSelectableTickets])
   const hasValidSupportedPrice = (() => {
     const v = parseInt(supportedPriceInput, 10)
-    return !isNaN(v) && v >= 20 && v <= 40
+    return !isNaN(v) && isSupportedPriceInRange(tiers, v)
   })()
   const totalPrice = Object.entries(selections).reduce((sum, [tierId, qty]) => {
     if (qty <= 0) return sum
@@ -348,6 +387,36 @@ export function CarrdStylePage({
     </section>
   ) : null
   const sharedMusicBlurb = dates.flatMap((d) => d.musicians).find((line) => line?.trim()) ?? ''
+  const reservationSteps = singleDateEvent ? ([2, 3] as const) : ([1, 2, 3] as const)
+  const panelCount = reservationSteps.length
+  const slideOffset = singleDateEvent ? reservationStep - 2 : reservationStep - 1
+  const panelFlexWidth = `${panelCount * 100}%`
+  const slideTransform = `translateX(-${Math.max(0, slideOffset) * (100 / panelCount)}%)`
+  const panelWidthClass = singleDateEvent ? 'w-1/2' : 'w-1/3'
+  const ticketStepLabel = singleDateEvent ? '1. Choose Your Ticket' : '2. Choose Your Ticket'
+  const formStepLabel = singleDateEvent ? '2. Complete Your Reservation' : '3. Complete Your Reservation'
+
+  const beginReservation = () => {
+    if (singleDateEvent && dates[0]) {
+      setSelectedDate(dates[0].id)
+      setReservationStep(2)
+    } else {
+      setReservationStep(1)
+    }
+    setShowReservationView(true)
+  }
+
+  const handleReservationBack = () => {
+    if (singleDateEvent && reservationStep === 2) {
+      setShowReservationView(false)
+      return
+    }
+    if (reservationStep === 1) {
+      setShowReservationView(false)
+      return
+    }
+    setReservationStep((s) => (s - 1) as 1 | 2 | 3)
+  }
 
   return (
     <div className="carrd-page flex flex-col items-center min-h-screen overflow-x-hidden pt-8">
@@ -370,11 +439,7 @@ export function CarrdStylePage({
             </div>
             <div className="carrd-video-fade w-full py-6 overflow-hidden">
               <div className="aspect-video overflow-hidden">
-                <HeroVideo
-                  className="w-full h-full object-cover"
-                  poster={EVENT_HERO_POSTER}
-                  sources={EVENT_HERO_VIDEO_SOURCES}
-                />
+                <EventHero className="w-full h-full object-cover" heroImage={heroImage} />
               </div>
             </div>
             {showCountdown && (
@@ -409,10 +474,7 @@ export function CarrdStylePage({
               </div>
               <button
                 type="button"
-                onClick={() => {
-                  setReservationStep(1)
-                  setShowReservationView(true)
-                }}
+                onClick={beginReservation}
                 className="carrd-btn px-10 py-4"
               >
                 Reserve Your Seat
@@ -424,7 +486,7 @@ export function CarrdStylePage({
           <div ref={mobileReservationPanelRef} className="carrd-mobile-reservation flex flex-col items-center px-4 py-4 gap-3 min-w-0 w-full max-w-full overflow-x-hidden">
             <div className="w-full flex flex-col items-center gap-1 shrink-0">
               <div className="flex justify-center gap-2" aria-hidden>
-                {([1, 2, 3] as const).map((step) => (
+                {reservationSteps.map((step) => (
                   <span key={step} className={`w-2 h-2 rounded-full transition-colors duration-300 ${reservationStep === step ? 'bg-[#FAE0B9]' : 'bg-[#D9D0BF]/40'}`} />
                 ))}
               </div>
@@ -432,10 +494,7 @@ export function CarrdStylePage({
                 <div className="flex-1 flex justify-start min-w-0">
                   <button
                     type="button"
-                    onClick={() => {
-                      if (reservationStep === 1) setShowReservationView(false)
-                      else setReservationStep((s) => (s - 1) as 1 | 2 | 3)
-                    }}
+                    onClick={handleReservationBack}
                     className="carrd-font-body text-lg text-[#D9D0BF] hover:text-[#FAEBD4] underline focus:outline-none cursor-pointer"
                   >
                     ← Back
@@ -449,13 +508,14 @@ export function CarrdStylePage({
               <div
                 className="flex transition-transform duration-500 ease-in-out min-w-0"
                 style={{
-                  width: '300%',
-                  transform: `translateX(-${(reservationStep - 1) * (100 / 3)}%)`,
+                  width: panelFlexWidth,
+                  transform: slideTransform,
                 }}
               >
                 {/* Mobile reservation reuses same panel structure - content is in desktop flow below, we need inline copy */}
-                <div className="carrd-font-body flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full">
-                  <h2 className="carrd-font-heading carrd-font-h2 text-2xl">1. Choose Your Evening</h2>
+                {!singleDateEvent ? (
+                <div className={`carrd-font-body flex-shrink-0 ${panelWidthClass} flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full`}>
+                  <h2 className="carrd-font-heading carrd-font-h2 text-2xl text-center w-full">1. Choose Your Evening</h2>
                   {sharedMusicBlurb ? (
                     <p className="carrd-font-body text-center italic text-[#D9D0BF]/90 px-1">{sharedMusicBlurb}</p>
                   ) : null}
@@ -493,8 +553,9 @@ export function CarrdStylePage({
                     })}
                   </div>
                 </div>
-                <div className="carrd-font-body flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full">
-                  <h2 className="carrd-font-heading carrd-font-h2 text-2xl">2. Choose Your Ticket</h2>
+                ) : null}
+                <div className={`carrd-font-body flex-shrink-0 ${panelWidthClass} flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full`}>
+                  <h2 className="carrd-font-heading carrd-font-h2 text-2xl text-center w-full">{ticketStepLabel}</h2>
                   <div className="w-full max-w-full min-w-0 flex flex-col gap-3 break-words">
                     {tiers.filter((t) => t.id === 'community' || t.id === 'patron').map((t) => {
                       const qty = selections[t.id] ?? 0
@@ -529,7 +590,7 @@ export function CarrdStylePage({
                     {(showSupportedTier || (selections['supported'] ?? 0) > 0) && (
                       <div className={`carrd-mobile-pill flex flex-col gap-3 text-left w-full mt-2 ${(selections['supported'] ?? 0) > 0 ? 'carrd-mobile-pill--selected' : ''}`}>
                         <div className="min-w-0">
-                          <p className="leading-tight text-xl"><span className="text-[#C4AF86] font-medium">Supported</span><span className="text-[#FAEBD4]/90 font-normal">, $20+</span></p>
+                          <p className="leading-tight text-xl"><span className="text-[#C4AF86] font-medium">Supported</span><span className="text-[#FAEBD4]/90 font-normal">{supportedPriceSuffix}</span></p>
                           <p className="text-[#D9D0BF]/90 text-lg leading-snug mt-0.5 italic">{tiers.find((t) => t.id === 'supported')?.blurb ?? ''}</p>
                           <p className="text-[#FAEBD4] text-lg leading-snug mt-0.5">{"We're excited to have guests from diverse backgrounds. Please choose a price that feels accessible for you."}</p>
                         </div>
@@ -537,7 +598,7 @@ export function CarrdStylePage({
                           <div className="flex flex-col gap-3 items-center">
                             <div className="flex items-center gap-2 w-full max-w-[8rem]">
                               <span className="text-[#D9D0BF] text-lg">$</span>
-                              <input type="number" min={20} max={40} value={supportedPriceInput} placeholder="20–40" onChange={(e) => { const raw = e.target.value; setSupportedPriceInput(raw); const v = parseInt(raw, 10); if (!isNaN(v) && v >= 20 && v <= 40) setSupportedPrice(v); else if (raw === '') setSelections((prev) => { const n = { ...prev }; delete n.supported; return n }); }} onBlur={() => { const v = parseInt(supportedPriceInput, 10); if (!isNaN(v) && v >= 20 && v <= 40) { setSupportedPrice(v); setSupportedPriceInput(String(v)) } else if (supportedPriceInput === '') setSelections((prev) => { const n = { ...prev }; delete n.supported; return n }); else setSupportedPriceInput(String(supportedPrice)) }} className="carrd-font-body flex-1 min-w-0 py-2.5 px-3 text-lg bg-[#2E0303]/40 rounded-lg border border-[#FAE0B9]/30 text-[#FAEBD4] focus:outline-none focus:border-[#FAE0B9]/60 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                              <input type="number" min={supportedMin} max={supportedMax} value={supportedPriceInput} placeholder={supportedPriceRangeLabel} onChange={(e) => { const raw = e.target.value; setSupportedPriceInput(raw); const v = parseInt(raw, 10); if (!isNaN(v) && isSupportedPriceInRange(tiers, v)) setSupportedPrice(v); else if (raw === '') setSelections((prev) => { const n = { ...prev }; delete n.supported; return n }); }} onBlur={() => { const v = parseInt(supportedPriceInput, 10); if (!isNaN(v) && isSupportedPriceInRange(tiers, v)) { setSupportedPrice(v); setSupportedPriceInput(String(v)) } else if (supportedPriceInput === '') setSelections((prev) => { const n = { ...prev }; delete n.supported; return n }); else setSupportedPriceInput(String(supportedPrice)) }} className="carrd-font-body flex-1 min-w-0 py-2.5 px-3 text-lg bg-[#2E0303]/40 rounded-lg border border-[#FAE0B9]/30 text-[#FAEBD4] focus:outline-none focus:border-[#FAE0B9]/60 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
                             </div>
                             <div className="flex items-center justify-center gap-2">
                               <button type="button" onClick={() => handleQuantityChange('supported', -1)} className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg" aria-label="Decrease Supported">−</button>
@@ -547,7 +608,7 @@ export function CarrdStylePage({
                           </div>
                         ) : null}
                         {(selections['supported'] ?? 0) === 0 && (
-                          <button type="button" onClick={() => { setShowSupportedTier(true); setSupportedPrice(20); setSupportedPriceInput('20'); setSelections((prev) => ({ ...prev, supported: 1 })) }} className="carrd-mobile-pill-select shrink-0 self-center">Select</button>
+                          <button type="button" onClick={() => { setShowSupportedTier(true); setSupportedPrice(supportedMin); setSupportedPriceInput(String(supportedMin)); setSelections((prev) => ({ ...prev, supported: 1 })) }} className="carrd-mobile-pill-select shrink-0 self-center">Select</button>
                         )}
                       </div>
                     )}
@@ -568,8 +629,8 @@ export function CarrdStylePage({
                   </div>
                   <button type="button" onClick={() => setReservationStep(3)} disabled={!hasSelection} className="carrd-btn px-8 py-4 disabled:opacity-50 disabled:cursor-not-allowed">Continue</button>
                 </div>
-                <div ref={mobileFormRef} className="carrd-font-body flex-shrink-0 w-1/3 flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full">
-                  <h2 className="carrd-font-heading carrd-font-h2 text-2xl">3. Complete Your Reservation</h2>
+                <div ref={mobileFormRef} className={`carrd-font-body flex-shrink-0 ${panelWidthClass} flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full`}>
+                  <h2 className="carrd-font-heading carrd-font-h2 text-2xl text-center w-full">{formStepLabel}</h2>
                   {selectedDate && hasSelection ? (
                     <div className="carrd-font-body rounded-lg bg-[#FAEBD4]/20 px-4 py-4 text-left w-full max-w-full min-w-0">
                       <div className="space-y-3">
@@ -589,7 +650,7 @@ export function CarrdStylePage({
                   <div className="w-full max-w-full min-w-0 text-left px-4 md:px-0">
                     <p className="carrd-font-body text-base font-medium mb-1.5">A few things to note before booking:</p>
                     <ul className="carrd-font-body text-base space-y-1.5 list-none pl-0 leading-snug">
-                      {BOOKING_NOTES.map((item, i) => (
+                      {bookingNotes.map((item, i) => (
                         <li key={i} className="flex items-center gap-2"><span className="text-[#D9D0BF] w-1.5 h-1.5 rounded-full bg-[#D9D0BF] shrink-0" aria-hidden /><span className="flex-1 min-w-0 text-[#D9D0BF]/95">{item}</span></li>
                       ))}
                     </ul>
@@ -636,11 +697,7 @@ export function CarrdStylePage({
         {/* Video */}
         <div className="carrd-video-fade w-full py-6 overflow-hidden">
           <div className="aspect-video overflow-hidden">
-            <HeroVideo
-              className="w-full h-full object-cover"
-              poster={EVENT_HERO_POSTER}
-              sources={EVENT_HERO_VIDEO_SOURCES}
-            />
+            <EventHero className="w-full h-full object-cover" heroImage={heroImage} />
           </div>
         </div>
 
@@ -694,8 +751,12 @@ export function CarrdStylePage({
           <button
             type="button"
             onClick={() => {
+              if (singleDateEvent && dates[0]) {
+                setSelectedDate(dates[0].id)
+                setReservationStep(2)
+              }
               if (typeof window !== 'undefined' && window.innerWidth < 768) {
-                setShowReservationView(true)
+                beginReservation()
                 joinRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
               } else {
                 scrollToSection(joinRef)
@@ -712,7 +773,7 @@ export function CarrdStylePage({
         <div className="w-full flex flex-col items-center gap-1">
           {/* Step indicator */}
           <div className="flex justify-center gap-2" aria-hidden>
-            {([1, 2, 3] as const).map((step) => (
+            {reservationSteps.map((step) => (
               <span
                 key={step}
                 className={`w-2 h-2 rounded-full transition-colors duration-300 ${
@@ -726,13 +787,7 @@ export function CarrdStylePage({
               {(reservationStep > 1 || showReservationView) && (
                 <button
                   type="button"
-                  onClick={() => {
-                    if (reservationStep === 1 && showReservationView) {
-                      setShowReservationView(false)
-                    } else if (reservationStep > 1) {
-                      setReservationStep((s) => (s - 1) as 1 | 2 | 3)
-                    }
-                  }}
+                  onClick={handleReservationBack}
                   className="carrd-font-body text-lg text-[#D9D0BF] hover:text-[#FAEBD4] underline focus:outline-none cursor-pointer"
                 >
                   ← Back
@@ -754,12 +809,13 @@ export function CarrdStylePage({
           <div
             className="flex transition-transform duration-500 ease-in-out min-w-0"
             style={{
-              width: '300%',
-              transform: `translateX(-${(reservationStep - 1) * (100 / 3)}%)`,
+              width: panelFlexWidth,
+              transform: slideTransform,
             }}
           >
             {/* Panel 1: Choose your evening */}
-            <div className="flex-shrink-0 w-1/3 min-w-0 flex flex-col items-center gap-6 px-4 md:px-6 max-w-full">
+            {!singleDateEvent ? (
+            <div className={`flex-shrink-0 ${panelWidthClass} min-w-0 flex flex-col items-center gap-6 px-4 md:px-6 max-w-full`}>
               <h2 className="carrd-font-heading carrd-font-h2">
                 1. Choose Your Evening
               </h2>
@@ -865,11 +921,12 @@ export function CarrdStylePage({
                 })}
               </div>
             </div>
+            ) : null}
 
             {/* Panel 2: Choose your ticket */}
-            <div ref={tierRef} className="flex-shrink-0 w-1/3 min-w-0 flex flex-col items-center gap-6 px-4 md:px-6 max-w-full">
+            <div ref={tierRef} className={`flex-shrink-0 ${panelWidthClass} min-w-0 flex flex-col items-center gap-6 px-4 md:px-6 max-w-full`}>
               <h2 className="carrd-font-heading carrd-font-h2">
-                2. Choose Your Ticket
+                {ticketStepLabel}
               </h2>
               {/* Mobile: cards first, then dropdown for pricing note */}
               <div className="carrd-font-body md:hidden w-full max-w-full flex flex-col gap-5 break-words">
@@ -945,7 +1002,7 @@ export function CarrdStylePage({
                     <div className="min-w-0">
                       <p className="leading-tight text-base">
                         <span className="text-[#C4AF86] font-medium">Supported</span>
-                        <span className="text-[#FAEBD4]/90 font-normal">, $20+</span>
+                        <span className="text-[#FAEBD4]/90 font-normal">{supportedPriceSuffix}</span>
                       </p>
                       <p className="text-[#D9D0BF]/90 text-[0.9375rem] leading-snug mt-0.5 italic">{tiers.find((t) => t.id === 'supported')?.blurb ?? ''}</p>
                       <p className="text-[#FAEBD4] text-[0.9375rem] leading-snug mt-0.5">{"We're excited to have guests from diverse backgrounds. Please choose a price that feels accessible for you."}</p>
@@ -956,22 +1013,22 @@ export function CarrdStylePage({
                           <span className="text-[#D9D0BF] text-lg">$</span>
                           <input
                             type="number"
-                            min={20}
-                            max={40}
+                            min={supportedMin}
+                            max={supportedMax}
                             value={supportedPriceInput}
-                            placeholder="20–40"
+                            placeholder={supportedPriceRangeLabel}
                             onChange={(e) => {
                               const raw = e.target.value
                               setSupportedPriceInput(raw)
                               const v = parseInt(raw, 10)
-                              if (!isNaN(v) && v >= 20 && v <= 40) setSupportedPrice(v)
+                              if (!isNaN(v) && isSupportedPriceInRange(tiers, v)) setSupportedPrice(v)
                               else if (raw === '') {
                                 setSelections((prev) => { const n = { ...prev }; delete n.supported; return n })
                               }
                             }}
                             onBlur={() => {
                               const v = parseInt(supportedPriceInput, 10)
-                              if (!isNaN(v) && v >= 20 && v <= 40) {
+                              if (!isNaN(v) && isSupportedPriceInRange(tiers, v)) {
                                 setSupportedPrice(v)
                                 setSupportedPriceInput(String(v))
                               } else if (supportedPriceInput === '') {
@@ -1010,8 +1067,8 @@ export function CarrdStylePage({
                         type="button"
                         onClick={() => {
                           setShowSupportedTier(true)
-                          setSupportedPrice(20)
-                          setSupportedPriceInput('20')
+                          setSupportedPrice(supportedMin)
+                          setSupportedPriceInput(String(supportedMin))
                           setSelections((prev) => ({ ...prev, supported: 1 }))
                         }}
                         className="carrd-mobile-pill-select shrink-0 self-center"
@@ -1116,15 +1173,15 @@ export function CarrdStylePage({
                           <span className="carrd-font-body text-[#D9D0BF] text-xs">$</span>
                           <input
                             type="number"
-                            min={20}
-                            max={40}
+                            min={supportedMin}
+                            max={supportedMax}
                             value={supportedPriceInput}
-                            placeholder="20–40"
+                            placeholder={supportedPriceRangeLabel}
                             onChange={(e) => {
                               const raw = e.target.value
                               setSupportedPriceInput(raw)
                               const v = parseInt(raw, 10)
-                              if (!isNaN(v) && v >= 20 && v <= 40) {
+                              if (!isNaN(v) && isSupportedPriceInRange(tiers, v)) {
                                 setSupportedPrice(v)
                               } else if (raw === '') {
                                 setSelections((prev) => {
@@ -1136,7 +1193,7 @@ export function CarrdStylePage({
                             }}
                             onBlur={() => {
                               const v = parseInt(supportedPriceInput, 10)
-                              if (!isNaN(v) && v >= 20 && v <= 40) {
+                              if (!isNaN(v) && isSupportedPriceInRange(tiers, v)) {
                                 setSupportedPrice(v)
                                 setSupportedPriceInput(String(v))
                               } else if (supportedPriceInput === '') {
@@ -1180,8 +1237,8 @@ export function CarrdStylePage({
                       <button
                         type="button"
                         onClick={() => {
-                          setSupportedPrice(20)
-                          setSupportedPriceInput('20')
+                          setSupportedPrice(supportedMin)
+                          setSupportedPriceInput(String(supportedMin))
                           setSelections((prev) => ({ ...prev, supported: 1 }))
                         }}
                         className="carrd-btn px-8 py-4 md:ml-4"
@@ -1190,7 +1247,7 @@ export function CarrdStylePage({
                       </button>
                     )}
                   </div>
-                  <p className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0">$20+</p>
+                  <p className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0">${supportedMin}+</p>
                   <p className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0 text-[#FAEBD4]">We're excited to have guests from diverse backgrounds. Please choose a price that feels accessible for you.</p>
                 </div>
               ))}
@@ -1228,10 +1285,10 @@ export function CarrdStylePage({
             </div>
 
             {/* Panel 3: Complete your reservation (summary + form + reserve) */}
-            <div ref={formRef} className="flex-shrink-0 w-1/3 min-w-0 flex flex-col items-center gap-6 px-4 md:px-6 max-w-full">
+            <div ref={formRef} className="flex-shrink-0 ${panelWidthClass} min-w-0 flex flex-col items-center gap-6 px-4 md:px-6 max-w-full">
               <div className="inline-flex flex-col items-stretch gap-6">
-                <h2 className="carrd-font-heading carrd-font-h2">
-                  3. Complete Your Reservation
+                <h2 className="carrd-font-heading carrd-font-h2 text-center">
+                  {formStepLabel}
                 </h2>
               {selectedDate && hasSelection ? (
                 <>
@@ -1287,7 +1344,7 @@ export function CarrdStylePage({
                     onClick={() => setReservationStep(1)}
                     className="carrd-btn px-10 py-4"
                   >
-                    Choose evening & ticket
+                    Choose your ticket
                   </button>
                 </div>
               )}
@@ -1345,7 +1402,7 @@ export function CarrdStylePage({
               <div className="w-full max-w-[650px] text-left mt-6 px-4 md:px-0">
                 <p className="carrd-font-body text-sm font-medium mb-1.5">A few things to note before booking:</p>
                 <ul className="carrd-font-body text-base space-y-1 list-none pl-0 leading-tight">
-                  {BOOKING_NOTES.map((item, i) => (
+                  {bookingNotes.map((item, i) => (
                     <li key={i} className="flex items-center gap-2">
                       <span className="text-[#D9D0BF] w-1.5 h-1.5 rounded-full bg-[#D9D0BF] shrink-0 flex-shrink-0" aria-hidden />
                       <span className="flex-1 min-w-0 text-[#D9D0BF]/95">{item}</span>
