@@ -8,10 +8,9 @@ export const dynamic = 'force-dynamic'
 const TURBY_HERO_IMAGE = '/images/xf_flowers_tea/xf_teacup.jpg'
 
 const TURBY_BOOKING_NOTES = [
-  'We’re open from 11am to 3pm. Join us anytime in this window.',
-  'Reservation includes unlimited tea and light café bites.',
+  'Reservation includes unlimited tea and light tea snacks.',
   'We invite you to keep phones and laptops tucked away while you’re with us.',
-  'This is an outdoor garden café—dress for the weather.',
+  'The teahouse is outdoors in a half-sunny, half-shaded yard. Bring a hat, sunscreen, and a light jacket (as always in SF).',
 ]
 
 function firstString(v: string | string[] | undefined): string | undefined {
@@ -30,19 +29,36 @@ export default async function TurbyEventPage({
 
   let availability: Awaited<ReturnType<typeof getAvailabilityForDates>>
   const mockParam = firstString(params.mock)
+  const availabilityOptions = { ticketFormats: eventConfig.ticketFormats }
   if (process.env.NODE_ENV === 'development' && mockParam?.startsWith('soldOut:')) {
     const ids = mockParam.replace('soldOut:', '').split(',').map((s) => s.trim()).filter(Boolean)
-    availability = getMockAvailabilityForDates(eventConfig.dates, ids)
+    availability = getMockAvailabilityForDates(eventConfig.dates, ids, availabilityOptions)
+  } else if (process.env.NODE_ENV === 'development' && mockParam?.startsWith('soldOutTasting:')) {
+    const ids = mockParam.replace('soldOutTasting:', '').split(',').map((s) => s.trim()).filter(Boolean)
+    availability = getMockAvailabilityForDates(eventConfig.dates, [], {
+      ...availabilityOptions,
+      mockSoldOutTastingDateIds: ids,
+    })
   } else {
-    availability = await getAvailabilityForDates(eventConfig.dates)
+    availability = await getAvailabilityForDates(eventConfig.dates, availabilityOptions)
   }
 
   const soldOutByDateId: Record<string, boolean> = {}
   const remainingByDateId: Record<string, number> = {}
+  const ticketPoolByDateId: Record<string, Record<string, { remaining: number; soldOut: boolean }>> = {}
   if (availability) {
     for (const a of availability) {
       soldOutByDateId[a.dateId] = a.soldOut
       remainingByDateId[a.dateId] = Math.max(0, a.capacity - a.sold)
+      if (a.ticketPools?.length) {
+        ticketPoolByDateId[a.dateId] = {}
+        for (const pool of a.ticketPools) {
+          ticketPoolByDateId[a.dateId][pool.ticketType] = {
+            remaining: pool.remaining,
+            soldOut: pool.soldOut,
+          }
+        }
+      }
     }
   }
 
@@ -64,9 +80,11 @@ export default async function TurbyEventPage({
       hostSectionDescription={eventConfig.hostSectionDescription}
       soldOutByDateId={soldOutByDateId}
       remainingByDateId={remainingByDateId}
+      ticketPoolByDateId={ticketPoolByDateId}
       initialTicket={ticket ?? undefined}
       heroImage={TURBY_HERO_IMAGE}
       bookingNotes={TURBY_BOOKING_NOTES}
+      ticketFormats={eventConfig.ticketFormats}
     />
   )
 }

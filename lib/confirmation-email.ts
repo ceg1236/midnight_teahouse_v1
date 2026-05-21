@@ -5,6 +5,8 @@ import {
   getConfirmationEmailIntro,
   getEventPracticalNotes,
 } from './event-messaging'
+import { getTiersForEvent } from './event-tiers'
+import { getTicketFormatLabels } from './ticket-format-labels'
 
 export type SendConfirmationParams = {
   to: string
@@ -14,36 +16,45 @@ export type SendConfirmationParams = {
   amountPaid: string
   quantity: string
   orderSummary: string
+  ticketFormat?: string
 }
 
 function buildOrderSummary(metadata: Record<string, string | undefined>): string {
   const event = getEventConfig(metadata.eventSlug)
+  const eventTiers = getTiersForEvent(event, metadata.ticketFormat)
+  const formatLabels = getTicketFormatLabels(event.ticketFormats)
+  const formatLabel = metadata.ticketFormat ? formatLabels[metadata.ticketFormat] : undefined
+
   const order = metadata.order
+  let tierSummary: string
   if (!order || typeof order !== 'string') {
-    return metadata.quantity ? `${metadata.quantity} ticket(s)` : '1 ticket'
+    tierSummary = metadata.quantity ? `${metadata.quantity} ticket(s)` : '1 ticket'
+  } else {
+    const parts: string[] = []
+    for (const pair of order.split(',')) {
+      const [tierId, qStr] = pair.split(':')
+      const q = parseInt(qStr ?? '1', 10)
+      if (!tierId || isNaN(q) || q < 1) continue
+      const tier = eventTiers.find((t) => t.id === tierId)
+      const label = tier?.label ?? tierId
+      const price =
+        tierId === 'supported' && metadata.supportedPrice
+          ? `$${metadata.supportedPrice}`
+          : tier
+            ? `$${tier.price}`
+            : ''
+      parts.push(`${q} × ${label} ${price}`.trim())
+    }
+    tierSummary = parts.length > 0 ? parts.join(', ') : String(order)
   }
-  const parts: string[] = []
-  for (const pair of order.split(',')) {
-    const [tierId, qStr] = pair.split(':')
-    const q = parseInt(qStr ?? '1', 10)
-    if (!tierId || isNaN(q) || q < 1) continue
-    const tier = event.tiers.find((t) => t.id === tierId)
-    const label = tier?.label ?? tierId
-    const price =
-      tierId === 'supported' && metadata.supportedPrice
-        ? `$${metadata.supportedPrice}`
-        : tier
-          ? `$${tier.price}`
-          : ''
-    parts.push(`${q} × ${label} ${price}`.trim())
-  }
-  return parts.length > 0 ? parts.join(', ') : String(order)
+
+  return formatLabel ? `${formatLabel} · ${tierSummary}` : tierSummary
 }
 
 function buildHtml(params: SendConfirmationParams): string {
-  const { eventSlug, name, ticketDate, amountPaid, quantity, orderSummary } = params
+  const { eventSlug, name, ticketDate, amountPaid, quantity, orderSummary, ticketFormat } = params
   const event = getEventConfig(eventSlug)
-  const notes = getEventPracticalNotes(event.slug)
+  const notes = getEventPracticalNotes(event.slug, ticketFormat)
   const mapUrl = getAddressMapUrl(event.address)
   const notesHtml = notes
     .map((n) => {
@@ -62,7 +73,7 @@ function buildHtml(params: SendConfirmationParams): string {
 </head>
 <body style="font-family: Georgia, serif; line-height: 1.6; color: #333; max-width: 560px; margin: 0 auto; padding: 24px;">
   <p>Hi ${name},</p>
-  <p>Thank you for reserving a seat at ${event.title}! ${getConfirmationEmailIntro(event.slug)}</p>
+  <p>Thank you for reserving a seat at ${event.title}! ${getConfirmationEmailIntro(event.slug, ticketFormat)}</p>
   <div style="background: #f8f6f2; padding: 16px; border-radius: 8px; margin: 24px 0;">
     <p style="margin: 0 0 8px 0;"><strong>${ticketDate}</strong></p>
     <p style="margin: 0 0 8px 0;">${orderSummary}</p>
@@ -139,6 +150,7 @@ export async function sendConfirmationEmail(
       amountPaid,
       quantity,
       orderSummary,
+      ticketFormat: metadata.ticketFormat,
     }),
   })
 

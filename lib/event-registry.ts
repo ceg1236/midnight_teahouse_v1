@@ -1,7 +1,7 @@
 import { eventDates, eventTiers } from '../content/event-invite.config'
 import { specialEventDates, specialEventTiers } from '../content/special-event.config'
-import { turbyEventDates, turbyEventTiers } from '../content/turby-event.config'
-import type { EventDate, EventTier } from '../content/event-schema'
+import { turbyEventDates, turbyEventTiers, turbyTicketFormats } from '../content/turby-event.config'
+import type { EventDate, EventTicketFormat, EventTier } from '../content/event-schema'
 
 export type EventConfig = {
   slug: string
@@ -22,6 +22,8 @@ export type EventConfig = {
   hostSectionDescription?: string
   dates: readonly EventDate[]
   tiers: readonly EventTier[]
+  /** Optional first reservation step (e.g. Open Teahouse vs Guided Tasting). */
+  ticketFormats?: readonly EventTicketFormat[]
 }
 
 export const DEFAULT_EVENT_SLUG = 'crossing-into-spring'
@@ -86,6 +88,7 @@ const EVENTS: Record<string, EventConfig> = {
       'Turby is a community house in the Mission that hosts various neighborhood events in their spacious backyard.',
     dates: turbyEventDates,
     tiers: turbyEventTiers,
+    ticketFormats: turbyTicketFormats,
   },
 }
 

@@ -10,9 +10,13 @@ vi.mock('stripe', () => {
   }
 })
 
-vi.mock('../../../../lib/sheets-availability', () => ({
-  getAvailabilityForDates: vi.fn(),
-}))
+vi.mock('../../../../lib/sheets-availability', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../../../lib/sheets-availability')>()
+  return {
+    ...actual,
+    getAvailabilityForDates: vi.fn(),
+  }
+})
 
 vi.mock('../../../../lib/admin-token', () => ({
   verifyToken: vi.fn(),
@@ -176,6 +180,87 @@ describe('POST /api/checkout', () => {
     ])
     vi.mocked(verifyToken).mockReturnValue({ dateId: 'mar-18', exp: Math.floor(Date.now() / 1000) + 3600 })
     const res = await POST(req({ ...validBody, ticket: 'valid-token' }))
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    expect(json.url).toBeDefined()
+  })
+
+  it('returns 409 when guided tasting pool is sold out', async () => {
+    vi.mocked(getAvailabilityForDates).mockResolvedValue([
+      {
+        dateId: 'turby-may-30',
+        label: 'Saturday, May 30',
+        sold: 10,
+        capacity: 45,
+        soldOut: false,
+        ticketPools: [{ ticketType: 'tasting', sold: 6, capacity: 6, soldOut: true, remaining: 0 }],
+      },
+    ])
+    const res = await POST(
+      req({
+        eventSlug: 'turby-event',
+        dateId: 'turby-may-30',
+        ticketFormat: 'guided-tasting',
+        items: [{ tierId: 'tasting', quantity: 1 }],
+        name: 'Test User',
+        email: 'test@example.com',
+      })
+    )
+    expect(res.status).toBe(409)
+    const json = await res.json()
+    expect(json.error).toMatch(/sold out/i)
+  })
+
+  it('returns 409 when guided tasting order exceeds pool capacity', async () => {
+    vi.mocked(getAvailabilityForDates).mockResolvedValue([
+      {
+        dateId: 'turby-may-30',
+        label: 'Saturday, May 30',
+        sold: 10,
+        capacity: 45,
+        soldOut: false,
+        ticketPools: [{ ticketType: 'tasting', sold: 5, capacity: 6, soldOut: false, remaining: 1 }],
+      },
+    ])
+    const res = await POST(
+      req({
+        eventSlug: 'turby-event',
+        dateId: 'turby-may-30',
+        ticketFormat: 'guided-tasting',
+        items: [{ tierId: 'tasting', quantity: 2 }],
+        name: 'Test User',
+        email: 'test@example.com',
+      })
+    )
+    expect(res.status).toBe(409)
+    const json = await res.json()
+    expect(json.error).toMatch(/only 1/i)
+  })
+
+  it('allows guided tasting when standard pool is full but tasting pool has seats', async () => {
+    vi.mocked(getAvailabilityForDates).mockResolvedValue([
+      {
+        dateId: 'turby-may-30',
+        label: 'Saturday, May 30',
+        sold: 5,
+        capacity: 5,
+        soldOut: true,
+        ticketPools: [
+          { ticketType: 'standard', sold: 5, capacity: 5, soldOut: true, remaining: 0 },
+          { ticketType: 'tasting', sold: 1, capacity: 6, soldOut: false, remaining: 5 },
+        ],
+      },
+    ])
+    const res = await POST(
+      req({
+        eventSlug: 'turby-event',
+        dateId: 'turby-may-30',
+        ticketFormat: 'guided-tasting',
+        items: [{ tierId: 'tasting', quantity: 1 }],
+        name: 'Test User',
+        email: 'test@example.com',
+      })
+    )
     expect(res.status).toBe(200)
     const json = await res.json()
     expect(json.url).toBeDefined()

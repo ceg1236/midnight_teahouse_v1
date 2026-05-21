@@ -4,7 +4,14 @@ import Link from 'next/link'
 import { Suspense, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { getEventConfig } from '../../../lib/event-registry'
-import { getCalendarDescription, getGoogleCalendarUrl } from '../../../lib/event-messaging'
+import {
+  getCalendarDescription,
+  getCalendarEventTitle,
+  getExperienceLabel,
+  getGoogleCalendarUrl,
+  getTurbySuccessWhenLine,
+  TURBY_OUTDOORS_NOTE,
+} from '../../../lib/event-messaging'
 
 const STORAGE_KEY = 'teahouse_reservation'
 
@@ -18,8 +25,11 @@ function TurbyEventSuccessContent() {
   const searchParams = useSearchParams()
   const name = searchParams.get('name') ?? ''
   const dateId = searchParams.get('date_id') ?? ''
+  const ticketFormat = searchParams.get('ticket_format') ?? undefined
   const selectedDate = dateId ? event.dates.find((d) => d.id === dateId) : event.dates[0]
-  const dateLabel = selectedDate?.dateTime ?? event.dateRangeLabel
+  const dateLabel = selectedDate?.label ?? selectedDate?.dateTime ?? event.dateRangeLabel
+  const experienceLabel = getExperienceLabel(event.slug, ticketFormat)
+  const whenLine = getTurbySuccessWhenLine(ticketFormat)
   const firstName = getFirstName(name)
 
   useEffect(() => {
@@ -39,7 +49,17 @@ function TurbyEventSuccessContent() {
             </p>
           ) : null}
           <div className="flex flex-col gap-2 w-full">
-            <p className="text-[11px] uppercase tracking-[0.05em] text-[#D9D0BF]">
+            {experienceLabel ? (
+              <>
+                <p className="text-[11px] uppercase tracking-[0.05em] text-[#D9D0BF]">
+                  Experience
+                </p>
+                <p className="text-[18.4px] font-medium text-[#FAE0B9] font-cursive">
+                  {experienceLabel}
+                </p>
+              </>
+            ) : null}
+            <p className="text-[11px] uppercase tracking-[0.05em] text-[#D9D0BF] mt-3">
               Date
             </p>
             <p className="text-[18.4px] font-medium text-[#FAE0B9] font-cursive">
@@ -60,6 +80,12 @@ function TurbyEventSuccessContent() {
               We are excited to share this day with you.
             </p>
             <p className="text-[16px] leading-[1.55] text-[#FAEBD4]">
+              {whenLine}
+            </p>
+            <p className="text-[16px] leading-[1.55] text-[#FAEBD4]">
+              {TURBY_OUTDOORS_NOTE}
+            </p>
+            <p className="text-[16px] leading-[1.55] text-[#FAEBD4]">
               We&apos;ve sent a confirmation email with your ticket details and venue info.
               Please check your inbox — and your Promotions folder if you use Gmail.
             </p>
@@ -69,10 +95,11 @@ function TurbyEventSuccessContent() {
           <a
             href={getGoogleCalendarUrl(
               selectedDate?.value ?? event.dates[0]?.value ?? '2026-05-30',
-              event.calendarTitle,
-              getCalendarDescription(event.slug),
+              getCalendarEventTitle(event.slug, ticketFormat),
+              getCalendarDescription(event.slug, { ticketFormat }),
               event.address,
-              event.slug
+              event.slug,
+              ticketFormat
             )}
             target="_blank"
             rel="noopener noreferrer"

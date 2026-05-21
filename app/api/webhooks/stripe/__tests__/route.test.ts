@@ -88,11 +88,17 @@ describe('POST /api/webhooks/stripe', () => {
       SPREADSHEET_ID: 'test-sheet-id',
       GOOGLE_CREDENTIALS_JSON: '{"type":"service_account"}',
     }
-    mockSheetsGet.mockResolvedValue({ data: { values: [] } })
-    mockChargesRetrieve.mockResolvedValue({
-      id: 'ch_refunded_123',
-      payment_intent: 'pi_test_123',
-      refunds: { data: [{ reason: 'requested_by_customer' }] },
+    mockSheetsGet.mockImplementation(({ range }: { range: string }) => {
+      if (range.includes('!J2:J') || range.includes('!I2:I')) {
+        return Promise.resolve({ data: { values: [] } })
+      }
+      if (range.includes('!A2:A')) {
+        return Promise.resolve({ data: { values: [] } })
+      }
+      if (range.includes('!A2:')) {
+        return Promise.resolve({ data: { values: [] } })
+      }
+      return Promise.resolve({ data: { values: [] } })
     })
     mockSheetsAppend.mockResolvedValue({
       data: {
@@ -100,6 +106,11 @@ describe('POST /api/webhooks/stripe', () => {
       },
     })
     mockSheetsUpdate.mockResolvedValue({})
+    mockChargesRetrieve.mockResolvedValue({
+      id: 'ch_refunded_123',
+      payment_intent: 'pi_test_123',
+      refunds: { data: [{ reason: 'requested_by_customer' }] },
+    })
     mockSpreadsheetsGet.mockResolvedValue({
       data: { sheets: [{ properties: { sheetId: 0, title: 'Sheet1' } }] },
     })
@@ -167,21 +178,26 @@ describe('POST /api/webhooks/stripe', () => {
     const json = await res.json()
     expect(json.received).toBe(true)
     expect(mockSheetsGet).toHaveBeenCalled()
-    expect(mockSheetsAppend).toHaveBeenCalled()
-    const appendCall = mockSheetsAppend.mock.calls[0]
-    expect(appendCall[0].requestBody.values[0]).toContain('Test User')
-    expect(appendCall[0].requestBody.values[0]).toContain('test@example.com')
-    expect(appendCall[0].requestBody.values[0]).toContain('Community')
+    expect(mockSheetsUpdate).toHaveBeenCalled()
+    const updateCall = mockSheetsUpdate.mock.calls[0]
+    expect(updateCall[0].requestBody.values[0]).toContain('Test User')
+    expect(updateCall[0].requestBody.values[0]).toContain('test@example.com')
+    expect(updateCall[0].requestBody.values[0]).toContain('Community')
   })
 
   it('returns 200 and skips duplicate payment ID', async () => {
     mockConstructEvent.mockReturnValue(validEvent)
-    mockSheetsGet.mockResolvedValue({ data: { values: [['pi_test_123']] } })
+    mockSheetsGet.mockImplementation(({ range }: { range: string }) => {
+      if (range.includes('!J2:J')) {
+        return Promise.resolve({ data: { values: [['pi_test_123']] } })
+      }
+      return Promise.resolve({ data: { values: [] } })
+    })
     const res = await POST(req('{}'))
     expect(res.status).toBe(200)
     const json = await res.json()
     expect(json.received).toBe(true)
-    expect(mockSheetsAppend).not.toHaveBeenCalled()
+    expect(mockSheetsUpdate).not.toHaveBeenCalled()
   })
 
   it('returns 200 and updates sheet for charge.refunded', async () => {
