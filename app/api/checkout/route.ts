@@ -2,11 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { verifyToken } from '../../../lib/admin-token'
 import { checkRateLimit } from '../../../lib/rate-limit'
-import { getAvailabilityForDates } from '../../../lib/sheets-availability'
+import { getAvailabilityForDates, getTicketPoolAvailability } from '../../../lib/sheets-availability'
 import { getEventConfig } from '../../../lib/event-registry'
 import { getStripeSecretKey } from '../../../lib/payment-env'
 import type { EventTier } from '../../../content/event-schema'
 import { clampSupportedPrice } from '../../../lib/supported-tier-price'
+import { getTiersForEvent } from '../../../lib/event-tiers'
+import { getTicketFormatLabels } from '../../../lib/ticket-format-labels'
+import { getFormatCapacityTicketType } from '../../../lib/ticket-pool'
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const NAME_MAX_LEN = 200
@@ -55,6 +58,7 @@ export async function POST(req: NextRequest) {
     notes?: string
     device?: string
     ticket?: string
+    ticketFormat?: string
   }
   try {
     body = await req.json()
@@ -72,8 +76,18 @@ export async function POST(req: NextRequest) {
     notes = '',
     device = 'desktop',
     ticket,
+    ticketFormat,
   } = body
   const event = getEventConfig(eventSlug)
+  const formatLabels = getTicketFormatLabels(event.ticketFormats)
+
+  if (event.ticketFormats?.length) {
+    if (!ticketFormat || !event.ticketFormats.some((f) => f.id === ticketFormat)) {
+      return NextResponse.json({ error: 'Select an experience' }, { status: 400 })
+    }
+  } else if (ticketFormat) {
+    return NextResponse.json({ error: 'Invalid ticket format' }, { status: 400 })
+  }
 
   // Bypass capacity if valid admin/door token
   const tokenPayload = ticket ? verifyToken(ticket) : null
@@ -94,13 +108,14 @@ export async function POST(req: NextRequest) {
   }
 
   // Validate items
+  const availableTiers = getTiersForEvent(event, ticketFormat)
   const lineItems: Array<{ tier: EventTier; quantity: number; unitAmount: number }> = []
   for (const item of items) {
-    const tier = event.tiers.find((t) => t.id === item.tierId)
+    const tier = availableTiers.find((t) => t.id === item.tierId)
     if (!tier || !item.quantity || item.quantity < 1 || item.quantity > 4) continue
     const unitAmount =
       item.tierId === 'supported' && typeof (item.supportedPrice ?? supportedPrice) === 'number'
-        ? clampSupportedPrice(event.tiers, item.supportedPrice ?? supportedPrice)
+        ? clampSupportedPrice(availableTiers, item.supportedPrice ?? supportedPrice)
         : tier.price
     lineItems.push({ tier, quantity: Math.min(4, Math.max(1, Math.round(item.quantity))), unitAmount })
   }
@@ -114,20 +129,48 @@ export async function POST(req: NextRequest) {
 
   // Capacity check (skip if valid admin/door token)
   if (!bypassCapacity) {
-    const availability = await getAvailabilityForDates(event.dates)
+    const availability = await getAvailabilityForDates(event.dates, {
+      ticketFormats: event.ticketFormats,
+    })
     if (availability) {
       const dateAvail = availability.find((a) => a.dateId === dateId)
-      if (dateAvail?.soldOut) {
-        return NextResponse.json(
-          { error: 'This date is sold out. Please choose another evening.' },
-          { status: 409 }
-        )
+      const usesIndependentPools = !!event.ticketFormats?.length
+
+      if (!usesIndependentPools) {
+        if (dateAvail?.soldOut) {
+          return NextResponse.json(
+            { error: 'This date is sold out. Please choose another evening.' },
+            { status: 409 }
+          )
+        }
+        if (dateAvail && dateAvail.sold + totalQty > dateAvail.capacity) {
+          return NextResponse.json(
+            { error: `Only ${Math.max(0, dateAvail.capacity - dateAvail.sold)} ticket(s) left for this date.` },
+            { status: 409 }
+          )
+        }
       }
-      if (dateAvail && dateAvail.sold + totalQty > dateAvail.capacity) {
-        return NextResponse.json(
-          { error: `Only ${Math.max(0, dateAvail.capacity - dateAvail.sold)} ticket(s) left for this date.` },
-          { status: 409 }
-        )
+
+      if (ticketFormat && event.ticketFormats?.length) {
+        const format = event.ticketFormats.find((f) => f.id === ticketFormat)
+        const poolKey = format ? getFormatCapacityTicketType(format) : undefined
+        if (poolKey) {
+          const poolAvail = getTicketPoolAvailability(availability, date.id, poolKey)
+          if (poolAvail?.soldOut) {
+            return NextResponse.json(
+              { error: `${format?.label ?? 'This experience'} is sold out for this date.` },
+              { status: 409 }
+            )
+          }
+          if (poolAvail && poolAvail.sold + totalQty > poolAvail.capacity) {
+            return NextResponse.json(
+              {
+                error: `Only ${Math.max(0, poolAvail.capacity - poolAvail.sold)} ${format?.label ?? 'experience'} seat(s) left.`,
+              },
+              { status: 409 }
+            )
+          }
+        }
       }
     }
   }
@@ -158,11 +201,13 @@ export async function POST(req: NextRequest) {
   const successUrl =
     `${baseUrl}${event.successPath}?session_id={CHECKOUT_SESSION_ID}` +
     `&date_id=${encodeURIComponent(date.id)}` +
-    `&name=${encodeURIComponent(trimmedName)}`
+    `&name=${encodeURIComponent(trimmedName)}` +
+    (ticketFormat ? `&ticket_format=${encodeURIComponent(ticketFormat)}` : '')
   const cancelUrl = `${baseUrl}${event.invitePath}`
 
   const orderStr = lineItems.map((li) => `${li.tier.id}:${li.quantity}`).join(',')
   const supportedInOrder = lineItems.find((li) => li.tier.id === 'supported')
+  const formatLabel = ticketFormat ? formatLabels[ticketFormat] : undefined
   const stripe = new Stripe(stripeSecretKey)
   try {
     const session = await stripe.checkout.sessions.create({
@@ -171,7 +216,9 @@ export async function POST(req: NextRequest) {
         price_data: {
           currency: 'usd',
           product_data: {
-            name: `${date.label} · ${li.tier.label}`,
+            name: formatLabel
+              ? `${formatLabel} · ${date.label} · ${li.tier.label}`
+              : `${date.label} · ${li.tier.label}`,
             description: `${event.stripeDescriptionLabel} - ${li.tier.label} tier`,
           },
           unit_amount: li.unitAmount * 100, // cents
@@ -186,6 +233,7 @@ export async function POST(req: NextRequest) {
         email: trimmedEmail,
         notes: notes.slice(0, 500), // Stripe metadata values max 500 chars
         device: deviceType,
+        ...(ticketFormat && { ticketFormat }),
         ...(supportedInOrder && { supportedPrice: String(supportedInOrder.unitAmount) }),
       },
       payment_intent_data: {

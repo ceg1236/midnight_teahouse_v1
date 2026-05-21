@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { google } from 'googleapis'
 import { getEventConfig } from '../../../../lib/event-registry'
 import { getSheetsConfig } from '../../../../lib/payment-env'
+import { writeRowAtNextDataRow } from '../../../../lib/sheets-append'
 
 export async function POST(req: NextRequest) {
   if (process.env.NODE_ENV === 'production') {
@@ -64,55 +65,40 @@ export async function POST(req: NextRequest) {
     '', // Refund Notes
   ]
 
-  const appendRes = await sheets.spreadsheets.values.append({
+  const appendedRow = await writeRowAtNextDataRow(sheets, spreadsheetId, sheetName, row)
+  const meta = await sheets.spreadsheets.get({ spreadsheetId })
+  const sheet = meta.data.sheets?.find(
+    (s) => (s.properties?.title ?? '').trim() === sheetName.trim()
+  )
+  const sheetId = sheet?.properties?.sheetId ?? 0
+  await sheets.spreadsheets.batchUpdate({
     spreadsheetId,
-    range: `${sheetName}!A2:L`,
-    valueInputOption: 'USER_ENTERED',
-    insertDataOption: 'INSERT_ROWS',
-    requestBody: { values: [row] },
-  })
-
-  const updatedRange = appendRes.data?.updates?.updatedRange
-  let appendedRow: number | null = null
-  if (updatedRange) {
-    const rowMatch = updatedRange.match(/!A(\d+):/)
-    appendedRow = rowMatch ? parseInt(rowMatch[1], 10) : null
-    if (appendedRow != null) {
-      const meta = await sheets.spreadsheets.get({ spreadsheetId })
-      const sheet = meta.data.sheets?.find(
-        (s) => (s.properties?.title ?? '').trim() === sheetName.trim()
-      )
-      const sheetId = sheet?.properties?.sheetId ?? 0
-      await sheets.spreadsheets.batchUpdate({
-        spreadsheetId,
-        requestBody: {
-          requests: [
-            {
-              repeatCell: {
-                range: {
-                  sheetId,
-                  startRowIndex: appendedRow - 1,
-                  endRowIndex: appendedRow,
-                  startColumnIndex: 0,
-                  endColumnIndex: 12,
+    requestBody: {
+      requests: [
+        {
+          repeatCell: {
+            range: {
+              sheetId,
+              startRowIndex: appendedRow - 1,
+              endRowIndex: appendedRow,
+              startColumnIndex: 0,
+              endColumnIndex: 12,
+            },
+            cell: {
+              userEnteredFormat: {
+                backgroundColor: {
+                  red: 1,
+                  green: 1,
+                  blue: 1,
                 },
-                cell: {
-                  userEnteredFormat: {
-                    backgroundColor: {
-                      red: 1,
-                      green: 1,
-                      blue: 1,
-                    },
-                  },
-                },
-                fields: 'userEnteredFormat.backgroundColor',
               },
             },
-          ],
+            fields: 'userEnteredFormat.backgroundColor',
+          },
         },
-      })
-    }
-  }
+      ],
+    },
+  })
 
   return NextResponse.json({
     ok: true,

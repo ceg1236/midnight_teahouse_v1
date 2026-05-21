@@ -3,10 +3,12 @@
 import Link from 'next/link'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { CountdownTimer } from './countdown-timer'
-import type { EventDate, EventTier } from '../../content/event-schema'
+import type { EventDate, EventTicketFormat, EventTier } from '../../content/event-schema'
 import { decodeTokenPayload } from '../../lib/admin-token-decode'
 import { resolveDoorDate } from '../../lib/door-date'
 import { getSupportedPriceBounds, isSupportedPriceInRange } from '../../lib/supported-tier-price'
+import { getTiersForTicketFormat } from '../../lib/event-tiers'
+import { getFormatCapacityState, getMaxSelectableForExperience } from '../../lib/ticket-pool'
 import { HeroVideo } from './hero-video'
 import { SiteFooter } from './site-footer'
 
@@ -57,6 +59,8 @@ type CarrdStylePageProps = {
   soldOutByDateId?: Record<string, boolean>
   /** dateId -> remaining seats; used for low-inventory messaging */
   remainingByDateId?: Record<string, number>
+  /** dateId -> ticketType -> pool availability (e.g. tasting cap) */
+  ticketPoolByDateId?: Record<string, Record<string, { remaining: number; soldOut: boolean }>>
   /** Admin/door token – bypasses sold-out, pre-fills date/tier */
   initialTicket?: string
   hostSectionTitle?: string
@@ -65,6 +69,8 @@ type CarrdStylePageProps = {
   heroImage?: string
   /** Overrides default evening booking notes at checkout. */
   bookingNotes?: readonly (string | React.ReactNode)[]
+  /** First reservation step: experience type before tier selection. */
+  ticketFormats?: readonly EventTicketFormat[]
 }
 
 const SCROLL_DURATION = 1200
@@ -172,23 +178,36 @@ export function CarrdStylePage({
   locationLabel,
   soldOutByDateId = {},
   remainingByDateId = {},
+  ticketPoolByDateId = {},
   initialTicket,
   hostSectionTitle,
   hostSectionDescription,
   heroImage,
   bookingNotes = BOOKING_NOTES,
+  ticketFormats,
 }: CarrdStylePageProps) {
   const singleDateEvent = dates.length === 1
-  const { supportedMin, supportedMax } = useMemo(() => getSupportedPriceBounds(tiers), [tiers])
-  const supportedPriceRangeLabel = `${supportedMin}–${supportedMax}`
-  const supportedPriceSuffix = useMemo(() => {
-    const mainLine = tiers.find((t) => t.id === 'supported')?.mainLine
-    return mainLine ? mainLine.replace(/^Supported\s*/i, ', ') : `, $${supportedMin}+`
-  }, [tiers, supportedMin])
+  const usesFormatStep = (ticketFormats?.length ?? 0) > 0
+  const skipDateStep = singleDateEvent && !usesFormatStep
   const tokenPayload = initialTicket ? decodeTokenPayload(initialTicket) : null
   const bypassSoldOut = !!tokenPayload
   const effectiveSoldOut = bypassSoldOut ? {} : soldOutByDateId
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [selectedTicketFormat, setSelectedTicketFormat] = useState<string | null>(null)
+  const activeTiers = useMemo(
+    () => getTiersForTicketFormat(tiers, ticketFormats, selectedTicketFormat ?? undefined),
+    [tiers, ticketFormats, selectedTicketFormat]
+  )
+  const hasSupportedTier = activeTiers.some((t) => t.id === 'supported')
+  const supportedTier = activeTiers.find((t) => t.id === 'supported')
+  const supportedTierLabel = supportedTier?.label ?? 'Supported'
+  const primaryTiers = activeTiers.filter((t) => t.id !== 'supported')
+  const { supportedMin, supportedMax } = useMemo(() => getSupportedPriceBounds(activeTiers), [activeTiers])
+  const supportedPriceRangeLabel = `${supportedMin}–${supportedMax}`
+  const supportedPriceSuffix = useMemo(() => {
+    const mainLine = activeTiers.find((t) => t.id === 'supported')?.mainLine
+    return mainLine ? mainLine.replace(/^Supported\s*/i, ', ') : `, $${supportedMin}+`
+  }, [activeTiers, supportedMin])
   const [selections, setSelections] = useState<TierSelections>({})
   const [supportedPrice, setSupportedPrice] = useState(supportedMin)
   const [supportedPriceInput, setSupportedPriceInput] = useState('')
@@ -212,6 +231,7 @@ export function CarrdStylePage({
   const mobileFormRef = useRef<HTMLDivElement>(null)
   const reservationHeaderRef = useRef<HTMLHeadingElement>(null)
   const mobileReservationHeaderRef = useRef<HTMLHeadingElement>(null)
+  const reservationInitializedRef = useRef(false)
 
   useEffect(() => {
     const persisted = loadPersisted(dates, tiers)
@@ -242,9 +262,14 @@ export function CarrdStylePage({
     setFormData(persisted.form)
     if (Object.keys(selections).some((id) => id === 'supported')) {
       setShowSupportedTier(true)
-      setSupportedPriceInput(String(supportedMin))
+      const supportedTier = tiers.find((t) => t.id === 'supported')
+      setSupportedPriceInput(String(supportedTier?.price ?? 20))
     }
     setHydrated(true)
+
+    if (reservationInitializedRef.current) return
+    reservationInitializedRef.current = true
+
     if (payload) {
       setShowReservationView(true)
       const hasSelection = Object.values(selections).some((q) => q > 0)
@@ -255,9 +280,9 @@ export function CarrdStylePage({
       if (singleDateEvent && !date && dates[0]) {
         setSelectedDate(dates[0].id)
       }
-      setReservationStep(2)
+      setReservationStep(usesFormatStep ? 1 : 2)
     }
-  }, [dates, tiers, initialTicket, singleDateEvent, supportedMin])
+  }, [dates, tiers, initialTicket, singleDateEvent, usesFormatStep])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -312,12 +337,32 @@ export function CarrdStylePage({
 
   const hasSelection = Object.values(selections).some((q) => q > 0)
   const totalQuantity = Object.values(selections).reduce((s, q) => s + q, 0)
-  const selectedDateRemaining = selectedDate ? remainingByDateId[selectedDate] : undefined
-  const maxSelectableTickets = bypassSoldOut
-    ? 4
-    : typeof selectedDateRemaining === 'number'
-      ? Math.max(0, Math.min(4, selectedDateRemaining))
-      : 4
+  /** Single-date events always use that date for capacity, even before date step runs. */
+  const capacityDateId =
+    selectedDate ?? (singleDateEvent && dates[0] ? dates[0].id : null)
+  const selectedFormatData = ticketFormats?.find((f) => f.id === selectedTicketFormat)
+  const selectedFormatCapacity = selectedFormatData
+    ? getFormatCapacityState(
+        selectedFormatData,
+        capacityDateId,
+        remainingByDateId,
+        ticketPoolByDateId
+      )
+    : undefined
+  const maxSelectableTickets = getMaxSelectableForExperience(
+    selectedFormatData,
+    capacityDateId,
+    remainingByDateId,
+    ticketPoolByDateId,
+    bypassSoldOut
+  )
+  const canAddTickets = bypassSoldOut || maxSelectableTickets > 0
+  const getFormatAvailability = (format: EventTicketFormat) =>
+    getFormatCapacityState(format, capacityDateId, remainingByDateId, ticketPoolByDateId)
+  const isFormatSoldOut = (format: EventTicketFormat) => {
+    if (bypassSoldOut) return false
+    return getFormatAvailability(format).soldOut
+  }
   useEffect(() => {
     if (!ticketLimitError) return
     if (totalQuantity < maxSelectableTickets) {
@@ -326,14 +371,22 @@ export function CarrdStylePage({
   }, [ticketLimitError, totalQuantity, maxSelectableTickets])
   const hasValidSupportedPrice = (() => {
     const v = parseInt(supportedPriceInput, 10)
-    return !isNaN(v) && isSupportedPriceInRange(tiers, v)
+    return !isNaN(v) && isSupportedPriceInRange(activeTiers, v)
   })()
   const totalPrice = Object.entries(selections).reduce((sum, [tierId, qty]) => {
     if (qty <= 0) return sum
-    const tier = tiers.find((t) => t.id === tierId)
+    const tier = activeTiers.find((t) => t.id === tierId)
     const price = tierId === 'supported' ? supportedPrice : (tier?.price ?? 0)
     return sum + price * qty
   }, 0)
+  const selectionSummaryLines = Object.entries(selections)
+    .filter(([, qty]) => qty > 0)
+    .map(([tierId, qty]) => {
+      const tier = activeTiers.find((t) => t.id === tierId)
+      const price = tierId === 'supported' ? supportedPrice : (tier?.price ?? 0)
+      const label = tier?.label ?? tierId
+      return { tierId, qty, price, label }
+    })
   const selectedDateData = dates.find((d) => d.id === selectedDate)
   const selectedDateDisplay = selectedDateData
     ? (() => {
@@ -387,18 +440,62 @@ export function CarrdStylePage({
     </section>
   ) : null
   const sharedMusicBlurb = dates.flatMap((d) => d.musicians).find((line) => line?.trim()) ?? ''
-  const reservationSteps = singleDateEvent ? ([2, 3] as const) : ([1, 2, 3] as const)
+  const reservationSteps = skipDateStep ? ([2, 3] as const) : ([1, 2, 3] as const)
   const panelCount = reservationSteps.length
-  const slideOffset = singleDateEvent ? reservationStep - 2 : reservationStep - 1
+  const slideOffset = skipDateStep ? reservationStep - 2 : reservationStep - 1
   const panelFlexWidth = `${panelCount * 100}%`
   const slideTransform = `translateX(-${Math.max(0, slideOffset) * (100 / panelCount)}%)`
-  const panelWidthClass = singleDateEvent ? 'w-1/2' : 'w-1/3'
-  const ticketStepLabel = singleDateEvent ? '1. Choose Your Ticket' : '2. Choose Your Ticket'
-  const formStepLabel = singleDateEvent ? '2. Complete Your Reservation' : '3. Complete Your Reservation'
+  const panelWidthClass = panelCount === 2 ? 'w-1/2' : 'w-1/3'
+  const formatStepLabel = '1. Choose Your Experience'
+  const ticketStepLabel = usesFormatStep
+    ? '2. Choose Your Ticket'
+    : skipDateStep
+      ? '1. Choose Your Ticket'
+      : '2. Choose Your Ticket'
+  const formStepLabel = usesFormatStep
+    ? '3. Complete Your Reservation'
+    : skipDateStep
+      ? '2. Complete Your Reservation'
+      : '3. Complete Your Reservation'
+  const readyToCheckout =
+    hasSelection && selectedDate && (!usesFormatStep || selectedTicketFormat)
+
+  const selectSupportedTier = () => {
+    if (!canAddTickets) {
+      setTicketLimitError(NO_MORE_TICKETS_MSG)
+      return
+    }
+    setTicketLimitError(null)
+    setShowSupportedTier(true)
+    setSupportedPrice(supportedMin)
+    setSupportedPriceInput(String(supportedMin))
+    setSelections((prev) => ({ ...prev, supported: 1 }))
+  }
+
+  const selectTicketFormat = (formatId: string) => {
+    const format = ticketFormats?.find((f) => f.id === formatId)
+    if (format && isFormatSoldOut(format)) return
+    if (singleDateEvent && dates[0]) {
+      setSelectedDate(dates[0].id)
+    }
+    setSelectedTicketFormat(formatId)
+    setSelections({})
+    setShowSupportedTier(false)
+    setSupportedPriceInput('')
+    setTicketLimitError(null)
+    setReservationStep(2)
+  }
 
   const beginReservation = () => {
     if (singleDateEvent && dates[0]) {
       setSelectedDate(dates[0].id)
+    }
+    if (usesFormatStep) {
+      setSelectedTicketFormat(null)
+      setSelections({})
+      setShowSupportedTier(false)
+      setReservationStep(1)
+    } else if (singleDateEvent) {
       setReservationStep(2)
     } else {
       setReservationStep(1)
@@ -407,7 +504,11 @@ export function CarrdStylePage({
   }
 
   const handleReservationBack = () => {
-    if (singleDateEvent && reservationStep === 2) {
+    if (skipDateStep && reservationStep === 2) {
+      setShowReservationView(false)
+      return
+    }
+    if (usesFormatStep && reservationStep === 1) {
       setShowReservationView(false)
       return
     }
@@ -513,6 +614,43 @@ export function CarrdStylePage({
                 }}
               >
                 {/* Mobile reservation reuses same panel structure - content is in desktop flow below, we need inline copy */}
+                {usesFormatStep ? (
+                <div className={`carrd-font-body flex-shrink-0 ${panelWidthClass} flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full`}>
+                  <h2 className="carrd-font-heading carrd-font-h2 text-2xl text-center w-full">{formatStepLabel}</h2>
+                  <div className="w-full max-w-full min-w-0 flex flex-col gap-3 break-words">
+                    {ticketFormats?.map((f) => {
+                      const formatSoldOut = isFormatSoldOut(f)
+                      const formatAvailability = getFormatAvailability(f)
+                      return (
+                      <div
+                        key={f.id}
+                        className={`carrd-mobile-pill flex flex-col gap-3 text-left w-full ${formatSoldOut ? 'opacity-60' : ''}`}
+                      >
+                        <div className="min-w-0">
+                          <p className="leading-tight text-xl">
+                            <span className="text-[#C4AF86] font-medium">{f.label}</span>
+                          </p>
+                          <p className="text-[#D9D0BF]/90 text-lg leading-snug mt-0.5 whitespace-pre-line">{f.description}</p>
+                          {!formatSoldOut && typeof formatAvailability.remaining === 'number' && formatAvailability.remaining > 0 && formatAvailability.remaining < 4 ? (
+                            <p className="text-[#FAE0B9] text-base mt-1">Only {formatAvailability.remaining} seat{formatAvailability.remaining === 1 ? '' : 's'} remaining</p>
+                          ) : null}
+                        </div>
+                        {formatSoldOut ? (
+                          <span className="shrink-0 self-center text-[#D9D0BF]/70 italic">Sold Out</span>
+                        ) : (
+                        <button
+                          type="button"
+                          onClick={() => selectTicketFormat(f.id)}
+                          className="carrd-mobile-pill-select shrink-0 self-center"
+                        >
+                          Select
+                        </button>
+                        )}
+                      </div>
+                    )})}
+                  </div>
+                </div>
+                ) : null}
                 {!singleDateEvent ? (
                 <div className={`carrd-font-body flex-shrink-0 ${panelWidthClass} flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full`}>
                   <h2 className="carrd-font-heading carrd-font-h2 text-2xl text-center w-full">1. Choose Your Evening</h2>
@@ -557,7 +695,7 @@ export function CarrdStylePage({
                 <div className={`carrd-font-body flex-shrink-0 ${panelWidthClass} flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full`}>
                   <h2 className="carrd-font-heading carrd-font-h2 text-2xl text-center w-full">{ticketStepLabel}</h2>
                   <div className="w-full max-w-full min-w-0 flex flex-col gap-3 break-words">
-                    {tiers.filter((t) => t.id === 'community' || t.id === 'patron').map((t) => {
+                    {primaryTiers.map((t) => {
                       const qty = selections[t.id] ?? 0
                       const isSelected = qty > 0
                       return (
@@ -578,11 +716,17 @@ export function CarrdStylePage({
                             </div>
                           ) : null}
                           {qty === 0 && (
+                            canAddTickets ? (
                             <button type="button" onClick={() => handleTierClick(t.id)} className="carrd-mobile-pill-select shrink-0 self-center">Select</button>
+                            ) : (
+                            <span className="shrink-0 self-center text-[#D9D0BF]/70 italic">Sold Out</span>
+                            )
                           )}
                         </div>
                       )
                     })}
+                    {hasSupportedTier ? (
+                    <>
                     <p className="carrd-font-body text-left text-base text-[#D9D0BF]/95">
                       If cost is a barrier, please consider our{' '}
                       <button type="button" onClick={() => setShowSupportedTier((v) => !v)} className="underline cursor-pointer text-[#FAE0B9] focus:outline-none focus:underline">supported ticket option</button>.
@@ -590,15 +734,15 @@ export function CarrdStylePage({
                     {(showSupportedTier || (selections['supported'] ?? 0) > 0) && (
                       <div className={`carrd-mobile-pill flex flex-col gap-3 text-left w-full mt-2 ${(selections['supported'] ?? 0) > 0 ? 'carrd-mobile-pill--selected' : ''}`}>
                         <div className="min-w-0">
-                          <p className="leading-tight text-xl"><span className="text-[#C4AF86] font-medium">Supported</span><span className="text-[#FAEBD4]/90 font-normal">{supportedPriceSuffix}</span></p>
-                          <p className="text-[#D9D0BF]/90 text-lg leading-snug mt-0.5 italic">{tiers.find((t) => t.id === 'supported')?.blurb ?? ''}</p>
+                          <p className="leading-tight text-xl"><span className="text-[#C4AF86] font-medium">{supportedTierLabel}</span><span className="text-[#FAEBD4]/90 font-normal">{supportedPriceSuffix}</span></p>
+                          <p className="text-[#D9D0BF]/90 text-lg leading-snug mt-0.5 italic">{activeTiers.find((t) => t.id === 'supported')?.blurb ?? ''}</p>
                           <p className="text-[#FAEBD4] text-lg leading-snug mt-0.5">{"We're excited to have guests from diverse backgrounds. Please choose a price that feels accessible for you."}</p>
                         </div>
                         {(selections['supported'] ?? 0) > 0 ? (
                           <div className="flex flex-col gap-3 items-center">
                             <div className="flex items-center gap-2 w-full max-w-[8rem]">
                               <span className="text-[#D9D0BF] text-lg">$</span>
-                              <input type="number" min={supportedMin} max={supportedMax} value={supportedPriceInput} placeholder={supportedPriceRangeLabel} onChange={(e) => { const raw = e.target.value; setSupportedPriceInput(raw); const v = parseInt(raw, 10); if (!isNaN(v) && isSupportedPriceInRange(tiers, v)) setSupportedPrice(v); else if (raw === '') setSelections((prev) => { const n = { ...prev }; delete n.supported; return n }); }} onBlur={() => { const v = parseInt(supportedPriceInput, 10); if (!isNaN(v) && isSupportedPriceInRange(tiers, v)) { setSupportedPrice(v); setSupportedPriceInput(String(v)) } else if (supportedPriceInput === '') setSelections((prev) => { const n = { ...prev }; delete n.supported; return n }); else setSupportedPriceInput(String(supportedPrice)) }} className="carrd-font-body flex-1 min-w-0 py-2.5 px-3 text-lg bg-[#2E0303]/40 rounded-lg border border-[#FAE0B9]/30 text-[#FAEBD4] focus:outline-none focus:border-[#FAE0B9]/60 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                              <input type="number" min={supportedMin} max={supportedMax} value={supportedPriceInput} placeholder={supportedPriceRangeLabel} onChange={(e) => { const raw = e.target.value; setSupportedPriceInput(raw); const v = parseInt(raw, 10); if (!isNaN(v) && isSupportedPriceInRange(activeTiers, v)) setSupportedPrice(v); else if (raw === '') setSelections((prev) => { const n = { ...prev }; delete n.supported; return n }); }} onBlur={() => { const v = parseInt(supportedPriceInput, 10); if (!isNaN(v) && isSupportedPriceInRange(activeTiers, v)) { setSupportedPrice(v); setSupportedPriceInput(String(v)) } else if (supportedPriceInput === '') setSelections((prev) => { const n = { ...prev }; delete n.supported; return n }); else setSupportedPriceInput(String(supportedPrice)) }} className="carrd-font-body flex-1 min-w-0 py-2.5 px-3 text-lg bg-[#2E0303]/40 rounded-lg border border-[#FAE0B9]/30 text-[#FAEBD4] focus:outline-none focus:border-[#FAE0B9]/60 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
                             </div>
                             <div className="flex items-center justify-center gap-2">
                               <button type="button" onClick={() => handleQuantityChange('supported', -1)} className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg" aria-label="Decrease Supported">−</button>
@@ -608,10 +752,14 @@ export function CarrdStylePage({
                           </div>
                         ) : null}
                         {(selections['supported'] ?? 0) === 0 && (
-                          <button type="button" onClick={() => { setShowSupportedTier(true); setSupportedPrice(supportedMin); setSupportedPriceInput(String(supportedMin)); setSelections((prev) => ({ ...prev, supported: 1 })) }} className="carrd-mobile-pill-select shrink-0 self-center">Select</button>
+                          <button type="button" onClick={selectSupportedTier} className="carrd-mobile-pill-select shrink-0 self-center">Select</button>
                         )}
                       </div>
                     )}
+                    </>
+                    ) : null}
+                    {hasSupportedTier ? (
+                    <>
                     <button type="button" onClick={() => setExpandedPricingNote((v) => !v)} className="carrd-font-body text-lg text-[#D9D0BF]/80 hover:text-[#FAEBD4] focus:outline-none focus:underline cursor-pointer w-fit flex items-center gap-1">
                       {expandedPricingNote ? 'Hide' : 'About our pricing'}
                       <span className="text-lg transition-transform" style={{ transform: expandedPricingNote ? 'rotate(180deg)' : 'none' }}>▾</span>
@@ -623,19 +771,33 @@ export function CarrdStylePage({
                         </p>
                       </div>
                     )}
+                    </>
+                    ) : null}
                     {ticketLimitError && (
                       <p className="carrd-font-body text-base text-[#FAE0B9]">{ticketLimitError}</p>
                     )}
+                    {!ticketLimitError &&
+                    selectedFormatCapacity &&
+                    typeof selectedFormatCapacity.remaining === 'number' &&
+                    selectedFormatCapacity.remaining > 0 &&
+                    selectedFormatCapacity.remaining < 4 ? (
+                      <p className="carrd-font-body text-base text-[#FAE0B9]">
+                        Only {selectedFormatCapacity.remaining} seat{selectedFormatCapacity.remaining === 1 ? '' : 's'} remaining
+                      </p>
+                    ) : null}
                   </div>
-                  <button type="button" onClick={() => setReservationStep(3)} disabled={!hasSelection} className="carrd-btn px-8 py-4 disabled:opacity-50 disabled:cursor-not-allowed">Continue</button>
+                  <button type="button" onClick={() => setReservationStep(3)} disabled={!hasSelection || (usesFormatStep && !selectedTicketFormat)} className="carrd-btn px-8 py-4 disabled:opacity-50 disabled:cursor-not-allowed">Continue</button>
                 </div>
                 <div ref={mobileFormRef} className={`carrd-font-body flex-shrink-0 ${panelWidthClass} flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full`}>
                   <h2 className="carrd-font-heading carrd-font-h2 text-2xl text-center w-full">{formStepLabel}</h2>
-                  {selectedDate && hasSelection ? (
+                  {readyToCheckout ? (
                     <div className="carrd-font-body rounded-lg bg-[#FAEBD4]/20 px-4 py-4 text-left w-full max-w-full min-w-0">
                       <div className="space-y-3">
                         <div><p className="text-base text-[#D9D0BF]/80 uppercase tracking-wider">Date</p><p className="text-lg text-[#FAEBD4]">{selectedDateData?.dateTime}</p></div>
-                        <div><p className="text-base text-[#D9D0BF]/80 uppercase tracking-wider mb-1.5">Tickets</p><div className="space-y-1">{(['supported', 'community', 'patron'] as const).filter((tid) => (selections[tid] ?? 0) > 0).map((tierId) => { const qty = selections[tierId] ?? 0; const tier = tiers.find((t) => t.id === tierId); const price = tierId === 'supported' ? supportedPrice : (tier?.price ?? 0); const label = tier?.label ?? tierId; return <p key={tierId} className="text-lg text-[#FAEBD4]">{label} — ${price} × {qty} = ${price * qty}</p> })}</div></div>
+                        {selectedFormatData ? (
+                          <div><p className="text-base text-[#D9D0BF]/80 uppercase tracking-wider">Experience</p><p className="text-lg text-[#FAEBD4]">{selectedFormatData.label}</p></div>
+                        ) : null}
+                        <div><p className="text-base text-[#D9D0BF]/80 uppercase tracking-wider mb-1.5">Tickets</p><div className="space-y-1">{selectionSummaryLines.map(({ tierId, qty, price, label }) => <p key={tierId} className="text-lg text-[#FAEBD4]">{label} — ${price} × {qty} = ${price * qty}</p>)}</div></div>
                         <div className="pt-2 border-t border-[#D9D0BF]/30"><p className="text-base text-[#D9D0BF]/80 uppercase tracking-wider">Total</p><p className="text-xl font-medium text-[#FAEBD4]">${totalPrice}</p></div>
                       </div>
                     </div>
@@ -655,16 +817,17 @@ export function CarrdStylePage({
                       ))}
                     </ul>
                   </div>
-                  {selectedDate && hasSelection && checkoutError && (
+                  {readyToCheckout && checkoutError && (
                     <p className="carrd-font-body text-base text-red-300 w-full max-w-full" role="alert">{checkoutError}</p>
                   )}
-                  {selectedDate && hasSelection && (
+                  {readyToCheckout && (
                     <button type="button" disabled={isSubmitting} onClick={async () => {
                       if (!selectedDate || !hasSelection || !formData.name.trim() || !formData.email.trim()) return
+                      if (usesFormatStep && !selectedTicketFormat) return
                       setIsSubmitting(true); setCheckoutError(null)
                       try {
                         const items = Object.entries(selections).filter(([, q]) => q > 0).map(([tierId, qty]) => ({ tierId, quantity: qty, ...(tierId === 'supported' && { supportedPrice }) }))
-                        const res = await fetch('/api/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ eventSlug, dateId: selectedDate, items, supportedPrice: (selections['supported'] ?? 0) > 0 ? supportedPrice : undefined, name: formData.name.trim(), email: formData.email.trim(), notes: formData.notes.trim(), device: deviceType, ...(initialTicket && { ticket: initialTicket }) }) })
+                        const res = await fetch('/api/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ eventSlug, dateId: selectedDate, items, supportedPrice: (selections['supported'] ?? 0) > 0 ? supportedPrice : undefined, name: formData.name.trim(), email: formData.email.trim(), notes: formData.notes.trim(), device: deviceType, ...(selectedTicketFormat && { ticketFormat: selectedTicketFormat }), ...(initialTicket && { ticket: initialTicket }) }) })
                         const data = await res.json()
                         if (!res.ok) { setCheckoutError(data.error ?? 'Something went wrong'); return }
                         if (data.url) window.location.href = data.url
@@ -751,12 +914,8 @@ export function CarrdStylePage({
           <button
             type="button"
             onClick={() => {
-              if (singleDateEvent && dates[0]) {
-                setSelectedDate(dates[0].id)
-                setReservationStep(2)
-              }
+              beginReservation()
               if (typeof window !== 'undefined' && window.innerWidth < 768) {
-                beginReservation()
                 joinRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
               } else {
                 scrollToSection(joinRef)
@@ -813,7 +972,42 @@ export function CarrdStylePage({
               transform: slideTransform,
             }}
           >
-            {/* Panel 1: Choose your evening */}
+            {/* Panel 1: Choose your experience (Turby) or evening */}
+            {usesFormatStep ? (
+            <div className={`flex-shrink-0 ${panelWidthClass} min-w-0 flex flex-col items-center gap-6 px-4 md:px-6 max-w-full`}>
+              <h2 className="carrd-font-heading carrd-font-h2 text-center">{formatStepLabel}</h2>
+              <div className="carrd-font-body w-full max-w-[650px] flex flex-col gap-4">
+                {ticketFormats?.map((f) => {
+                  const formatSoldOut = isFormatSoldOut(f)
+                  const formatAvailability = getFormatAvailability(f)
+                  return (
+                  <div
+                    key={f.id}
+                    className={`carrd-reservation-card flex flex-col gap-2 md:grid md:grid-cols-[1fr_auto] md:gap-x-6 md:items-start w-full ${formatSoldOut ? 'opacity-60' : ''}`}
+                  >
+                    <div className="min-w-0">
+                      <p className="carrd-font-body carrd-accent-color font-medium text-[1.625rem]">{f.label}</p>
+                      <p className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0 text-[#FAEBD4] mt-1 whitespace-pre-line">{f.description}</p>
+                      {!formatSoldOut && typeof formatAvailability.remaining === 'number' && formatAvailability.remaining > 0 && formatAvailability.remaining < 4 ? (
+                        <p className="carrd-font-body text-[#FAE0B9] text-base mt-1">Only {formatAvailability.remaining} seat{formatAvailability.remaining === 1 ? '' : 's'} remaining</p>
+                      ) : null}
+                    </div>
+                    {formatSoldOut ? (
+                      <span className="carrd-font-body text-[#D9D0BF]/70 italic md:ml-4 shrink-0 self-start">Sold Out</span>
+                    ) : (
+                    <button
+                      type="button"
+                      onClick={() => selectTicketFormat(f.id)}
+                      className="carrd-btn px-8 py-4 md:ml-4 shrink-0 self-start"
+                    >
+                      Select
+                    </button>
+                    )}
+                  </div>
+                )})}
+              </div>
+            </div>
+            ) : null}
             {!singleDateEvent ? (
             <div className={`flex-shrink-0 ${panelWidthClass} min-w-0 flex flex-col items-center gap-6 px-4 md:px-6 max-w-full`}>
               <h2 className="carrd-font-heading carrd-font-h2">
@@ -930,9 +1124,7 @@ export function CarrdStylePage({
               </h2>
               {/* Mobile: cards first, then dropdown for pricing note */}
               <div className="carrd-font-body md:hidden w-full max-w-full flex flex-col gap-5 break-words">
-                {tiers
-                  .filter((t) => t.id === 'community' || t.id === 'patron')
-                  .map((t) => {
+                {primaryTiers.map((t) => {
                     const qty = selections[t.id] ?? 0
                     const isSelected = qty > 0
                     return (
@@ -973,6 +1165,7 @@ export function CarrdStylePage({
                           </div>
                         ) : null}
                         {qty === 0 && (
+                          canAddTickets ? (
                           <button
                             type="button"
                             onClick={() => handleTierClick(t.id)}
@@ -980,10 +1173,15 @@ export function CarrdStylePage({
                           >
                             Select
                           </button>
+                          ) : (
+                          <span className="shrink-0 self-center text-[#D9D0BF]/70 italic">Sold Out</span>
+                          )
                         )}
                       </div>
                     )
                   })}
+                {hasSupportedTier ? (
+                <>
                 <p className="carrd-font-body text-left text-base text-[#D9D0BF]/95">
                   If cost is a barrier, please consider our{' '}
                   <button
@@ -1001,10 +1199,10 @@ export function CarrdStylePage({
                   >
                     <div className="min-w-0">
                       <p className="leading-tight text-base">
-                        <span className="text-[#C4AF86] font-medium">Supported</span>
+                        <span className="text-[#C4AF86] font-medium">{supportedTierLabel}</span>
                         <span className="text-[#FAEBD4]/90 font-normal">{supportedPriceSuffix}</span>
                       </p>
-                      <p className="text-[#D9D0BF]/90 text-[0.9375rem] leading-snug mt-0.5 italic">{tiers.find((t) => t.id === 'supported')?.blurb ?? ''}</p>
+                      <p className="text-[#D9D0BF]/90 text-[0.9375rem] leading-snug mt-0.5 italic">{activeTiers.find((t) => t.id === 'supported')?.blurb ?? ''}</p>
                       <p className="text-[#FAEBD4] text-[0.9375rem] leading-snug mt-0.5">{"We're excited to have guests from diverse backgrounds. Please choose a price that feels accessible for you."}</p>
                     </div>
                     {(selections['supported'] ?? 0) > 0 ? (
@@ -1021,14 +1219,14 @@ export function CarrdStylePage({
                               const raw = e.target.value
                               setSupportedPriceInput(raw)
                               const v = parseInt(raw, 10)
-                              if (!isNaN(v) && isSupportedPriceInRange(tiers, v)) setSupportedPrice(v)
+                              if (!isNaN(v) && isSupportedPriceInRange(activeTiers, v)) setSupportedPrice(v)
                               else if (raw === '') {
                                 setSelections((prev) => { const n = { ...prev }; delete n.supported; return n })
                               }
                             }}
                             onBlur={() => {
                               const v = parseInt(supportedPriceInput, 10)
-                              if (!isNaN(v) && isSupportedPriceInRange(tiers, v)) {
+                              if (!isNaN(v) && isSupportedPriceInRange(activeTiers, v)) {
                                 setSupportedPrice(v)
                                 setSupportedPriceInput(String(v))
                               } else if (supportedPriceInput === '') {
@@ -1063,18 +1261,17 @@ export function CarrdStylePage({
                         </div>
                     ) : null}
                     {(selections['supported'] ?? 0) === 0 && (
+                      canAddTickets ? (
                       <button
                         type="button"
-                        onClick={() => {
-                          setShowSupportedTier(true)
-                          setSupportedPrice(supportedMin)
-                          setSupportedPriceInput(String(supportedMin))
-                          setSelections((prev) => ({ ...prev, supported: 1 }))
-                        }}
+                        onClick={selectSupportedTier}
                         className="carrd-mobile-pill-select shrink-0 self-center"
                       >
                         Select
                       </button>
+                      ) : (
+                      <span className="shrink-0 self-center text-[#D9D0BF]/70 italic">Sold Out</span>
+                      )
                     )}
                   </div>
                 )}
@@ -1093,12 +1290,12 @@ export function CarrdStylePage({
                     </p>
                   </div>
                 )}
+                </>
+                ) : null}
               </div>
               {/* Desktop: tier cards first, then About our pricing */}
               <div className="hidden md:block w-full max-w-[650px] space-y-6">
-                {tiers
-                  .filter((t) => t.id === 'community' || t.id === 'patron')
-                  .map((t) => {
+                {primaryTiers.map((t) => {
                     const qty = selections[t.id] ?? 0
                     return (
                       <div
@@ -1129,7 +1326,7 @@ export function CarrdStylePage({
                                 +
                               </button>
                             </div>
-                          ) : (
+                          ) : canAddTickets ? (
                             <button
                               type="button"
                               onClick={() => handleTierClick(t.id)}
@@ -1137,6 +1334,8 @@ export function CarrdStylePage({
                             >
                               Select
                             </button>
+                          ) : (
+                            <span className="carrd-font-body text-[#D9D0BF]/70 italic md:ml-4">Sold Out</span>
                           )}
                         </div>
                         <p className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0">${t.price}</p>
@@ -1145,6 +1344,7 @@ export function CarrdStylePage({
                     )
                   })}
               </div>
+              {hasSupportedTier ? (
               <div className="hidden md:block w-full max-w-[650px] space-y-4">
                 <p className="carrd-font-body text-left text-[#D9D0BF]/95">
                   If cost is a barrier, please consider our{' '}
@@ -1159,12 +1359,12 @@ export function CarrdStylePage({
                 </p>
                 {(showSupportedTier || (selections['supported'] ?? 0) > 0) && (
               <div className="hidden md:block w-full max-w-[650px]">
-              {tiers.filter((t) => t.id === 'supported').map((t) => (
+              {activeTiers.filter((t) => t.id === 'supported').map((t) => (
                 <div
                   key={t.id}
                   className="carrd-reservation-card flex flex-col gap-2 md:grid md:grid-cols-[6rem_1fr_auto] md:grid-rows-[auto_auto] md:gap-x-6 md:gap-y-1 md:items-start w-full max-w-[650px]"
                 >
-                  <p className="carrd-font-body carrd-accent-color font-medium text-[1.625rem]">Supported</p>
+                  <p className="carrd-font-body carrd-accent-color font-medium text-[1.625rem]">{t.label}</p>
                   <p className="carrd-font-body carrd-accent-color font-medium italic text-[1.625rem]">{t.blurb}</p>
                   <div className="flex items-start justify-end min-w-[8rem] w-[8rem] row-span-2 self-start order-last md:order-none">
                     {(selections['supported'] ?? 0) > 0 ? (
@@ -1181,7 +1381,7 @@ export function CarrdStylePage({
                               const raw = e.target.value
                               setSupportedPriceInput(raw)
                               const v = parseInt(raw, 10)
-                              if (!isNaN(v) && isSupportedPriceInRange(tiers, v)) {
+                              if (!isNaN(v) && isSupportedPriceInRange(activeTiers, v)) {
                                 setSupportedPrice(v)
                               } else if (raw === '') {
                                 setSelections((prev) => {
@@ -1193,7 +1393,7 @@ export function CarrdStylePage({
                             }}
                             onBlur={() => {
                               const v = parseInt(supportedPriceInput, 10)
-                              if (!isNaN(v) && isSupportedPriceInRange(tiers, v)) {
+                              if (!isNaN(v) && isSupportedPriceInRange(activeTiers, v)) {
                                 setSupportedPrice(v)
                                 setSupportedPriceInput(String(v))
                               } else if (supportedPriceInput === '') {
@@ -1233,18 +1433,16 @@ export function CarrdStylePage({
                           </button>
                         </div>
                       </div>
-                    ) : (
+                    ) : canAddTickets ? (
                       <button
                         type="button"
-                        onClick={() => {
-                          setSupportedPrice(supportedMin)
-                          setSupportedPriceInput(String(supportedMin))
-                          setSelections((prev) => ({ ...prev, supported: 1 }))
-                        }}
+                        onClick={selectSupportedTier}
                         className="carrd-btn px-8 py-4 md:ml-4"
                       >
                         Select
                       </button>
+                    ) : (
+                      <span className="carrd-font-body text-[#D9D0BF]/70 italic md:ml-4">Sold Out</span>
                     )}
                   </div>
                   <p className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0">${supportedMin}+</p>
@@ -1271,12 +1469,22 @@ export function CarrdStylePage({
                 {ticketLimitError && (
                   <p className="carrd-font-body text-base text-[#FAE0B9]">{ticketLimitError}</p>
                 )}
+                {!ticketLimitError &&
+                selectedFormatCapacity &&
+                typeof selectedFormatCapacity.remaining === 'number' &&
+                selectedFormatCapacity.remaining > 0 &&
+                selectedFormatCapacity.remaining < 4 ? (
+                  <p className="carrd-font-body text-base text-[#FAE0B9]">
+                    Only {selectedFormatCapacity.remaining} seat{selectedFormatCapacity.remaining === 1 ? '' : 's'} remaining
+                  </p>
+                ) : null}
               </div>
+              ) : null}
               <div className="flex flex-wrap items-center justify-center gap-4 w-full max-w-[650px]">
                 <button
                   type="button"
                   onClick={() => setReservationStep(3)}
-                  disabled={!hasSelection}
+                  disabled={!hasSelection || (usesFormatStep && !selectedTicketFormat)}
                   className="carrd-btn px-8 py-4 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Continue
@@ -1285,12 +1493,12 @@ export function CarrdStylePage({
             </div>
 
             {/* Panel 3: Complete your reservation (summary + form + reserve) */}
-            <div ref={formRef} className="flex-shrink-0 ${panelWidthClass} min-w-0 flex flex-col items-center gap-6 px-4 md:px-6 max-w-full">
+            <div ref={formRef} className={`flex-shrink-0 ${panelWidthClass} min-w-0 flex flex-col items-center gap-6 px-4 md:px-6 max-w-full`}>
               <div className="inline-flex flex-col items-stretch gap-6">
                 <h2 className="carrd-font-heading carrd-font-h2 text-center">
                   {formStepLabel}
                 </h2>
-              {selectedDate && hasSelection ? (
+              {readyToCheckout ? (
                 <>
                   {/* Summary box: same width as heading */}
                   <div className="carrd-font-body rounded-lg bg-[#FAEBD4]/20 px-4 py-4 text-left w-full">
@@ -1309,22 +1517,20 @@ export function CarrdStylePage({
                           )}
                         </p>
                       </div>
+                      {selectedFormatData ? (
+                        <div>
+                          <p className="text-sm text-[#D9D0BF]/80 uppercase tracking-wider">Experience</p>
+                          <p className="text-base text-[#FAEBD4]">{selectedFormatData.label}</p>
+                        </div>
+                      ) : null}
                       <div>
                         <p className="text-sm text-[#D9D0BF]/80 uppercase tracking-wider mb-1.5">Tickets</p>
                         <div className="space-y-1">
-                          {(['supported', 'community', 'patron'] as const)
-                            .filter((tierId) => (selections[tierId] ?? 0) > 0)
-                            .map((tierId) => {
-                              const qty = selections[tierId] ?? 0
-                              const tier = tiers.find((t) => t.id === tierId)
-                              const price = tierId === 'supported' ? supportedPrice : (tier?.price ?? 0)
-                              const label = tier?.label ?? (tierId === 'supported' ? 'Supported' : tierId)
-                              return (
-                                <p key={tierId} className="text-base text-[#FAEBD4]">
-                                  {label} — ${price} × {qty} = ${price * qty}
-                                </p>
-                              )
-                            })}
+                          {selectionSummaryLines.map(({ tierId, qty, price, label }) => (
+                            <p key={tierId} className="text-base text-[#FAEBD4]">
+                              {label} — ${price} × {qty} = ${price * qty}
+                            </p>
+                          ))}
                         </div>
                       </div>
                       <div className="pt-2 border-t border-[#D9D0BF]/30">
@@ -1394,7 +1600,7 @@ export function CarrdStylePage({
                   />
                 </label>
               </form>
-              {selectedDate && hasSelection && checkoutError && (
+              {readyToCheckout && checkoutError && (
                 <p className="carrd-font-body text-sm text-red-300" role="alert">
                   {checkoutError}
                 </p>
@@ -1410,12 +1616,13 @@ export function CarrdStylePage({
                   ))}
                 </ul>
               </div>
-              {selectedDate && hasSelection && (
+              {readyToCheckout && (
                 <button
                   type="button"
                   disabled={isSubmitting}
                   onClick={async () => {
                     if (!selectedDate || !hasSelection || !formData.name.trim() || !formData.email.trim()) return
+                    if (usesFormatStep && !selectedTicketFormat) return
                     setIsSubmitting(true)
                     setCheckoutError(null)
                     try {
@@ -1438,6 +1645,7 @@ export function CarrdStylePage({
                           email: formData.email.trim(),
                           notes: formData.notes.trim(),
                           device: deviceType,
+                          ...(selectedTicketFormat && { ticketFormat: selectedTicketFormat }),
                           ...(initialTicket && { ticket: initialTicket }),
                         }),
                       })

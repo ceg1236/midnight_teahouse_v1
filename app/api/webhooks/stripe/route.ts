@@ -4,28 +4,14 @@ import { google } from 'googleapis'
 import { sendConfirmationEmail } from '../../../../lib/confirmation-email'
 import { applyRefundToSheet } from '../../../../lib/sheets-refund'
 import { getEventConfig } from '../../../../lib/event-registry'
+import { getTiersForEvent } from '../../../../lib/event-tiers'
+import { formatSheetTicketType } from '../../../../lib/ticket-format-labels'
+import { writeRowAtNextDataRow } from '../../../../lib/sheets-append'
 import { getSheetsConfig, getStripeSecretKey, getStripeWebhookSecret } from '../../../../lib/payment-env'
-
-function formatTicketType(orderStr: string, tierLabels: Record<string, string>): string {
-  const parts: string[] = []
-  for (const pair of orderStr.split(',')) {
-    const [tierId] = pair.split(':')
-    if (!tierId) continue
-    const label = tierLabels[tierId] ?? tierId
-    parts.push(label)
-  }
-  return Array.from(new Set(parts)).join(', ') || ''
-}
 
 function normalizeTicketDateLabel(value: string): string {
   // Guard against accidental trailing punctuation in config labels.
   return value.replace(/\s*,+\s*$/, '').trim()
-}
-
-function getAppendedRowNumber(updatedRange?: string | null): number | null {
-  if (!updatedRange) return null
-  const rowMatch = updatedRange.match(/!A(\d+):/)
-  return rowMatch ? parseInt(rowMatch[1], 10) : null
 }
 
 async function applyWhiteRowBackground(
@@ -102,46 +88,41 @@ async function appendGuestlistRow({
     return
   }
 
-  const appendRes = await sheets.spreadsheets.values.append({
+  const appendedRow = await writeRowAtNextDataRow(
+    sheets,
     spreadsheetId,
-    range: `${guestlistSheetName}!A2:O`,
-    valueInputOption: 'USER_ENTERED',
-    insertDataOption: 'INSERT_ROWS',
-    requestBody: { values: [row] },
-  })
-
-  const appendedRow = getAppendedRowNumber(appendRes.data?.updates?.updatedRange)
-  if (appendedRow != null) {
-    await applyWhiteRowBackground(sheets, spreadsheetId, guestlistSheetName, appendedRow, 15)
-    const meta = await sheets.spreadsheets.get({ spreadsheetId })
-    const sheet = meta.data.sheets?.find(
-      (s) => (s.properties?.title ?? '').trim() === guestlistSheetName.trim()
-    )
-    const sheetId = sheet?.properties?.sheetId ?? 0
-    await sheets.spreadsheets.batchUpdate({
-      spreadsheetId,
-      requestBody: {
-        requests: [
-          {
-            setDataValidation: {
-              range: {
-                sheetId,
-                startRowIndex: appendedRow - 1,
-                endRowIndex: appendedRow,
-                startColumnIndex: 12, // M = Checked in
-                endColumnIndex: 13,
-              },
-              rule: {
-                condition: { type: 'BOOLEAN' },
-                strict: true,
-                showCustomUi: true,
-              },
+    guestlistSheetName,
+    row
+  )
+  await applyWhiteRowBackground(sheets, spreadsheetId, guestlistSheetName, appendedRow, 15)
+  const meta = await sheets.spreadsheets.get({ spreadsheetId })
+  const sheet = meta.data.sheets?.find(
+    (s) => (s.properties?.title ?? '').trim() === guestlistSheetName.trim()
+  )
+  const sheetId = sheet?.properties?.sheetId ?? 0
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId,
+    requestBody: {
+      requests: [
+        {
+          setDataValidation: {
+            range: {
+              sheetId,
+              startRowIndex: appendedRow - 1,
+              endRowIndex: appendedRow,
+              startColumnIndex: 12, // M = Checked in
+              endColumnIndex: 13,
+            },
+            rule: {
+              condition: { type: 'BOOLEAN' },
+              strict: true,
+              showCustomUi: true,
             },
           },
-        ],
-      },
-    })
-  }
+        },
+      ],
+    },
+  })
 
   console.log(
     JSON.stringify({
@@ -364,9 +345,7 @@ export async function POST(req: NextRequest) {
   }
 
   const eventConfig = getEventConfig(metadata?.eventSlug)
-  const tierLabels: Record<string, string> = Object.fromEntries(
-    eventConfig.tiers.map((t) => [t.id, t.label])
-  )
+  const tiersForOrder = getTiersForEvent(eventConfig, metadata?.ticketFormat)
   const date = eventConfig.dates.find((d) => d.id === metadata.dateId)
   const ticketDate = normalizeTicketDateLabel((date?.label ?? metadata.dateId).replace(/\n/g, ' '))
 
@@ -394,7 +373,12 @@ export async function POST(req: NextRequest) {
   const qty = String(totalQty)
   const ticketType =
     metadata.order && typeof metadata.order === 'string'
-      ? formatTicketType(metadata.order, tierLabels)
+      ? formatSheetTicketType(
+          metadata.order,
+          tiersForOrder,
+          metadata.ticketFormat,
+          metadata.supportedPrice
+        )
       : ''
   const row = [
     new Date().toISOString(),
@@ -479,17 +463,13 @@ export async function POST(req: NextRequest) {
   if (!paymentAlreadyWritten) {
     // Append to data rows (A2:L) - includes Refunded and Refund Notes
     try {
-      const appendRes = await sheets.spreadsheets.values.append({
+      const appendedRow = await writeRowAtNextDataRow(
+        sheets,
         spreadsheetId,
-        range: `${sheetName}!A2:L`,
-        valueInputOption: 'USER_ENTERED',
-        insertDataOption: 'INSERT_ROWS',
-        requestBody: { values: [row] },
-      })
-      const appendedRow = getAppendedRowNumber(appendRes.data?.updates?.updatedRange)
-      if (appendedRow != null) {
-        await applyWhiteRowBackground(sheets, spreadsheetId, sheetName, appendedRow, 12)
-      }
+        sheetName,
+        row
+      )
+      await applyWhiteRowBackground(sheets, spreadsheetId, sheetName, appendedRow, 12)
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err)
       const details = err && typeof err === 'object' && 'response' in err
