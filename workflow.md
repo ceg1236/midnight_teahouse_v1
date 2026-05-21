@@ -13,9 +13,27 @@ Collaborators should **always use branches and pull requests** so changes can be
 
 1. `git checkout main` → `git pull`
 2. `git checkout -b descriptive-branch-name`
-3. Make changes, run `pnpm build` to verify
-4. `git add .` → `git commit -m "message"` → `git push -u origin descriptive-branch-name`
-5. Open a PR on GitHub; owner reviews and merges
+3. Make changes, run `pnpm test` and `pnpm build` to verify
+4. `git add .` → `git commit -m "message"`
+5. **Before pushing:** sync with `main` (see Pre-push checklist below), then `git push -u origin descriptive-branch-name`
+6. Open a PR on GitHub; owner reviews and merges
+
+## Pre-push checklist
+
+**Before every push** (especially on feature branches open as PRs):
+
+1. **Fetch and sync with `main`**
+   - `git fetch origin main`
+   - `git merge origin/main` (or rebase if you prefer a linear history)
+   - Resolve any merge conflicts; prefer the feature branch for feature-specific work unless `main` has an unrelated fix you need
+2. **Verify**
+   - `pnpm test`
+   - `pnpm build`
+3. **Commit** the merge (if any) with a clear message
+4. **Push**
+   - `git push` (or `git push -u origin <branch-name>`)
+
+Skipping step 1 is the most common reason a PR cannot auto-merge (conflicts with `main`).
 
 ## Commit Workflow
 
@@ -28,9 +46,9 @@ Collaborators should **always use branches and pull requests** so changes can be
     - "Update header styling and add custom fonts"
     - "Add hover animations to navigation"
     - "Fix font loading issue"
-- **Push after committing**: After creating a commit, push the changes to the remote repository.
+- **Push after committing**: After creating a commit, sync with `main` (Pre-push checklist), then push.
   - Use: `git push` (or `git push origin <branch-name>` if needed)
-- **Standard flow**: `git add <files>` → `git commit -m "message"` → `git push`
+- **Standard flow**: `git add <files>` → `git commit -m "message"` → **merge `origin/main`** → `pnpm test` → `pnpm build` → `git push`
 
 ## Guidelines
 
