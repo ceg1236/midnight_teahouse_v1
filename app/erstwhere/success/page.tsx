@@ -5,6 +5,7 @@ import { Suspense, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { getEventConfig } from '../../../lib/event-registry'
 import { getCalendarDescription } from '../../../lib/event-messaging'
+import { EventPageTopLinks } from '../../components/event-page-top-links'
 
 const STORAGE_KEY = 'teahouse_reservation'
 
@@ -50,8 +51,9 @@ function ErstwhereEventSuccessContent() {
   }, [])
 
   return (
-    <div className="carrd-page flex min-h-[100dvh] flex-col items-center justify-center px-6 md:min-h-screen">
-      <div className="mx-auto flex max-w-md flex-col items-center gap-8 text-center">
+    <div className="carrd-page flex min-h-[100dvh] flex-col md:min-h-screen">
+      <EventPageTopLinks />
+      <div className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center gap-8 px-6 pb-8 text-center">
         <h1 className="carrd-font-heading text-[2rem] md:text-[2.5rem] font-semibold [font-variant:small-caps] tracking-wide text-[#FAEBD4]">
           See you at the Teahouse
         </h1>

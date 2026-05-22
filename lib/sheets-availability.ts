@@ -12,6 +12,10 @@ import type { EventDate, EventTicketFormat } from '../content/event-schema'
 import { resolveConfigDateKey } from './config-date-key'
 import { getFormatCapacityKeys, isTastingSheetTicketType, STANDARD_CAPACITY_KEY } from './ticket-pool'
 import { getSheetsConfig } from './payment-env'
+import { buildAvailabilityState } from './availability-state'
+
+export { buildAvailabilityState } from './availability-state'
+export type { AvailabilityState } from './availability-state'
 
 /** Map Config sheet date keys (e.g. May-30) to canonical event date ids. */
 export function resolveCapacitySettings(
@@ -252,11 +256,14 @@ export async function getAvailabilityForDates(
   const independentPools = (options?.ticketFormats?.length ?? 0) > 0
 
   try {
-    const res = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: `${sheetName}!D2:K`,
-    })
-    const rows = (res.data.values ?? []) as string[][]
+    const [paymentsRes, capacityFromSheet] = await Promise.all([
+      sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: `${sheetName}!D2:K`,
+      }),
+      getCapacityFromSheet(),
+    ])
+    const rows = (paymentsRes.data.values ?? []) as string[][]
 
     const soldByLabel: Record<string, number> = {}
     const soldByLabelAndTicketType: Record<string, Record<string, number>> = {}
@@ -286,7 +293,7 @@ export async function getAvailabilityForDates(
       dates,
       defaultCapacity,
       resolveCapacitySettings(
-        (await getCapacityFromSheet()) ?? { byDateId: {}, byDateAndTicketType: {} },
+        capacityFromSheet ?? { byDateId: {}, byDateAndTicketType: {} },
         dates
       ),
       options?.ticketFormats

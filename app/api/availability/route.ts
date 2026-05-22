@@ -1,27 +1,36 @@
 import { NextResponse } from 'next/server'
-import { getAvailability } from '../../../lib/sheets-availability'
+import { buildAvailabilityState } from '../../../lib/availability-state'
+import { getEventConfig } from '../../../lib/event-registry'
+import { getAvailabilityForDates } from '../../../lib/sheets-availability'
 
 export const dynamic = 'force-dynamic'
 
 /**
- * GET /api/availability
- * Returns sold counts and sold-out status per date.
- * Used by UI and checkout for capacity enforcement.
+ * GET /api/availability?eventSlug=turby-event
+ * Returns sold counts and sold-out status per date for the requested event.
  */
-export async function GET() {
-  const availability = await getAvailability()
+export async function GET(request: Request) {
+  const eventSlug = new URL(request.url).searchParams.get('eventSlug') ?? undefined
+  const event = getEventConfig(eventSlug)
+  const availability = await getAvailabilityForDates(event.dates, {
+    ticketFormats: event.ticketFormats,
+  })
+
   if (!availability) {
-    // Sheets not configured – return all dates as available
-    const { eventDates } = await import('../../../content/event-invite.config')
     return NextResponse.json({
-      dates: eventDates.map((d) => ({
+      dates: event.dates.map((d) => ({
         dateId: d.id,
         label: d.label,
         sold: 0,
-        capacity: (d as { capacity?: number }).capacity ?? 999,
+        capacity: d.capacity ?? 999,
         soldOut: false,
       })),
+      ...buildAvailabilityState(null),
     })
   }
-  return NextResponse.json({ dates: availability })
+
+  return NextResponse.json({
+    dates: availability,
+    ...buildAvailabilityState(availability),
+  })
 }

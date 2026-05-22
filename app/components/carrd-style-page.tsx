@@ -11,6 +11,7 @@ import { getTiersForTicketFormat } from '../../lib/event-tiers'
 import { getFormatCapacityState, getMaxSelectableForExperience } from '../../lib/ticket-pool'
 import { getTurbyBookingNotes } from '../../lib/event-messaging'
 import { HeroVideo } from './hero-video'
+import { EventPageTopLinks } from './event-page-top-links'
 import { SiteFooter } from './site-footer'
 
 const STORAGE_KEY = 'teahouse_reservation'
@@ -72,6 +73,8 @@ type CarrdStylePageProps = {
   bookingNotes?: readonly (string | React.ReactNode)[]
   /** First reservation step: experience type before tier selection. */
   ticketFormats?: readonly EventTicketFormat[]
+  /** When true, sheet availability is still loading (Reserve stays disabled). */
+  availabilityLoading?: boolean
 }
 
 const SCROLL_DURATION = 1200
@@ -186,6 +189,7 @@ export function CarrdStylePage({
   heroImage,
   bookingNotes = BOOKING_NOTES,
   ticketFormats,
+  availabilityLoading = false,
 }: CarrdStylePageProps) {
   const singleDateEvent = dates.length === 1
   const usesFormatStep = (ticketFormats?.length ?? 0) > 0
@@ -441,12 +445,23 @@ export function CarrdStylePage({
     })
   }
 
-  const hostSection = hostSectionTitle && hostSectionDescription ? (
-    <section className="w-full max-w-[650px] text-center space-y-4 pt-8">
-      <h3 className="carrd-font-heading carrd-font-h2 italic">{hostSectionTitle}</h3>
-      <p className="carrd-font-body">{hostSectionDescription}</p>
-    </section>
-  ) : null
+  const welcomeAndHostSection = (
+    <div className="carrd-font-body w-full max-w-[650px] space-y-4">
+      <div className="text-left space-y-4">
+        {welcomeContent.split(/\n\n+/).map((para, i) => (
+          <p key={i} className="whitespace-pre-line">
+            {para}
+          </p>
+        ))}
+      </div>
+      {hostSectionTitle && hostSectionDescription ? (
+        <div className="text-center space-y-4">
+          <h3 className="carrd-font-heading carrd-font-h2 italic">{hostSectionTitle}</h3>
+          <p>{hostSectionDescription}</p>
+        </div>
+      ) : null}
+    </div>
+  )
   const sharedMusicBlurb = dates.flatMap((d) => d.musicians).find((line) => line?.trim()) ?? ''
   const reservationSteps = skipDateStep ? ([2, 3] as const) : ([1, 2, 3] as const)
   const panelCount = reservationSteps.length
@@ -529,15 +544,7 @@ export function CarrdStylePage({
 
   return (
     <div className={`carrd-page flex flex-col items-center min-h-screen overflow-x-hidden pt-8${eventSlug === 'turby-event' ? ' carrd-page--daytime' : ''}`}>
-      {/* Top-right link block (scrolls with page, not sticky) */}
-      <div className="w-full flex justify-end px-6 md:px-12 pt-2 md:pt-4">
-        <Link
-          href="/our-story"
-          className="carrd-link carrd-link--muted text-sm whitespace-nowrap hidden md:inline"
-        >
-          Our Story
-        </Link>
-      </div>
+      <EventPageTopLinks />
       {/* Mobile: single column, viewport < 768px */}
       <div className="md:hidden w-full flex-1 min-w-0 overflow-x-hidden max-w-full">
         {!showReservationView ? (
@@ -559,12 +566,7 @@ export function CarrdStylePage({
             <section className="w-full flex flex-col items-center gap-10 text-center">
               <div className="flex flex-col items-center gap-[1em] w-full">
                 <h2 className="carrd-font-heading text-[0.96rem] italic" style={{ letterSpacing: '-2px' }}>{eventTitle}</h2>
-                <div className="carrd-font-body text-left space-y-4 w-full max-w-[650px]">
-                  {welcomeContent.split(/\n\n+/).map((para, i) => (
-                    <p key={i} className="whitespace-pre-line">{para}</p>
-                  ))}
-                </div>
-                {hostSection}
+                {welcomeAndHostSection}
               </div>
               <div className="w-full max-w-[650px] flex flex-col items-center justify-center gap-16 text-center pt-2">
                 <div className="space-y-2">
@@ -584,9 +586,10 @@ export function CarrdStylePage({
               <button
                 type="button"
                 onClick={beginReservation}
-                className="carrd-btn px-10 py-4"
+                disabled={availabilityLoading}
+                className="carrd-btn px-10 py-4 disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Reserve Your Seat
+                {availabilityLoading ? 'Loading…' : 'Reserve Your Seat'}
               </button>
             </section>
             <SiteFooter variant="main" />
@@ -885,14 +888,7 @@ export function CarrdStylePage({
               <h2 className="carrd-font-heading text-[0.96rem] md:text-3xl italic" style={{ letterSpacing: '-2px' }}>
               {eventTitle}
             </h2>
-            <div className="carrd-font-body text-left space-y-4 w-full max-w-[650px]">
-            {welcomeContent.split(/\n\n+/).map((para, i) => (
-              <p key={i} className="whitespace-pre-line">
-                {para}
-              </p>
-            ))}
-            </div>
-            {hostSection}
+            {welcomeAndHostSection}
           </div>
           <div className="w-full max-w-[650px] flex flex-col md:flex-row items-center md:items-start justify-center gap-16 md:gap-28 text-center pt-2">
             <div className="space-y-2">
@@ -929,9 +925,10 @@ export function CarrdStylePage({
                 scrollToSection(joinRef)
               }
             }}
-            className="carrd-btn px-10 py-4"
+            disabled={availabilityLoading}
+            className="carrd-btn px-10 py-4 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Reserve Your Seat
+            {availabilityLoading ? 'Loading…' : 'Reserve Your Seat'}
           </button>
         </section>
 

@@ -40,6 +40,17 @@ const UPCOMING_GATHERINGS = [
     href: '/erstwhere',
     ctaLabel: 'Reserve →',
   },
+  {
+    startsAt: '2026-05-30T11:00:00-07:00',
+    endsAt: '2026-05-30T15:00:00-07:00',
+    monthShort: 'May',
+    dayNum: '30',
+    title: 'Backyard Teahouse at Turby',
+    detailLine: '11am–3pm · The Mission · San Francisco',
+    badge: 'Daytime Teahouse',
+    href: '/turby',
+    ctaLabel: 'Reserve →',
+  },
 ] as const satisfies readonly UpcomingGathering[]
 
 /**
