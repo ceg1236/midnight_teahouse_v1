@@ -70,7 +70,7 @@ const EVENTS: Record<string, EventConfig> = {
   },
   'turby-event': {
     slug: 'turby-event',
-    title: 'Daytime Teahouse at Turby',
+    title: 'Backyard Teahouse at Turby',
     invitePath: '/turby',
     successPath: '/turby/success',
     countdownTarget: Math.floor(new Date('2026-05-30T11:00:00-07:00').getTime() / 1000),
@@ -79,10 +79,10 @@ const EVENTS: Record<string, EventConfig> = {
     timeLabel: '11am-3pm',
     locationLabel: 'The Mission, San Francisco',
     address: '1303A Alabama St, San Francisco',
-    calendarTitle: 'Daytime Teahouse at Turby',
-    calendarDetails: 'Daytime garden teahouse at Turby in the Mission.',
+    calendarTitle: 'Backyard Teahouse at Turby',
+    calendarDetails: 'Backyard teahouse at Turby in the Mission.',
     welcomeContentSlug: 'turby-invite',
-    stripeDescriptionLabel: 'Daytime Teahouse at Turby',
+    stripeDescriptionLabel: 'Backyard Teahouse at Turby',
     hostSectionTitle: 'About our host',
     hostSectionDescription:
       'Turby is a community home shared by nine friends from all walks of life. Their beautiful backyard — featuring a once-functional wind turbine that inspired the house\'s name — has long been a beloved gathering place for friends, families, and neighbors — hosting potlucks, pop-up cafés, concerts, and even a wedding.',

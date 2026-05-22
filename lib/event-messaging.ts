@@ -133,12 +133,12 @@ export function getConfirmationEmailIntro(eventSlug?: string, ticketFormat?: str
   const event = getEventConfig(eventSlug)
   if (event.slug === 'turby-event') {
     if (ticketFormat === 'guided-tasting') {
-      return "We're very excited to welcome you for a guided tasting at 10am—to slow down together, taste premium teas, and enjoy the garden."
+      return "We're very excited to welcome you for a guided tasting at 10am—to slow down together, taste premium teas, and enjoy the backyard."
     }
     if (ticketFormat === 'open-teahouse') {
-      return "We're very excited to welcome you to the open teahouse—to slow down together, enjoy tea and light bites in the garden from 11am."
+      return "We're very excited to welcome you to the open teahouse—to slow down together, enjoy tea and light bites in the backyard from 11am."
     }
-    return "We're very excited to share this day with you—to slow down together, enjoy tea and light bites in the garden."
+    return "We're very excited to share this day with you—to slow down together, enjoy tea and light bites in the backyard."
   }
   if (event.slug === 'special-event') {
     return "We're very excited to share this evening with you—to slow down together, enjoy tea and music, and settle into the parlors at Erstwhere."
