@@ -78,7 +78,7 @@ const EVENTS: Record<string, EventConfig> = {
     dateRangeLabel: 'Saturday, May 30, 2026',
     timeLabel: '11am-3pm',
     locationLabel: 'The Mission, San Francisco',
-    address: '3027 25th St, San Francisco',
+    address: '1303A Alabama St, San Francisco',
     calendarTitle: 'Daytime Teahouse at Turby',
     calendarDetails: 'Daytime garden teahouse at Turby in the Mission.',
     welcomeContentSlug: 'turby-invite',
