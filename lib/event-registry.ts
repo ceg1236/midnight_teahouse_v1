@@ -85,7 +85,7 @@ const EVENTS: Record<string, EventConfig> = {
     stripeDescriptionLabel: 'Daytime Teahouse at Turby',
     hostSectionTitle: 'About our host',
     hostSectionDescription:
-      'Turby is a community house in the Mission that hosts various neighborhood events in their spacious backyard.',
+      'Turby is a community home shared by nine friends from all walks of life. Their beautiful backyard — featuring a once-functional wind turbine that inspired the house\'s name — has long been a beloved gathering place for friends, families, and neighbors — hosting potlucks, pop-up cafés, concerts, and even a wedding.',
     dates: turbyEventDates,
     tiers: turbyEventTiers,
     ticketFormats: turbyTicketFormats,
