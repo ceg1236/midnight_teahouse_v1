@@ -9,6 +9,43 @@ export type PracticalNote = {
 export const TURBY_OUTDOORS_NOTE =
   'The teahouse is outdoors in a half-sunny, half-shaded yard. Bring a hat, sunscreen, and a light jacket (as always in SF).'
 
+export const TURBY_PHONES_NOTE = 'We are a phone and laptop-free space.'
+
+export const TURBY_TEA_NOTE =
+  'Your reservation includes unlimited tea and light tea snacks. We will be serving caffeinated and non-caffeinated teas.'
+
+export const TURBY_TICKETS_NOTE =
+  'Tickets are non-refundable, but feel free to transfer to a friend.'
+
+export const TURBY_ADDRESS_BEFORE_BOOKING = 'The exact address will be shared after reservation.'
+
+export const TURBY_KIDS_NOTE =
+  'This is a kid-friendly gathering! Please feel free to bring your little ones — we’ll have non-caffeinated herbal tisanes for them to enjoy.'
+
+export const TURBY_PETS_NOTE =
+  'Though we love our animal friends, we sadly won’t be able to accommodate pets this time, as there will be delicate teaware throughout the space.'
+
+export const TURBY_OPEN_HOURS_NOTE = 'Doors open at 11am and the teahouse closes at 3pm.'
+
+export const TURBY_TASTING_HOURS_NOTE =
+  'Guided tasting begins at 10am; you’re welcome to stay for the open teahouse until 3pm.'
+
+/** Shown on the Turby checkout step before payment. */
+export function getTurbyBookingNotes(ticketFormat?: string): readonly string[] {
+  const notes: string[] =
+    ticketFormat === 'guided-tasting' ? [TURBY_TASTING_HOURS_NOTE] : [TURBY_OPEN_HOURS_NOTE]
+  notes.push(
+    TURBY_TEA_NOTE,
+    TURBY_PHONES_NOTE,
+    TURBY_TICKETS_NOTE,
+    TURBY_ADDRESS_BEFORE_BOOKING,
+    TURBY_KIDS_NOTE,
+    TURBY_PETS_NOTE,
+    TURBY_OUTDOORS_NOTE
+  )
+  return notes
+}
+
 export function getAddressMapUrl(address: string): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
 }
@@ -22,12 +59,12 @@ export function getExperienceLabel(eventSlug?: string, ticketFormat?: string): s
 
 function getTurbyWhenNote(ticketFormat?: string): string {
   if (ticketFormat === 'guided-tasting') {
-    return 'Your guided tasting begins at 10am. Afterward, you’re welcome to stay for the Open Teahouse until 3pm.'
+    return TURBY_TASTING_HOURS_NOTE
   }
   if (ticketFormat === 'open-teahouse') {
-    return 'Drop in anytime between 11am and 3pm.'
+    return TURBY_OPEN_HOURS_NOTE
   }
-  return 'We’re open from 11am to 3pm. Join us anytime in this window.'
+  return TURBY_OPEN_HOURS_NOTE
 }
 
 export function getEventPracticalNotes(
@@ -57,14 +94,17 @@ export function getEventPracticalNotes(
     },
     {
       label: 'Phones',
-      text: isDaytimeTurby
-        ? 'We invite you to keep phones and laptops tucked away while you’re with us.'
-        : 'We invite you to keep phones and laptops tucked away for the evening.',
+      text: isDaytimeTurby ? TURBY_PHONES_NOTE : 'We invite you to keep phones and laptops tucked away for the evening.',
     }
   )
 
   if (isDaytimeTurby) {
-    notes.push({ label: 'Outdoors', text: TURBY_OUTDOORS_NOTE })
+    notes.push(
+      { label: 'Outdoors', text: TURBY_OUTDOORS_NOTE },
+      { label: 'Kids', text: TURBY_KIDS_NOTE },
+      { label: 'Pets', text: TURBY_PETS_NOTE },
+      { label: 'Tickets', text: TURBY_TICKETS_NOTE }
+    )
   } else {
     notes.push({ label: 'Shoes', text: 'The teahouse is a shoes-free space. Bring cozy socks.' })
   }
@@ -78,9 +118,7 @@ export function getEventPracticalNotes(
 
   notes.push({
     label: 'Tea & food',
-    text: isDaytimeTurby
-      ? 'We will be serving caffeinated and non-caffeinated teas, with light tea snacks.'
-      : 'We will be serving caffeinated and non-caffeinated teas, and some light snacks.',
+    text: isDaytimeTurby ? TURBY_TEA_NOTE : 'We will be serving caffeinated and non-caffeinated teas, and some light snacks.',
   })
 
   return notes
@@ -165,11 +203,35 @@ export function getCalendarDescription(
 }
 
 export function getTurbySuccessWhenLine(ticketFormat?: string): string {
-  if (ticketFormat === 'guided-tasting') {
-    return 'Your guided tasting begins at 10am. You’re welcome to stay for the Open Teahouse until 3pm.'
-  }
+  return getTurbyWhenNote(ticketFormat)
+}
+
+/** Confirmation page only — email and gcal use getEventPracticalNotes. */
+export function getTurbySuccessExperienceLine(ticketFormat?: string): string | undefined {
+  const label = getExperienceLabel('turby-event', ticketFormat)
+  if (!label) return undefined
   if (ticketFormat === 'open-teahouse') {
-    return 'Drop in anytime between 11am and 3pm.'
+    return 'Ticket type: Open Teahouse, 11am'
   }
-  return 'We’re open from 11am to 3pm.'
+  return label
+}
+
+export function getTurbySuccessPageNotes(ticketFormat?: string): PracticalNote[] {
+  const event = getEventConfig('turby-event')
+  const notes = getEventPracticalNotes('turby-event', ticketFormat)
+  const result: PracticalNote[] = [
+    { label: 'Address', text: `Our venue address is ${event.address}.` },
+  ]
+
+  for (const note of notes) {
+    if (note.label === 'Where') continue
+    if (note.label === 'Experience') {
+      const line = getTurbySuccessExperienceLine(ticketFormat)
+      if (line) result.push({ label: 'Ticket type', text: line })
+      continue
+    }
+    result.push(note)
+  }
+
+  return result
 }

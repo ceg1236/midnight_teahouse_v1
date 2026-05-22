@@ -87,6 +87,7 @@ describe('mergeCapacityForTicketFormats', () => {
 describe('isTastingSheetTicketType', () => {
   it('matches current and legacy tasting ticket type labels', () => {
     expect(isTastingSheetTicketType('Tasting')).toBe(true)
+    expect(isTastingSheetTicketType('Tasting Supported')).toBe(true)
     expect(isTastingSheetTicketType('Tasting · Supported $45')).toBe(true)
     expect(isTastingSheetTicketType('Guided Tasting · Tasting')).toBe(true)
     expect(isTastingSheetTicketType('Community')).toBe(false)

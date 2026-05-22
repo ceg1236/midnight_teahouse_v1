@@ -7,10 +7,8 @@ import { getEventConfig } from '../../../lib/event-registry'
 import {
   getCalendarDescription,
   getCalendarEventTitle,
-  getExperienceLabel,
   getGoogleCalendarUrl,
-  getTurbySuccessWhenLine,
-  TURBY_OUTDOORS_NOTE,
+  getTurbySuccessPageNotes,
 } from '../../../lib/event-messaging'
 
 const STORAGE_KEY = 'teahouse_reservation'
@@ -28,8 +26,7 @@ function TurbyEventSuccessContent() {
   const ticketFormat = searchParams.get('ticket_format') ?? undefined
   const selectedDate = dateId ? event.dates.find((d) => d.id === dateId) : event.dates[0]
   const dateLabel = selectedDate?.label ?? selectedDate?.dateTime ?? event.dateRangeLabel
-  const experienceLabel = getExperienceLabel(event.slug, ticketFormat)
-  const whenLine = getTurbySuccessWhenLine(ticketFormat)
+  const successNotes = getTurbySuccessPageNotes(ticketFormat)
   const firstName = getFirstName(name)
 
   useEffect(() => {
@@ -37,7 +34,7 @@ function TurbyEventSuccessContent() {
   }, [])
 
   return (
-    <div className="carrd-page flex min-h-[100dvh] flex-col items-center justify-center px-6 md:min-h-screen">
+    <div className="carrd-page carrd-page--daytime flex min-h-[100dvh] flex-col items-center justify-center px-6 md:min-h-screen">
       <div className="mx-auto flex max-w-md flex-col items-center gap-8 text-center">
         <h1 className="carrd-font-heading text-[2rem] md:text-[2.5rem] font-semibold [font-variant:small-caps] tracking-wide text-[#FAEBD4]">
           See you at the Teahouse
@@ -49,27 +46,11 @@ function TurbyEventSuccessContent() {
             </p>
           ) : null}
           <div className="flex flex-col gap-2 w-full">
-            {experienceLabel ? (
-              <>
-                <p className="text-[11px] uppercase tracking-[0.05em] text-[#D9D0BF]">
-                  Experience
-                </p>
-                <p className="text-[18.4px] font-medium text-[#FAE0B9] font-cursive">
-                  {experienceLabel}
-                </p>
-              </>
-            ) : null}
-            <p className="text-[11px] uppercase tracking-[0.05em] text-[#D9D0BF] mt-3">
+            <p className="text-[11px] uppercase tracking-[0.05em] text-[#D9D0BF]">
               Date
             </p>
             <p className="text-[18.4px] font-medium text-[#FAE0B9] font-cursive">
               {dateLabel}
-            </p>
-            <p className="text-[11px] uppercase tracking-[0.05em] text-[#D9D0BF] mt-3">
-              Location
-            </p>
-            <p className="text-[18.4px] font-medium text-[#FAE0B9] font-cursive">
-              {event.address}
             </p>
           </div>
           <div className="flex flex-col gap-2 text-left w-full">
@@ -79,12 +60,19 @@ function TurbyEventSuccessContent() {
             <p className="text-[16px] leading-[1.55] text-[#FAEBD4]">
               We are excited to share this day with you.
             </p>
-            <p className="text-[16px] leading-[1.55] text-[#FAEBD4]">
-              {whenLine}
-            </p>
-            <p className="text-[16px] leading-[1.55] text-[#FAEBD4]">
-              {TURBY_OUTDOORS_NOTE}
-            </p>
+            <div className="flex flex-col gap-3 pt-1">
+              <p className="text-[11px] uppercase tracking-[0.05em] text-[#D9D0BF]">
+                A few things to note
+              </p>
+              <ul className="list-disc space-y-2 pl-5 text-[16px] leading-[1.55] text-[#FAEBD4]">
+                {successNotes.map((note) => (
+                  <li key={note.label}>
+                    <span className="sr-only">{note.label}: </span>
+                    {note.text}
+                  </li>
+                ))}
+              </ul>
+            </div>
             <p className="text-[16px] leading-[1.55] text-[#FAEBD4]">
               We&apos;ve sent a confirmation email with your ticket details and venue info.
               Please check your inbox — and your Promotions folder if you use Gmail.
@@ -122,7 +110,7 @@ function TurbyEventSuccessContent() {
 export default function TurbyEventSuccessPage() {
   return (
     <Suspense fallback={
-      <div className="carrd-page flex min-h-[100dvh] flex-col items-center justify-center px-6 md:min-h-screen">
+      <div className="carrd-page carrd-page--daytime flex min-h-[100dvh] flex-col items-center justify-center px-6 md:min-h-screen">
         <div className="carrd-font-body text-[#FAEBD4]">Loading...</div>
       </div>
     }>

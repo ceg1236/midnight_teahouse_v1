@@ -8,6 +8,7 @@ export function isTastingSheetTicketType(ticketType: string): boolean {
   const t = ticketType.trim()
   if (!t) return false
   if (t === 'Tasting') return true
+  if (t.startsWith('Tasting Supported')) return true
   if (t.startsWith('Tasting ·')) return true
   if (t.includes('Guided Tasting')) return true
   return false

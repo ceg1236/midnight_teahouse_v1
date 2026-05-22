@@ -87,7 +87,7 @@ export default function OurStoryPage() {
           </div>
 
           <Link
-            href="/invite"
+            href="/"
             className="carrd-btn px-8 py-3 mt-4 inline-block"
           >
             Join Our Gatherings

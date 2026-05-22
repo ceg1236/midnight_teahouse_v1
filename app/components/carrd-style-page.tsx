@@ -9,6 +9,7 @@ import { resolveDoorDate } from '../../lib/door-date'
 import { getSupportedPriceBounds, isSupportedPriceInRange } from '../../lib/supported-tier-price'
 import { getTiersForTicketFormat } from '../../lib/event-tiers'
 import { getFormatCapacityState, getMaxSelectableForExperience } from '../../lib/ticket-pool'
+import { getTurbyBookingNotes } from '../../lib/event-messaging'
 import { HeroVideo } from './hero-video'
 import { SiteFooter } from './site-footer'
 
@@ -232,6 +233,13 @@ export function CarrdStylePage({
   const reservationHeaderRef = useRef<HTMLHeadingElement>(null)
   const mobileReservationHeaderRef = useRef<HTMLHeadingElement>(null)
   const reservationInitializedRef = useRef(false)
+
+  const checkoutBookingNotes = useMemo(() => {
+    if (eventSlug === 'turby-event') {
+      return getTurbyBookingNotes(selectedTicketFormat ?? undefined)
+    }
+    return bookingNotes
+  }, [eventSlug, selectedTicketFormat, bookingNotes])
 
   useEffect(() => {
     const persisted = loadPersisted(dates, tiers)
@@ -520,7 +528,7 @@ export function CarrdStylePage({
   }
 
   return (
-    <div className="carrd-page flex flex-col items-center min-h-screen overflow-x-hidden pt-8">
+    <div className={`carrd-page flex flex-col items-center min-h-screen overflow-x-hidden pt-8${eventSlug === 'turby-event' ? ' carrd-page--daytime' : ''}`}>
       {/* Top-right link block (scrolls with page, not sticky) */}
       <div className="w-full flex justify-end px-6 md:px-12 pt-2 md:pt-4">
         <Link
@@ -710,9 +718,9 @@ export function CarrdStylePage({
                           </div>
                           {qty > 0 ? (
                             <div className="flex items-center justify-center gap-2">
-                              <button type="button" onClick={() => handleQuantityChange(t.id, -1)} className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg" aria-label={`Decrease ${t.label}`}>−</button>
+                              <button type="button" onClick={() => handleQuantityChange(t.id, -1)} className="carrd-qty-btn flex h-11 w-11 items-center justify-center text-lg" aria-label={`Decrease ${t.label}`}>−</button>
                               <span className="w-8 text-center text-lg tabular-nums text-[#FAEBD4]">{qty}</span>
-                              <button type="button" onClick={() => handleQuantityChange(t.id, 1)} disabled={totalQuantity >= maxSelectableTickets} className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg disabled:opacity-40" aria-label={`Increase ${t.label}`}>+</button>
+                              <button type="button" onClick={() => handleQuantityChange(t.id, 1)} disabled={totalQuantity >= maxSelectableTickets} className="carrd-qty-btn flex h-11 w-11 items-center justify-center text-lg disabled:opacity-40" aria-label={`Increase ${t.label}`}>+</button>
                             </div>
                           ) : null}
                           {qty === 0 && (
@@ -745,9 +753,9 @@ export function CarrdStylePage({
                               <input type="number" min={supportedMin} max={supportedMax} value={supportedPriceInput} placeholder={supportedPriceRangeLabel} onChange={(e) => { const raw = e.target.value; setSupportedPriceInput(raw); const v = parseInt(raw, 10); if (!isNaN(v) && isSupportedPriceInRange(activeTiers, v)) setSupportedPrice(v); else if (raw === '') setSelections((prev) => { const n = { ...prev }; delete n.supported; return n }); }} onBlur={() => { const v = parseInt(supportedPriceInput, 10); if (!isNaN(v) && isSupportedPriceInRange(activeTiers, v)) { setSupportedPrice(v); setSupportedPriceInput(String(v)) } else if (supportedPriceInput === '') setSelections((prev) => { const n = { ...prev }; delete n.supported; return n }); else setSupportedPriceInput(String(supportedPrice)) }} className="carrd-font-body flex-1 min-w-0 py-2.5 px-3 text-lg bg-[#2E0303]/40 rounded-lg border border-[#FAE0B9]/30 text-[#FAEBD4] focus:outline-none focus:border-[#FAE0B9]/60 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
                             </div>
                             <div className="flex items-center justify-center gap-2">
-                              <button type="button" onClick={() => handleQuantityChange('supported', -1)} className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg" aria-label="Decrease Supported">−</button>
+                              <button type="button" onClick={() => handleQuantityChange('supported', -1)} className="carrd-qty-btn flex h-11 w-11 items-center justify-center text-lg" aria-label="Decrease Supported">−</button>
                               <span className="w-8 text-center text-lg tabular-nums text-[#FAEBD4]">{selections['supported'] ?? 0}</span>
-                              <button type="button" onClick={() => handleQuantityChange('supported', 1)} disabled={totalQuantity >= maxSelectableTickets} className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg disabled:opacity-40" aria-label="Increase Supported">+</button>
+                              <button type="button" onClick={() => handleQuantityChange('supported', 1)} disabled={totalQuantity >= maxSelectableTickets} className="carrd-qty-btn flex h-11 w-11 items-center justify-center text-lg disabled:opacity-40" aria-label="Increase Supported">+</button>
                             </div>
                           </div>
                         ) : null}
@@ -812,7 +820,7 @@ export function CarrdStylePage({
                   <div className="w-full max-w-full min-w-0 text-left px-4 md:px-0">
                     <p className="carrd-font-body text-base font-medium mb-1.5">A few things to note before booking:</p>
                     <ul className="carrd-font-body text-base space-y-1.5 list-none pl-0 leading-snug">
-                      {bookingNotes.map((item, i) => (
+                      {checkoutBookingNotes.map((item, i) => (
                         <li key={i} className="flex items-center gap-2"><span className="text-[#D9D0BF] w-1.5 h-1.5 rounded-full bg-[#D9D0BF] shrink-0" aria-hidden /><span className="flex-1 min-w-0 text-[#D9D0BF]/95">{item}</span></li>
                       ))}
                     </ul>
@@ -1147,7 +1155,7 @@ export function CarrdStylePage({
                             <button
                               type="button"
                               onClick={() => handleQuantityChange(t.id, -1)}
-                              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg transition-colors hover:bg-[#FAE0B9]/25 active:bg-[#FAE0B9]/30"
+                              className="carrd-qty-btn flex h-11 w-11 items-center justify-center text-lg transition-colors"
                               aria-label={`Decrease ${t.label} quantity`}
                             >
                               −
@@ -1156,7 +1164,7 @@ export function CarrdStylePage({
                             <button
                               type="button"
                               onClick={() => handleQuantityChange(t.id, 1)}
-                              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg transition-colors hover:bg-[#FAE0B9]/25 active:bg-[#FAE0B9]/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#D9D0BF]/20"
+                              className="carrd-qty-btn flex h-11 w-11 items-center justify-center text-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                               disabled={totalQuantity >= maxSelectableTickets}
                               aria-label={`Increase ${t.label} quantity`}
                             >
@@ -1240,7 +1248,7 @@ export function CarrdStylePage({
                           <button
                             type="button"
                             onClick={() => handleQuantityChange('supported', -1)}
-                            className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg transition-colors hover:bg-[#FAE0B9]/25"
+                            className="carrd-qty-btn flex h-11 w-11 items-center justify-center text-lg transition-colors"
                             aria-label="Decrease Supported quantity"
                           >
                             −
@@ -1251,7 +1259,7 @@ export function CarrdStylePage({
                             <button
                               type="button"
                               onClick={() => handleQuantityChange('supported', 1)}
-                              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D9D0BF]/20 text-[#FAEBD4] text-lg transition-colors hover:bg-[#FAE0B9]/25 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#D9D0BF]/20"
+                              className="carrd-qty-btn flex h-11 w-11 items-center justify-center text-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                               disabled={totalQuantity >= maxSelectableTickets}
                               aria-label="Increase Supported quantity"
                             >
@@ -1310,7 +1318,7 @@ export function CarrdStylePage({
                               <button
                                 type="button"
                                 onClick={() => handleQuantityChange(t.id, -1)}
-                                className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-sm transition-colors hover:bg-[#FAE0B9]/30"
+                                className="carrd-qty-btn flex h-7 w-7 items-center justify-center text-sm transition-colors"
                                 aria-label={`Decrease ${t.label} quantity`}
                               >
                                 −
@@ -1319,7 +1327,7 @@ export function CarrdStylePage({
                               <button
                                 type="button"
                                 onClick={() => handleQuantityChange(t.id, 1)}
-                                className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-sm transition-colors hover:bg-[#FAE0B9]/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                                className="carrd-qty-btn flex h-7 w-7 items-center justify-center text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                                 disabled={totalQuantity >= maxSelectableTickets}
                                 aria-label={`Increase ${t.label} quantity`}
                               >
@@ -1414,7 +1422,7 @@ export function CarrdStylePage({
                           <button
                             type="button"
                             onClick={() => handleQuantityChange('supported', -1)}
-                            className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-sm transition-colors hover:bg-[#FAE0B9]/30"
+                            className="carrd-qty-btn flex h-7 w-7 items-center justify-center text-sm transition-colors"
                             aria-label="Decrease Supported quantity"
                           >
                             −
@@ -1425,7 +1433,7 @@ export function CarrdStylePage({
                           <button
                             type="button"
                             onClick={() => handleQuantityChange('supported', 1)}
-                            className="flex h-7 w-7 items-center justify-center rounded-full bg-[#D9D0BF]/25 text-[#FAEBD4] text-sm transition-colors hover:bg-[#FAE0B9]/30 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                            className="carrd-qty-btn flex h-7 w-7 items-center justify-center text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                             disabled={totalQuantity >= maxSelectableTickets}
                             aria-label="Increase Supported quantity"
                           >
@@ -1608,7 +1616,7 @@ export function CarrdStylePage({
               <div className="w-full max-w-[650px] text-left mt-6 px-4 md:px-0">
                 <p className="carrd-font-body text-sm font-medium mb-1.5">A few things to note before booking:</p>
                 <ul className="carrd-font-body text-base space-y-1 list-none pl-0 leading-tight">
-                  {bookingNotes.map((item, i) => (
+                  {checkoutBookingNotes.map((item, i) => (
                     <li key={i} className="flex items-center gap-2">
                       <span className="text-[#D9D0BF] w-1.5 h-1.5 rounded-full bg-[#D9D0BF] shrink-0 flex-shrink-0" aria-hidden />
                       <span className="flex-1 min-w-0 text-[#D9D0BF]/95">{item}</span>

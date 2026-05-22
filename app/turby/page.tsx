@@ -7,12 +7,6 @@ export const dynamic = 'force-dynamic'
 
 const TURBY_HERO_IMAGE = '/images/xf_flowers_tea/xf_teacup.jpg'
 
-const TURBY_BOOKING_NOTES = [
-  'Reservation includes unlimited tea and light tea snacks.',
-  'We invite you to keep phones and laptops tucked away while you’re with us.',
-  'The teahouse is outdoors in a half-sunny, half-shaded yard. Bring a hat, sunscreen, and a light jacket (as always in SF).',
-]
-
 function firstString(v: string | string[] | undefined): string | undefined {
   if (v == null) return undefined
   return Array.isArray(v) ? v[0] : v
@@ -83,7 +77,6 @@ export default async function TurbyEventPage({
       ticketPoolByDateId={ticketPoolByDateId}
       initialTicket={ticket ?? undefined}
       heroImage={TURBY_HERO_IMAGE}
-      bookingNotes={TURBY_BOOKING_NOTES}
       ticketFormats={eventConfig.ticketFormats}
     />
   )

@@ -31,24 +31,20 @@ function formatTierOrder(orderStr: string, tierLabels: Record<string, string>): 
   return Array.from(new Set(parts)).join(', ') || ''
 }
 
-/** Ticket Type column (Payments + Guestlist) — reporting labels, not checkout UI copy. */
+/** Ticket Type column (Payments + Guestlist) — tier labels only; amount paid is column F. */
 export function formatSheetTicketType(
   orderStr: string,
   tiers: readonly EventTier[],
   ticketFormat?: string,
-  supportedPrice?: string | number
+  _supportedPrice?: string | number
 ): string {
   const parts: string[] = []
-  const priceSuffix =
-    supportedPrice != null && supportedPrice !== ''
-      ? `$${String(supportedPrice).replace(/^\$/, '')}`
-      : undefined
 
   for (const pair of orderStr.split(',')) {
     const [tierId] = pair.split(':')
     if (!tierId) continue
     const tier = tiers.find((t) => t.id === tierId)
-    parts.push(sheetLabelForTier(tierId, tier?.label ?? tierId, ticketFormat, priceSuffix))
+    parts.push(sheetLabelForTier(tierId, tier?.label ?? tierId, ticketFormat))
   }
 
   return Array.from(new Set(parts)).join(', ') || ''
@@ -57,19 +53,12 @@ export function formatSheetTicketType(
 function sheetLabelForTier(
   tierId: string,
   tierLabel: string,
-  ticketFormat?: string,
-  supportedPrice?: string
+  ticketFormat?: string
 ): string {
   if (ticketFormat === 'guided-tasting') {
     if (tierId === 'tasting') return 'Tasting'
-    if (tierId === 'supported') {
-      return supportedPrice ? `Tasting · Supported ${supportedPrice}` : 'Tasting · Supported'
-    }
+    if (tierId === 'supported') return 'Tasting Supported'
     return tierLabel
-  }
-
-  if (tierId === 'supported' && supportedPrice) {
-    return `Supported ${supportedPrice}`
   }
 
   return tierLabel

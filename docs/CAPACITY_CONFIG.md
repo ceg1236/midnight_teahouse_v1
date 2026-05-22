@@ -40,8 +40,8 @@ A full Open Teahouse does **not** block tasting sales, and a full tasting sessio
 
 | Pool | Ticket type labels |
 |------|-------------------|
-| **tasting** | `Tasting`, `Tasting · Supported $X`, legacy `Guided Tasting · …` |
-| **standard** | `Community`, `Supporter`, `Supported $X`, etc. (anything that is not tasting) |
+| **tasting** | `Tasting`, `Tasting Supported`, legacy `Tasting · Supported`, `Guided Tasting · …` |
+| **standard** | `Community`, `Supporter`, `Supported`, etc. (anything that is not tasting) |
 
 ## Fallback
 

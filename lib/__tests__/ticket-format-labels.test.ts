@@ -12,17 +12,17 @@ describe('formatSheetTicketType', () => {
     expect(formatSheetTicketType('patron:1', openTiers, 'open-teahouse')).toBe('Supporter')
   })
 
-  it('includes chosen price for open teahouse supported tickets', () => {
-    expect(formatSheetTicketType('supported:1', openTiers, 'open-teahouse', 20)).toBe('Supported $20')
+  it('uses tier label for open teahouse supported tickets (price is in Amount paid)', () => {
+    expect(formatSheetTicketType('supported:1', openTiers, 'open-teahouse', 20)).toBe('Supported')
   })
 
   it('writes tasting category for guided tasting full-price tickets', () => {
     expect(formatSheetTicketType('tasting:1', tastingTiers, 'guided-tasting')).toBe('Tasting')
   })
 
-  it('writes tasting supported label with chosen price for guided tasting', () => {
+  it('writes tasting supported label without price for guided tasting', () => {
     expect(formatSheetTicketType('supported:1', tastingTiers, 'guided-tasting', 45)).toBe(
-      'Tasting · Supported $45'
+      'Tasting Supported'
     )
   })
 })
