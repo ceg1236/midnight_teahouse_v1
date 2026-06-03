@@ -23,7 +23,7 @@ TEST_GOOGLE_CREDENTIALS_JSON={"type":"service_account",...}
 
 ## 2) Start app + Stripe listener
 
-One command starts Next.js and `stripe listen` (requires [Stripe CLI](https://stripe.com/docs/stripe-cli)):
+One command starts Next.js and `stripe listen` (requires [Stripe CLI](https://stripe.com/docs/stripe-cli)). The dev script reads `.env.local` and passes `TEST_STRIPE_SECRET_KEY` (or `STRIPE_SECRET_KEY`) to the CLI so an expired `stripe login` session does not block the app. If webhook forwarding fails, Next.js still starts — fix the key or run `stripe login` again.
 
 ```bash
 pnpm dev

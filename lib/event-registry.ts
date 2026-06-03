@@ -1,11 +1,17 @@
 import { eventDates, eventTiers } from '../content/event-invite.config'
+import { midsummerEventDates, midsummerEventTiers } from '../content/midsummer-event.config'
 import { specialEventDates, specialEventTiers } from '../content/special-event.config'
 import { turbyEventDates, turbyEventTiers, turbyTicketFormats } from '../content/turby-event.config'
 import type { EventDate, EventTicketFormat, EventTier } from '../content/event-schema'
 
+export type EventTheme = 'daytime' | 'midsummer' | 'evening'
+
 export type EventConfig = {
   slug: string
   title: string
+  eventTheme?: EventTheme
+  /** Static hero image instead of looping video. */
+  heroImage?: string
   invitePath: string
   successPath: string
   countdownTarget: number
@@ -70,6 +76,7 @@ const EVENTS: Record<string, EventConfig> = {
   },
   'turby-event': {
     slug: 'turby-event',
+    eventTheme: 'daytime',
     title: 'Backyard Teahouse at Turby',
     invitePath: '/turby',
     successPath: '/turby/success',
@@ -90,6 +97,41 @@ const EVENTS: Record<string, EventConfig> = {
     tiers: turbyEventTiers,
     ticketFormats: turbyTicketFormats,
   },
+  'midsummer-event': {
+    slug: 'midsummer-event',
+    eventTheme: 'midsummer',
+    heroImage: '/images/midsummer_washburn.avif',
+    title: 'Midsummer Dream',
+    invitePath: '/midsummer',
+    successPath: '/midsummer/success',
+    countdownTarget: Math.floor(new Date('2026-06-25T19:00:00-07:00').getTime() / 1000),
+    showCountdown: false,
+    dateRangeLabel: 'June 25-27, 2026',
+    timeLabel: '7-11pm',
+    locationLabel: 'SoMa, San Francisco',
+    address: '54 Washburn st, San Francisco',
+    calendarTitle: 'Midsummer Dream',
+    calendarDetails: 'An enchanted world hidden in San Francisco',
+    welcomeContentSlug: 'midsummer-invite',
+    stripeDescriptionLabel: 'Midsummer Dream',
+    hostSectionTitle: 'About our space',
+    hostSectionDescription:
+      'Our teahouse is a hidden gathering place in SoMa — a shoe-free parlor and rooftop where we host slow evenings of tea, music, and conversation.',
+    dates: midsummerEventDates,
+    tiers: midsummerEventTiers,
+  },
+}
+
+export function isDaytimeEvent(slug?: string): boolean {
+  if (!slug) return false
+  return EVENTS[slug]?.eventTheme === 'daytime'
+}
+
+export function getCarrdPageThemeClass(slug?: string): string {
+  const theme = slug ? EVENTS[slug]?.eventTheme : undefined
+  if (theme === 'daytime') return ' carrd-page--daytime'
+  if (theme === 'midsummer') return ' carrd-page--midsummer'
+  return ''
 }
 
 export function getEventConfig(slug?: string): EventConfig {

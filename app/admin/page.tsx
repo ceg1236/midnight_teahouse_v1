@@ -8,6 +8,7 @@ const EVENT_OPTIONS = [
   getEventConfig('crossing-into-spring'),
   getEventConfig('special-event'),
   getEventConfig('turby-event'),
+  getEventConfig('midsummer-event'),
 ]
 
 export default function AdminPage() {

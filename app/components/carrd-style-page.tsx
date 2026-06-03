@@ -9,7 +9,8 @@ import { resolveDoorDate } from '../../lib/door-date'
 import { getSupportedPriceBounds, isSupportedPriceInRange } from '../../lib/supported-tier-price'
 import { getTiersForTicketFormat } from '../../lib/event-tiers'
 import { getFormatCapacityState, getMaxSelectableForExperience } from '../../lib/ticket-pool'
-import { getTurbyBookingNotes } from '../../lib/event-messaging'
+import { getDaytimeBookingNotes } from '../../lib/event-messaging'
+import { getCarrdPageThemeClass, isDaytimeEvent } from '../../lib/event-registry'
 import { HeroVideo } from './hero-video'
 import { EventPageTopLinks } from './event-page-top-links'
 import { SiteFooter } from './site-footer'
@@ -239,8 +240,8 @@ export function CarrdStylePage({
   const reservationInitializedRef = useRef(false)
 
   const checkoutBookingNotes = useMemo(() => {
-    if (eventSlug === 'turby-event') {
-      return getTurbyBookingNotes(selectedTicketFormat ?? undefined)
+    if (isDaytimeEvent(eventSlug)) {
+      return getDaytimeBookingNotes(selectedTicketFormat ?? undefined)
     }
     return bookingNotes
   }, [eventSlug, selectedTicketFormat, bookingNotes])
@@ -283,7 +284,9 @@ export function CarrdStylePage({
     reservationInitializedRef.current = true
 
     if (payload) {
-      setShowReservationView(true)
+      if (typeof window !== 'undefined' && window.innerWidth < 768) {
+        setShowReservationView(true)
+      }
       const hasSelection = Object.values(selections).some((q) => q > 0)
       if (date && hasSelection) setReservationStep(3)
       else if (date) setReservationStep(2)
@@ -311,7 +314,7 @@ export function CarrdStylePage({
   }, [hydrated, selectedDate, selections, formData])
 
   useEffect(() => {
-    if (showReservationView) {
+    if (showReservationView && typeof window !== 'undefined' && window.innerWidth < 768) {
       requestAnimationFrame(() => {
         window.scrollTo({ top: 0, behavior: 'auto' })
       })
@@ -523,7 +526,9 @@ export function CarrdStylePage({
     } else {
       setReservationStep(1)
     }
-    setShowReservationView(true)
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setShowReservationView(true)
+    }
   }
 
   const handleReservationBack = () => {
@@ -543,7 +548,7 @@ export function CarrdStylePage({
   }
 
   return (
-    <div className={`carrd-page flex flex-col items-center min-h-screen overflow-x-hidden pt-8${eventSlug === 'turby-event' ? ' carrd-page--daytime' : ''}`}>
+    <div className={`carrd-page flex flex-col items-center min-h-screen overflow-x-hidden pt-8${getCarrdPageThemeClass(eventSlug)}`}>
       <EventPageTopLinks />
       {/* Mobile: single column, viewport < 768px */}
       <div className="md:hidden w-full flex-1 min-w-0 overflow-x-hidden max-w-full">
@@ -948,7 +953,7 @@ export function CarrdStylePage({
           </div>
           <div className="flex items-start justify-between w-full">
             <div className="flex-1 flex justify-start min-w-0">
-              {(reservationStep > 1 || showReservationView) && (
+              {reservationStep > 1 && (
                 <button
                   type="button"
                   onClick={handleReservationBack}
