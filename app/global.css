@@ -796,102 +796,186 @@ html::-webkit-scrollbar {
       rgba(196, 184, 168, 0.16) 100%
     );
 }
+
+/* Midsummer Washburn: amber-gold + sage lifted from hero photography */
+.carrd-page--midsummer {
+  color: #3d2e24;
+  --carrd-daytime-bg-top: #f7efe6;
+  --carrd-daytime-bg-mid: #f0e2d0;
+  --carrd-daytime-bg-soft: #e8d4b4;
+  --carrd-daytime-bg-bottom: #d8e2dc;
+  --carrd-daytime-text: #3d2e24;
+  --carrd-daytime-text-soft: #4d3828;
+  --carrd-daytime-muted: #6b5040;
+  --carrd-daytime-accent: #9a6530;
+  --carrd-daytime-link: #7d5632;
+  --carrd-daytime-link-hover: #4d3828;
+  --carrd-daytime-border: rgba(122, 86, 50, 0.35);
+}
+.carrd-page--midsummer::before {
+  background: linear-gradient(
+    180deg,
+    var(--carrd-daytime-bg-top) 0%,
+    var(--carrd-daytime-bg-mid) 34%,
+    var(--carrd-daytime-bg-soft) 68%,
+    #ded0b8 88%,
+    var(--carrd-daytime-bg-bottom) 100%
+  );
+}
+.carrd-page--midsummer .carrd-video-fade::after {
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(247, 239, 230, 0) 0%,
+      rgba(240, 226, 208, 0.3) 52%,
+      rgba(232, 212, 180, 0.72) 84%,
+      var(--carrd-daytime-bg-soft) 100%
+    ),
+    radial-gradient(
+      ellipse 88% 78% at 50% 46%,
+      transparent 44%,
+      rgba(181, 126, 64, 0.14) 100%
+    );
+}
 .carrd-page--daytime .carrd-font-heading,
+.carrd-page--midsummer .carrd-font-heading,
 .carrd-page--daytime .carrd-font-heading-sm,
+.carrd-page--midsummer .carrd-font-heading-sm,
 .carrd-page--daytime .carrd-accent-color,
+.carrd-page--midsummer .carrd-accent-color,
 .carrd-page--daytime .carrd-font-body.carrd-accent-color,
-.carrd-page--daytime .our-story-subheading {
+.carrd-page--midsummer .carrd-font-body.carrd-accent-color,
+.carrd-page--daytime .our-story-subheading,
+.carrd-page--midsummer .our-story-subheading {
   color: var(--carrd-daytime-accent);
 }
 .carrd-page--daytime .carrd-font-h2,
+.carrd-page--midsummer .carrd-font-h2,
 .carrd-page--daytime .carrd-font-body,
+.carrd-page--midsummer .carrd-font-body,
 .carrd-page--daytime .carrd-font-body-light,
-.carrd-page--daytime .carrd-font-intro {
+.carrd-page--midsummer .carrd-font-body-light,
+.carrd-page--daytime .carrd-font-intro,
+.carrd-page--midsummer .carrd-font-intro {
   color: var(--carrd-daytime-text-soft);
 }
 .carrd-page--daytime .carrd-font-label,
+.carrd-page--midsummer .carrd-font-label,
 .carrd-page--daytime .carrd-font-subtitle,
+.carrd-page--midsummer .carrd-font-subtitle,
 .carrd-page--daytime .carrd-font-muted,
-.carrd-page--daytime .carrd-link {
+.carrd-page--midsummer .carrd-font-muted,
+.carrd-page--daytime .carrd-link,
+.carrd-page--midsummer .carrd-link {
   color: var(--carrd-daytime-muted);
 }
 .carrd-page--daytime .carrd-link:hover,
-.carrd-page--daytime .carrd-link--muted:hover {
+.carrd-page--midsummer .carrd-link:hover,
+.carrd-page--daytime .carrd-link--muted:hover,
+.carrd-page--midsummer .carrd-link--muted:hover {
   color: var(--carrd-daytime-link-hover);
 }
-.carrd-page--daytime .carrd-link--muted {
+.carrd-page--daytime .carrd-link--muted,
+.carrd-page--midsummer .carrd-link--muted {
   color: var(--carrd-daytime-link);
 }
-.carrd-page--daytime .carrd-btn {
+.carrd-page--daytime .carrd-btn,
+.carrd-page--midsummer .carrd-btn {
   color: var(--carrd-daytime-link-hover);
   border-color: var(--carrd-daytime-link);
 }
-.carrd-page--daytime .carrd-btn:hover:not(:disabled) {
+.carrd-page--daytime .carrd-btn:hover:not(:disabled),
+.carrd-page--midsummer .carrd-btn:hover:not(:disabled) {
   background-color: rgba(107, 83, 68, 0.1);
   box-shadow: 0 0 12px rgba(107, 83, 68, 0.14);
 }
-.carrd-page--daytime .carrd-mobile-pill {
+.carrd-page--daytime .carrd-mobile-pill,
+.carrd-page--midsummer .carrd-mobile-pill {
   border-color: var(--carrd-daytime-border);
   background: rgba(255, 252, 247, 0.45);
 }
 .carrd-page--daytime .carrd-mobile-pill:active,
-.carrd-page--daytime .carrd-mobile-pill.carrd-mobile-pill--selected {
+.carrd-page--midsummer .carrd-mobile-pill:active,
+.carrd-page--daytime .carrd-mobile-pill.carrd-mobile-pill--selected,
+.carrd-page--midsummer .carrd-mobile-pill.carrd-mobile-pill--selected {
   background: rgba(107, 83, 68, 0.08);
   border-color: rgba(107, 83, 68, 0.45);
 }
-.carrd-page--daytime .carrd-mobile-pill-select {
+.carrd-page--daytime .carrd-mobile-pill-select,
+.carrd-page--midsummer .carrd-mobile-pill-select {
   color: var(--carrd-daytime-link-hover);
   border-color: var(--carrd-daytime-link);
 }
 .carrd-page--daytime .carrd-mobile-pill-select:hover,
-.carrd-page--daytime .carrd-mobile-pill-select.carrd-mobile-pill-select--selected {
+.carrd-page--midsummer .carrd-mobile-pill-select:hover,
+.carrd-page--daytime .carrd-mobile-pill-select.carrd-mobile-pill-select--selected,
+.carrd-page--midsummer .carrd-mobile-pill-select.carrd-mobile-pill-select--selected {
   background: rgba(107, 83, 68, 0.08);
 }
 .carrd-page--daytime .carrd-divider-solid,
-.carrd-page--daytime .carrd-divider {
+.carrd-page--midsummer .carrd-divider-solid,
+.carrd-page--daytime .carrd-divider,
+.carrd-page--midsummer .carrd-divider {
   background-color: rgba(107, 83, 68, 0.28);
   background-image: radial-gradient(circle, rgba(107, 83, 68, 0.35) 1px, transparent 1px);
 }
-.carrd-page--daytime .carrd-reservation-card {
+.carrd-page--daytime .carrd-reservation-card,
+.carrd-page--midsummer .carrd-reservation-card {
   border-color: var(--carrd-daytime-border);
 }
 .carrd-page--daytime input:-webkit-autofill,
+.carrd-page--midsummer input:-webkit-autofill,
 .carrd-page--daytime input:-webkit-autofill:hover,
+.carrd-page--midsummer input:-webkit-autofill:hover,
 .carrd-page--daytime input:-webkit-autofill:focus,
-.carrd-page--daytime input:-webkit-autofill:active {
+.carrd-page--midsummer input:-webkit-autofill:focus,
+.carrd-page--daytime input:-webkit-autofill:active,
+.carrd-page--midsummer input:-webkit-autofill:active {
   -webkit-box-shadow: inset 0 0 0 1000px rgba(255, 252, 247, 0.92);
   box-shadow: inset 0 0 0 1000px rgba(255, 252, 247, 0.92);
   -webkit-text-fill-color: var(--carrd-daytime-text);
   color: var(--carrd-daytime-text);
 }
 .carrd-page--daytime [class*='text-[#FAEBD4]'],
+.carrd-page--midsummer [class*='text-[#FAEBD4]'],
 .carrd-page--daytime [class*='text-[#FAE9D8]'],
-.carrd-page--daytime [class*='text-[#F7EFE2]'] {
+.carrd-page--midsummer [class*='text-[#FAE9D8]'],
+.carrd-page--daytime [class*='text-[#F7EFE2]'],
+.carrd-page--midsummer [class*='text-[#F7EFE2]'] {
   color: var(--carrd-daytime-text-soft) !important;
 }
 .carrd-page--daytime [class*='text-[#D9D0BF]'],
-.carrd-page--daytime [class*='text-[#D8CFBE]'] {
+.carrd-page--midsummer [class*='text-[#D9D0BF]'],
+.carrd-page--daytime [class*='text-[#D8CFBE]'],
+.carrd-page--midsummer [class*='text-[#D8CFBE]'] {
   color: var(--carrd-daytime-muted) !important;
 }
-.carrd-page--daytime [class*='text-[#FAE0B9]'] {
+.carrd-page--daytime [class*='text-[#FAE0B9]'],
+.carrd-page--midsummer [class*='text-[#FAE0B9]'] {
   color: var(--carrd-daytime-link) !important;
 }
-.carrd-page--daytime [class*='text-[#C4AF86]'] {
+.carrd-page--daytime [class*='text-[#C4AF86]'],
+.carrd-page--midsummer [class*='text-[#C4AF86]'] {
   color: var(--carrd-daytime-accent) !important;
 }
-.carrd-page--daytime [class*='bg-[#2E0303]'] {
+.carrd-page--daytime [class*='bg-[#2E0303]'],
+.carrd-page--midsummer [class*='bg-[#2E0303]'] {
   background-color: rgba(255, 252, 247, 0.72) !important;
 }
-.carrd-page--daytime [class*='border-[#FAE0B9]'] {
+.carrd-page--daytime [class*='border-[#FAE0B9]'],
+.carrd-page--midsummer [class*='border-[#FAE0B9]'] {
   border-color: rgba(107, 83, 68, 0.35) !important;
 }
-.carrd-page--daytime [class*='bg-[#FAEBD4]'] {
+.carrd-page--daytime [class*='bg-[#FAEBD4]'],
+.carrd-page--midsummer [class*='bg-[#FAEBD4]'] {
   background-color: rgba(255, 252, 247, 0.55) !important;
 }
-.carrd-page--daytime [class*='bg-[#D9D0BF]'] {
+.carrd-page--daytime [class*='bg-[#D9D0BF]'],
+.carrd-page--midsummer [class*='bg-[#D9D0BF]'] {
   background-color: rgba(107, 83, 68, 0.12) !important;
 }
-.carrd-page--daytime [class*='bg-[#FAE0B9]'] {
+.carrd-page--daytime [class*='bg-[#FAE0B9]'],
+.carrd-page--midsummer [class*='bg-[#FAE0B9]'] {
   background-color: rgba(107, 83, 68, 0.72) !important;
 }
 
@@ -910,12 +994,14 @@ html::-webkit-scrollbar {
   opacity: 0.4;
   cursor: not-allowed;
 }
-.carrd-page--daytime .carrd-qty-btn {
+.carrd-page--daytime .carrd-qty-btn,
+.carrd-page--midsummer .carrd-qty-btn {
   border-color: rgba(74, 56, 41, 0.42);
   color: var(--carrd-daytime-text-soft);
   background: transparent !important;
 }
-.carrd-page--daytime .carrd-qty-btn:hover:not(:disabled) {
+.carrd-page--daytime .carrd-qty-btn:hover:not(:disabled),
+.carrd-page--midsummer .carrd-qty-btn:hover:not(:disabled) {
   background: transparent !important;
   border-color: rgba(74, 56, 41, 0.62);
 }

@@ -1,11 +1,8 @@
 import { getEventInviteContentBySlug } from '../../content/parse'
 import { buildAvailabilityState } from '../../lib/availability-state'
 import { getEventConfig } from '../../lib/event-registry'
-import {
-  getAvailabilityForDates,
-  getMockAvailabilityForDates,
-} from '../../lib/sheets-availability'
-import { TurbyEventClient } from './turby-event-client'
+import { getMockAvailabilityForDates } from '../../lib/sheets-availability'
+import { DaytimeEventClient } from '../components/daytime-event-client'
 
 function firstString(v: string | string[] | undefined): string | undefined {
   if (v == null) return undefined
@@ -45,7 +42,7 @@ export default async function TurbyEventPage({
   }
 
   return (
-    <TurbyEventClient
+    <DaytimeEventClient
       eventConfig={eventConfig}
       welcomeContent={welcomeContent}
       initialTicket={ticket ?? undefined}

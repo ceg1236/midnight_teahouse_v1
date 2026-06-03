@@ -1,4 +1,4 @@
-import { getEventConfig } from './event-registry'
+import { getEventConfig, isDaytimeEvent } from './event-registry'
 import { getTicketFormatLabels } from './ticket-format-labels'
 
 export type PracticalNote = {
@@ -30,8 +30,8 @@ export const TURBY_OPEN_HOURS_NOTE = 'Doors open at 11am and the teahouse closes
 export const TURBY_TASTING_HOURS_NOTE =
   'Guided tasting begins at 10am; you’re welcome to stay for the open teahouse until 3pm.'
 
-/** Shown on the Turby checkout step before payment. */
-export function getTurbyBookingNotes(ticketFormat?: string): readonly string[] {
+/** Shown on daytime event checkout step before payment. */
+export function getDaytimeBookingNotes(ticketFormat?: string): readonly string[] {
   const notes: string[] =
     ticketFormat === 'guided-tasting' ? [TURBY_TASTING_HOURS_NOTE] : [TURBY_OPEN_HOURS_NOTE]
   notes.push(
@@ -44,6 +44,11 @@ export function getTurbyBookingNotes(ticketFormat?: string): readonly string[] {
     TURBY_OUTDOORS_NOTE
   )
   return notes
+}
+
+/** @deprecated Use getDaytimeBookingNotes */
+export function getTurbyBookingNotes(ticketFormat?: string): readonly string[] {
+  return getDaytimeBookingNotes(ticketFormat)
 }
 
 export function getAddressMapUrl(address: string): string {
@@ -72,8 +77,8 @@ export function getEventPracticalNotes(
   ticketFormat?: string
 ): PracticalNote[] {
   const event = getEventConfig(eventSlug)
-  const isDaytimeTurby = event.slug === 'turby-event'
-  const experienceLabel = isDaytimeTurby ? getExperienceLabel(event.slug, ticketFormat) : undefined
+  const daytime = isDaytimeEvent(event.slug)
+  const experienceLabel = daytime ? getExperienceLabel(event.slug, ticketFormat) : undefined
   const notes: PracticalNote[] = []
 
   if (experienceLabel) {
@@ -83,7 +88,7 @@ export function getEventPracticalNotes(
   notes.push(
     {
       label: 'When',
-      text: isDaytimeTurby
+      text: daytime
         ? getTurbyWhenNote(ticketFormat)
         : 'Doors open at 7pm, and the teahouse will remain open until 11pm.',
     },
@@ -94,11 +99,11 @@ export function getEventPracticalNotes(
     },
     {
       label: 'Phones',
-      text: isDaytimeTurby ? TURBY_PHONES_NOTE : 'We invite you to keep phones and laptops tucked away for the evening.',
+      text: daytime ? TURBY_PHONES_NOTE : 'We invite you to keep phones and laptops tucked away for the evening.',
     }
   )
 
-  if (isDaytimeTurby) {
+  if (daytime) {
     notes.push(
       { label: 'Outdoors', text: TURBY_OUTDOORS_NOTE },
       { label: 'Kids', text: TURBY_KIDS_NOTE },
@@ -109,7 +114,7 @@ export function getEventPracticalNotes(
     notes.push({ label: 'Shoes', text: 'The teahouse is a shoes-free space. Bring cozy socks.' })
   }
 
-  if (event.slug !== 'special-event' && event.slug !== 'turby-event') {
+  if (event.slug !== 'special-event' && !daytime) {
     notes.push({
       label: 'Rooftop',
       text: "There is a beautiful rooftop. If you're interested, bring a warm jacket or blanket!",
@@ -118,7 +123,7 @@ export function getEventPracticalNotes(
 
   notes.push({
     label: 'Tea & food',
-    text: isDaytimeTurby ? TURBY_TEA_NOTE : 'We will be serving caffeinated and non-caffeinated teas, and some light snacks.',
+    text: daytime ? TURBY_TEA_NOTE : 'We will be serving caffeinated and non-caffeinated teas, and some light snacks.',
   })
 
   return notes
@@ -134,10 +139,10 @@ export function getGoogleCalendarUrl(
   ticketFormat?: string
 ): string {
   const event = getEventConfig(eventSlug)
-  const isDaytimeTurby = event.slug === 'turby-event'
+  const daytime = isDaytimeEvent(event.slug)
   let startHour = 19
   let endHour = 23
-  if (isDaytimeTurby) {
+  if (daytime) {
     startHour = ticketFormat === 'guided-tasting' ? 10 : 11
     endHour = 15
   }
@@ -169,17 +174,20 @@ export function getCalendarEventTitle(eventSlug?: string, ticketFormat?: string)
 /** Opening paragraph in the Resend confirmation email (HTML). */
 export function getConfirmationEmailIntro(eventSlug?: string, ticketFormat?: string): string {
   const event = getEventConfig(eventSlug)
-  if (event.slug === 'turby-event') {
+  if (isDaytimeEvent(event.slug)) {
     if (ticketFormat === 'guided-tasting') {
       return "We're very excited to welcome you for a guided tasting at 10am—to slow down together, taste premium teas, and enjoy the backyard."
     }
     if (ticketFormat === 'open-teahouse') {
       return "We're very excited to welcome you to the open teahouse—to slow down together, enjoy tea and light bites in the backyard from 11am."
     }
-    return "We're very excited to share this day with you—to slow down together, enjoy tea and light bites in the backyard."
+    return "We're very excited to share this day with you—to slow down together, enjoy tea and light bites."
   }
   if (event.slug === 'special-event') {
     return "We're very excited to share this evening with you—to slow down together, enjoy tea and music, and settle into the parlors at Erstwhere."
+  }
+  if (event.slug === 'midsummer-event') {
+    return "We're very excited to share this evening with you—to slow down together, enjoy tea and music, and settle into our SoMa teahouse."
   }
   return "We're very excited to share this evening with you—to slow down together, enjoy tea and music, settle into the night."
 }
@@ -190,7 +198,7 @@ export function getCalendarDescription(
 ): string {
   const event = getEventConfig(eventSlug)
   const notes = getEventPracticalNotes(event.slug, options?.ticketFormat)
-  const whenPhrase = event.slug === 'turby-event' ? 'this day with you' : 'this evening with you'
+  const whenPhrase = isDaytimeEvent(event.slug) ? 'this day with you' : 'this evening with you'
   const lines = [
     `Thank you for reserving a seat at ${event.title}.`,
     `We are excited to share ${whenPhrase}.`,
@@ -207,8 +215,8 @@ export function getTurbySuccessWhenLine(ticketFormat?: string): string {
 }
 
 /** Confirmation page only — email and gcal use getEventPracticalNotes. */
-export function getTurbySuccessExperienceLine(ticketFormat?: string): string | undefined {
-  const label = getExperienceLabel('turby-event', ticketFormat)
+export function getDaytimeSuccessExperienceLine(eventSlug: string, ticketFormat?: string): string | undefined {
+  const label = getExperienceLabel(eventSlug, ticketFormat)
   if (!label) return undefined
   if (ticketFormat === 'open-teahouse') {
     return 'Ticket type: Open Teahouse, 11am'
@@ -216,9 +224,14 @@ export function getTurbySuccessExperienceLine(ticketFormat?: string): string | u
   return label
 }
 
-export function getTurbySuccessPageNotes(ticketFormat?: string): PracticalNote[] {
-  const event = getEventConfig('turby-event')
-  const notes = getEventPracticalNotes('turby-event', ticketFormat)
+/** @deprecated Use getDaytimeSuccessExperienceLine */
+export function getTurbySuccessExperienceLine(ticketFormat?: string): string | undefined {
+  return getDaytimeSuccessExperienceLine('turby-event', ticketFormat)
+}
+
+export function getDaytimeSuccessPageNotes(eventSlug: string, ticketFormat?: string): PracticalNote[] {
+  const event = getEventConfig(eventSlug)
+  const notes = getEventPracticalNotes(eventSlug, ticketFormat)
   const result: PracticalNote[] = [
     { label: 'Address', text: `Our venue address is ${event.address}.` },
   ]
@@ -226,7 +239,7 @@ export function getTurbySuccessPageNotes(ticketFormat?: string): PracticalNote[]
   for (const note of notes) {
     if (note.label === 'Where') continue
     if (note.label === 'Experience') {
-      const line = getTurbySuccessExperienceLine(ticketFormat)
+      const line = getDaytimeSuccessExperienceLine(eventSlug, ticketFormat)
       if (line) result.push({ label: 'Ticket type', text: line })
       continue
     }
@@ -234,4 +247,8 @@ export function getTurbySuccessPageNotes(ticketFormat?: string): PracticalNote[]
   }
 
   return result
+}
+
+export function getTurbySuccessPageNotes(ticketFormat?: string): PracticalNote[] {
+  return getDaytimeSuccessPageNotes('turby-event', ticketFormat)
 }

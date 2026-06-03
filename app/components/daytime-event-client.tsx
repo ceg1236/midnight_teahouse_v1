@@ -1,12 +1,12 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { CarrdStylePage } from '../components/carrd-style-page'
+import { CarrdStylePage } from './carrd-style-page'
 import type { AvailabilityState } from '../../lib/availability-state'
 import { buildAvailabilityState } from '../../lib/availability-state'
 import type { EventConfig } from '../../lib/event-registry'
 
-type TurbyEventClientProps = {
+type DaytimeEventClientProps = {
   eventConfig: EventConfig
   welcomeContent: string
   initialTicket?: string
@@ -14,13 +14,13 @@ type TurbyEventClientProps = {
   skipAvailabilityFetch?: boolean
 }
 
-export function TurbyEventClient({
+export function DaytimeEventClient({
   eventConfig,
   welcomeContent,
   initialTicket,
   initialAvailability = buildAvailabilityState(null),
   skipAvailabilityFetch = false,
-}: TurbyEventClientProps) {
+}: DaytimeEventClientProps) {
   const [availabilityLoading, setAvailabilityLoading] = useState(!skipAvailabilityFetch)
   const [availabilityState, setAvailabilityState] = useState<AvailabilityState>(initialAvailability)
 

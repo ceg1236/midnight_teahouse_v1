@@ -2,9 +2,13 @@ import { spawn, spawnSync } from 'node:child_process'
 import { hostname, networkInterfaces } from 'node:os'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { config as loadEnv } from 'dotenv'
 
 const port = process.env.PORT || '3000'
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
+loadEnv({ path: join(root, '.env.local') })
+loadEnv({ path: join(root, '.env') })
+
 const mobile = process.argv.includes('--mobile')
 const nextHost = mobile ? '0.0.0.0' : 'localhost'
 const localUrl = `http://localhost:${port}`
@@ -15,6 +19,13 @@ const children = []
 function hasStripeCli() {
   const r = spawnSync('stripe', ['--version'], { stdio: 'ignore', shell: process.platform === 'win32' })
   return r.status === 0
+}
+
+function stripeApiKeyFromEnv() {
+  if (process.env.PAYMENT_ENV === 'test') {
+    return process.env.TEST_STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY
+  }
+  return process.env.STRIPE_SECRET_KEY
 }
 
 function lanIpv4() {
@@ -54,6 +65,7 @@ function printDevBanner() {
     console.log('    • iOS Simulator on this Mac: ' + localUrl)
     console.log('')
     console.log('  Turby: ' + (ip ? `http://${ip}:${port}` : localUrl) + '/turby')
+    console.log('  Midsummer: ' + (ip ? `http://${ip}:${port}` : localUrl) + '/midsummer')
   }
   console.log('')
   console.log('  Stripe webhooks → ' + webhookTarget)
@@ -70,7 +82,7 @@ function shutdown(code = 0) {
   setTimeout(() => process.exit(code), 100)
 }
 
-function spawnChild(label, command, args) {
+function spawnChild(label, command, args, { fatal = true } = {}) {
   const child = spawn(command, args, {
     cwd: root,
     stdio: 'inherit',
@@ -83,7 +95,9 @@ function spawnChild(label, command, args) {
     } else if (code && code !== 0) {
       console.error(`\n  ${label} exited with code ${code}.`)
     }
-    shutdown(code ?? 0)
+    if (fatal) {
+      shutdown(code ?? 0)
+    }
   })
   children.push(child)
   return child
@@ -92,7 +106,16 @@ function spawnChild(label, command, args) {
 printDevBanner()
 
 if (hasStripeCli()) {
-  spawnChild('Stripe CLI', 'stripe', ['listen', '--forward-to', webhookTarget])
+  const stripeArgs = ['listen', '--forward-to', webhookTarget]
+  const stripeKey = stripeApiKeyFromEnv()
+  if (stripeKey) {
+    stripeArgs.push('--api-key', stripeKey)
+  } else {
+    console.warn('  No STRIPE_SECRET_KEY in .env.local — Stripe CLI will use `stripe login` credentials.')
+    console.warn('  If auth fails, add TEST_STRIPE_SECRET_KEY or run `stripe login` again.')
+    console.log('')
+  }
+  spawnChild('Stripe CLI', 'stripe', stripeArgs, { fatal: false })
 } else {
   console.warn('  Stripe CLI not found — skipping `stripe listen`.')
   console.warn('  Install: https://stripe.com/docs/stripe-cli')
