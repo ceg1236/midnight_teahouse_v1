@@ -88,7 +88,8 @@ describe('Turby event messaging', () => {
 describe('Midsummer event messaging', () => {
   it('uses evening hours, Washburn address, and rooftop in email/gcal notes', () => {
     const notes = getEventPracticalNotes('midsummer-event')
-    expect(notes.find((n) => n.label === 'When')?.text).toContain('7pm')
+    expect(notes.find((n) => n.label === 'When')?.text).toContain('8pm')
+    expect(notes.find((n) => n.label === 'When')?.text).toContain('12am')
     expect(notes.find((n) => n.label === 'Where')?.text).toBe('54 Washburn st, San Francisco')
     expect(notes.find((n) => n.label === 'Shoes')?.text).toContain('shoes-free')
     expect(notes.find((n) => n.label === 'Rooftop')?.text).toContain('rooftop')
@@ -102,7 +103,7 @@ describe('Midsummer event messaging', () => {
     expect(description).toContain('this evening with you')
   })
 
-  it('uses 7–11pm Pacific in Google Calendar URL', () => {
+  it('uses 8pm–12am Pacific in Google Calendar URL', () => {
     const url = getGoogleCalendarUrl(
       '2026-06-25',
       'Midsummer Dream',
@@ -110,11 +111,11 @@ describe('Midsummer event messaging', () => {
       '54 Washburn st, San Francisco',
       'midsummer-event'
     )
-    expect(url).toContain('20260626T020000Z/20260626T060000Z')
+    expect(url).toContain('20260626T030000Z/20260626T070000Z')
     expect(url).toContain(encodeURIComponent('54 Washburn st, San Francisco'))
   })
 
   it('uses a Midsummer-specific confirmation email intro', () => {
-    expect(getConfirmationEmailIntro('midsummer-event')).toContain('SoMa teahouse')
+    expect(getConfirmationEmailIntro('midsummer-event')).toContain('summer sun sets over the city')
   })
 })
