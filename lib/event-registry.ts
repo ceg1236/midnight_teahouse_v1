@@ -18,6 +18,13 @@ export type EventConfig = {
   showCountdown: boolean
   dateRangeLabel: string
   timeLabel: string
+  /** Overrides default evening hours in confirmation email / gcal notes. */
+  whenNote?: string
+  /** Overrides first checkout note on the reservation page (evening events). */
+  checkoutDoorsNote?: string
+  /** Pacific start/end hour for Google Calendar (24h; end 24 = midnight). */
+  calendarStartHour?: number
+  calendarEndHour?: number
   locationLabel: string
   address: string
   calendarTitle: string
@@ -104,10 +111,14 @@ const EVENTS: Record<string, EventConfig> = {
     title: 'Midsummer Dream',
     invitePath: '/midsummer',
     successPath: '/midsummer/success',
-    countdownTarget: Math.floor(new Date('2026-06-25T19:00:00-07:00').getTime() / 1000),
+    countdownTarget: Math.floor(new Date('2026-06-25T20:00:00-07:00').getTime() / 1000),
     showCountdown: false,
     dateRangeLabel: 'June 25-27, 2026',
-    timeLabel: '7-11pm',
+    timeLabel: '8pm-12am',
+    whenNote: 'Doors open at 8pm, and the teahouse will remain open until 12am.',
+    checkoutDoorsNote: 'Doors open at 8pm and we close at midnight.',
+    calendarStartHour: 20,
+    calendarEndHour: 24,
     locationLabel: 'SoMa, San Francisco',
     address: '54 Washburn st, San Francisco',
     calendarTitle: 'Midsummer Dream',
@@ -116,7 +127,7 @@ const EVENTS: Record<string, EventConfig> = {
     stripeDescriptionLabel: 'Midsummer Dream',
     hostSectionTitle: 'About our space',
     hostSectionDescription:
-      'Our teahouse is a hidden gathering place in SoMa — a shoe-free parlor and rooftop where we host slow evenings of tea, music, and conversation.',
+      "We'll be gathering in a beautiful home in SoMa, hidden in plain sight in the middle of the city streets. It's one of our favorite places for hosting.",
     dates: midsummerEventDates,
     tiers: midsummerEventTiers,
   },

@@ -7,6 +7,8 @@ export type EventDate = {
   capacity?: number
   musicians: readonly string[]
   blurb?: string
+  websiteUrl?: string
+  instagramUrl?: string
   spotifyUrl?: string
   spotifyLabel?: string
 }

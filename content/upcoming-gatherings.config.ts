@@ -51,6 +51,17 @@ const UPCOMING_GATHERINGS = [
     href: '/turby',
     ctaLabel: 'Reserve →',
   },
+  {
+    startsAt: '2026-06-25T20:00:00-07:00',
+    endsAt: '2026-06-28T00:00:00-07:00',
+    monthShort: 'Jun',
+    dayNum: '25',
+    title: 'Midsummer Dream',
+    detailLine: 'June 25–27 · 8 pm–12 am · SoMa · San Francisco',
+    badge: 'Tea Lounge',
+    href: '/midsummer',
+    ctaLabel: 'Reserve →',
+  },
 ] as const satisfies readonly UpcomingGathering[]
 
 /**

@@ -90,7 +90,8 @@ export function getEventPracticalNotes(
       label: 'When',
       text: daytime
         ? getTurbyWhenNote(ticketFormat)
-        : 'Doors open at 7pm, and the teahouse will remain open until 11pm.',
+        : (event.whenNote ??
+          'Doors open at 7pm, and the teahouse will remain open until 11pm.'),
     },
     { label: 'Where', text: event.address },
     {
@@ -140,8 +141,8 @@ export function getGoogleCalendarUrl(
 ): string {
   const event = getEventConfig(eventSlug)
   const daytime = isDaytimeEvent(event.slug)
-  let startHour = 19
-  let endHour = 23
+  let startHour = event.calendarStartHour ?? 19
+  let endHour = event.calendarEndHour ?? 23
   if (daytime) {
     startHour = ticketFormat === 'guided-tasting' ? 10 : 11
     endHour = 15
@@ -187,7 +188,7 @@ export function getConfirmationEmailIntro(eventSlug?: string, ticketFormat?: str
     return "We're very excited to share this evening with you—to slow down together, enjoy tea and music, and settle into the parlors at Erstwhere."
   }
   if (event.slug === 'midsummer-event') {
-    return "We're very excited to share this evening with you—to slow down together, enjoy tea and music, and settle into our SoMa teahouse."
+    return "We're very excited to share this evening with you—to slow down together, enjoy tea and music, as the summer sun sets over the city."
   }
   return "We're very excited to share this evening with you—to slow down together, enjoy tea and music, settle into the night."
 }

@@ -10,9 +10,10 @@ import { getSupportedPriceBounds, isSupportedPriceInRange } from '../../lib/supp
 import { getTiersForTicketFormat } from '../../lib/event-tiers'
 import { getFormatCapacityState, getMaxSelectableForExperience } from '../../lib/ticket-pool'
 import { getDaytimeBookingNotes } from '../../lib/event-messaging'
-import { getCarrdPageThemeClass, isDaytimeEvent } from '../../lib/event-registry'
+import { getCarrdPageThemeClass, getEventConfig, isDaytimeEvent } from '../../lib/event-registry'
 import { HeroVideo } from './hero-video'
 import { EventPageTopLinks } from './event-page-top-links'
+import { DateMusicianBlurb } from './date-musician-blurb'
 import { SiteFooter } from './site-footer'
 
 const STORAGE_KEY = 'teahouse_reservation'
@@ -242,6 +243,10 @@ export function CarrdStylePage({
   const checkoutBookingNotes = useMemo(() => {
     if (isDaytimeEvent(eventSlug)) {
       return getDaytimeBookingNotes(selectedTicketFormat ?? undefined)
+    }
+    const checkoutDoorsNote = getEventConfig(eventSlug).checkoutDoorsNote
+    if (checkoutDoorsNote) {
+      return [checkoutDoorsNote, ...BOOKING_NOTES.slice(1)]
     }
     return bookingNotes
   }, [eventSlug, selectedTicketFormat, bookingNotes])
@@ -695,7 +700,12 @@ export function CarrdStylePage({
                               <span className="text-[#FAEBD4]/90 font-normal">, {headerRest}</span>
                             </p>
                             {d.blurb ? (
-                              <p className="text-[#D9D0BF]/90 text-base leading-snug mt-1 whitespace-pre-line">{d.blurb}</p>
+                              <DateMusicianBlurb
+                                blurb={d.blurb}
+                                websiteUrl={d.websiteUrl}
+                                instagramUrl={d.instagramUrl}
+                                textClassName="text-[#D9D0BF]/90 text-base leading-snug"
+                              />
                             ) : null}
                             {!soldOut && typeof remaining === 'number' && remaining > 0 && remaining < 5 ? (
                               <p className="text-[#FAE0B9] text-base mt-1">Only {remaining} tickets remaining</p>
@@ -1062,7 +1072,12 @@ export function CarrdStylePage({
                           <span className="text-[#FAEBD4]/90 font-normal">, {headerRest}</span>
                         </p>
                         {d.blurb ? (
-                          <p className="text-[#D9D0BF]/90 text-[0.9375rem] leading-snug mt-1 whitespace-pre-line">{d.blurb}</p>
+                          <DateMusicianBlurb
+                            blurb={d.blurb}
+                            websiteUrl={d.websiteUrl}
+                            instagramUrl={d.instagramUrl}
+                            textClassName="text-[#D9D0BF]/90 text-[0.9375rem] leading-snug"
+                          />
                         ) : null}
                         {!soldOut && typeof remaining === 'number' && remaining > 0 && remaining < 5 ? (
                           <p className="text-[#FAE0B9] text-sm mt-1">Only {remaining} tickets remaining</p>
@@ -1099,9 +1114,12 @@ export function CarrdStylePage({
                     </p>
                     <div className="min-w-0 md:col-start-2 md:row-start-1 md:row-span-2">
                       {d.blurb ? (
-                        <p className="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0 text-[#D9D0BF]/90 whitespace-pre-line">
-                          {d.blurb}
-                        </p>
+                        <DateMusicianBlurb
+                          blurb={d.blurb}
+                          websiteUrl={d.websiteUrl}
+                          instagramUrl={d.instagramUrl}
+                          textClassName="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0 text-[#D9D0BF]/90"
+                        />
                       ) : null}
                       {!soldOut && typeof remaining === 'number' && remaining > 0 && remaining < 5 ? (
                         <p className="text-[#FAE0B9] text-base mt-1">Only {remaining} tickets remaining</p>

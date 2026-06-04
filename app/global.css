@@ -979,6 +979,13 @@ html::-webkit-scrollbar {
   background-color: rgba(107, 83, 68, 0.72) !important;
 }
 
+.carrd-blurb-clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 .carrd-qty-btn {
   background: transparent;
   border: 1px solid rgba(217, 208, 191, 0.45);
