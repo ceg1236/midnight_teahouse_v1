@@ -23,7 +23,10 @@ export const midsummerEventDates = [
     value: '2026-06-26',
     capacity: 45,
     musicians: [],
-    blurb: 'Musician to be booked',
+    blurb:
+      'Noah Solt is a sea captain and folk musician whose music is deeply inspired by his time sailing around the world. For Noah, music is a point of reflection — a way to slow down and remember that he is whole in the midst of a distracted and extractive world that so often urges us to forget.',
+    websiteUrl: 'https://www.noahsolt.com/about',
+    instagramUrl: 'https://www.instagram.com/noahsolt/',
   },
   {
     id: 'midsummer-jun-27',
