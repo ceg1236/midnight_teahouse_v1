@@ -1,5 +1,6 @@
 import { getEventConfig, isDaytimeEvent } from './event-registry'
 import { getTicketFormatLabels } from './ticket-format-labels'
+import { pacificWallTimeToUtcMs } from './pacific-time'
 
 export type PracticalNote = {
   label: string
@@ -150,7 +151,7 @@ export function getGoogleCalendarUrl(
   const [y, m, d] = dateValue.split('-').map(Number)
   const pad = (n: number) => String(n).padStart(2, '0')
   const toGCal = (hour: number) => {
-    const ms = Date.parse(`${y}-${pad(m)}-${pad(d)}T${pad(hour)}:00:00-07:00`)
+    const ms = pacificWallTimeToUtcMs(y, m, d, hour)
     const dt = new Date(ms)
     return `${dt.getUTCFullYear()}${pad(dt.getUTCMonth() + 1)}${pad(dt.getUTCDate())}T${pad(dt.getUTCHours())}${pad(dt.getUTCMinutes())}00Z`
   }

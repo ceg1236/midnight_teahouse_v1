@@ -9,7 +9,7 @@ import type { EventTier } from '../../../content/event-schema'
 import { clampSupportedPrice } from '../../../lib/supported-tier-price'
 import { getTiersForEvent } from '../../../lib/event-tiers'
 import { getTicketFormatLabels } from '../../../lib/ticket-format-labels'
-import { getFormatCapacityTicketType } from '../../../lib/ticket-pool'
+import { getFormatCapacityTicketType, isFormatAvailableForDate } from '../../../lib/ticket-pool'
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const NAME_MAX_LEN = 200
@@ -105,6 +105,17 @@ export async function POST(req: NextRequest) {
   const date = event.dates.find((d) => d.id === dateId)
   if (!date) {
     return NextResponse.json({ error: 'Invalid date' }, { status: 400 })
+  }
+
+  // Validate the format is actually offered on this date (e.g. tasting is Wed/Thu only)
+  if (ticketFormat && event.ticketFormats?.length) {
+    const requestedFormat = event.ticketFormats.find((f) => f.id === ticketFormat)
+    if (requestedFormat && !isFormatAvailableForDate(requestedFormat, date.id)) {
+      return NextResponse.json(
+        { error: `${requestedFormat.label} is not available on this date.` },
+        { status: 400 }
+      )
+    }
   }
 
   // Validate items

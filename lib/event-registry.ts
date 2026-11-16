@@ -1,10 +1,15 @@
 import { eventDates, eventTiers } from '../content/event-invite.config'
+import {
+  holidayShowcaseEventDates,
+  holidayShowcaseEventTiers,
+  holidayShowcaseTicketFormats,
+} from '../content/holiday-showcase-event.config'
 import { midsummerEventDates, midsummerEventTiers } from '../content/midsummer-event.config'
 import { specialEventDates, specialEventTiers } from '../content/special-event.config'
 import { turbyEventDates, turbyEventTiers, turbyTicketFormats } from '../content/turby-event.config'
 import type { EventDate, EventTicketFormat, EventTier } from '../content/event-schema'
 
-export type EventTheme = 'daytime' | 'midsummer' | 'evening'
+export type EventTheme = 'daytime' | 'midsummer' | 'evening' | 'winter'
 
 export type EventConfig = {
   slug: string
@@ -131,6 +136,29 @@ const EVENTS: Record<string, EventConfig> = {
     dates: midsummerEventDates,
     tiers: midsummerEventTiers,
   },
+  'holiday-showcase-event': {
+    slug: 'holiday-showcase-event',
+    eventTheme: 'winter',
+    title: 'Holiday Showcase',
+    invitePath: '/holiday-showcase',
+    successPath: '/holiday-showcase/success',
+    countdownTarget: Math.floor(new Date('2026-12-15T19:00:00-08:00').getTime() / 1000),
+    showCountdown: false,
+    dateRangeLabel: 'December 15-17, 2026',
+    timeLabel: '7-11pm',
+    locationLabel: 'SoMa, San Francisco',
+    address: '54 Washburn st, San Francisco',
+    calendarTitle: 'Holiday Showcase',
+    calendarDetails: 'An enchanted world hidden in San Francisco',
+    welcomeContentSlug: 'holiday-showcase-invite',
+    stripeDescriptionLabel: 'Holiday Showcase',
+    hostSectionTitle: 'About our space',
+    hostSectionDescription:
+      "We'll be gathering in a beautiful home in SoMa, hidden in plain sight in the middle of the city streets. It's one of our favorite places for hosting.",
+    dates: holidayShowcaseEventDates,
+    tiers: holidayShowcaseEventTiers,
+    ticketFormats: holidayShowcaseTicketFormats,
+  },
 }
 
 export function isDaytimeEvent(slug?: string): boolean {
@@ -142,7 +170,12 @@ export function getCarrdPageThemeClass(slug?: string): string {
   const theme = slug ? EVENTS[slug]?.eventTheme : undefined
   if (theme === 'daytime') return ' carrd-page--daytime'
   if (theme === 'midsummer') return ' carrd-page--midsummer'
+  if (theme === 'winter') return ' carrd-page--winter'
   return ''
+}
+
+export function isKnownEventSlug(slug: string): boolean {
+  return Object.prototype.hasOwnProperty.call(EVENTS, slug)
 }
 
 export function getEventConfig(slug?: string): EventConfig {

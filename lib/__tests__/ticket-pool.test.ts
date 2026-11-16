@@ -5,6 +5,7 @@ import { turbyEventDates } from '../../content/turby-event.config'
 import {
   getFormatCapacityState,
   getMaxSelectableForExperience,
+  isFormatAvailableForDate,
   isTastingSheetTicketType,
   STANDARD_CAPACITY_KEY,
 } from '../ticket-pool'
@@ -81,6 +82,33 @@ describe('mergeCapacityForTicketFormats', () => {
         'turby-may-30': { [STANDARD_CAPACITY_KEY]: 5, tasting: 6 },
       },
     })
+  })
+})
+
+describe('isFormatAvailableForDate', () => {
+  const tastingWedThu = {
+    id: 'guided-tasting',
+    label: 'Guided Tasting, 5:30pm',
+    availableDateIds: ['dec-16', 'dec-17'],
+  } as const satisfies EventTicketFormat
+
+  it('is available on a date in availableDateIds', () => {
+    expect(isFormatAvailableForDate(tastingWedThu, 'dec-16')).toBe(true)
+    expect(isFormatAvailableForDate(tastingWedThu, 'dec-17')).toBe(true)
+  })
+
+  it('is not available on a date outside availableDateIds', () => {
+    expect(isFormatAvailableForDate(tastingWedThu, 'dec-15')).toBe(false)
+  })
+
+  it('is not available when no date is selected yet', () => {
+    expect(isFormatAvailableForDate(tastingWedThu, null)).toBe(false)
+    expect(isFormatAvailableForDate(tastingWedThu, undefined)).toBe(false)
+  })
+
+  it('is available on every date when availableDateIds is unset', () => {
+    expect(isFormatAvailableForDate(openTeahouseFormat, 'any-date')).toBe(true)
+    expect(isFormatAvailableForDate(openTeahouseFormat, null)).toBe(true)
   })
 })
 
