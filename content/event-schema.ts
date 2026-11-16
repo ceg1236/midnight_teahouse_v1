@@ -32,4 +32,6 @@ export type EventTicketFormat = {
   capacity?: number
   /** Config sheet TicketType key (col C); defaults to format id. */
   capacityTicketType?: string
+  /** Restricts this format to specific event date ids (e.g. tasting only offered Wed/Thu). Omit to offer on every date. */
+  availableDateIds?: readonly string[]
 }

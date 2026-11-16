@@ -8,7 +8,7 @@ import { decodeTokenPayload } from '../../lib/admin-token-decode'
 import { resolveDoorDate } from '../../lib/door-date'
 import { getSupportedPriceBounds, isSupportedPriceInRange } from '../../lib/supported-tier-price'
 import { getTiersForTicketFormat } from '../../lib/event-tiers'
-import { getFormatCapacityState, getMaxSelectableForExperience } from '../../lib/ticket-pool'
+import { getFormatCapacityState, getMaxSelectableForExperience, isFormatAvailableForDate } from '../../lib/ticket-pool'
 import { getDaytimeBookingNotes } from '../../lib/event-messaging'
 import { getCarrdPageThemeClass, getEventConfig, isDaytimeEvent } from '../../lib/event-registry'
 import { HeroVideo } from './hero-video'
@@ -201,6 +201,13 @@ export function CarrdStylePage({
   const effectiveSoldOut = bypassSoldOut ? {} : soldOutByDateId
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [selectedTicketFormat, setSelectedTicketFormat] = useState<string | null>(null)
+  /** Multi-night events with experience formats (e.g. Holiday Showcase tasting) need the date picked before the
+   *  experience, since an experience like tasting may only run on some nights. Single-date format events (Turby)
+   *  already auto-assign the date, so they're unaffected. */
+  const multiDateFormatEvent = usesFormatStep && !singleDateEvent
+  const visibleTicketFormats = multiDateFormatEvent
+    ? ticketFormats?.filter((f) => isFormatAvailableForDate(f, selectedDate))
+    : ticketFormats
   const activeTiers = useMemo(
     () => getTiersForTicketFormat(tiers, ticketFormats, selectedTicketFormat ?? undefined),
     [tiers, ticketFormats, selectedTicketFormat]
@@ -503,6 +510,14 @@ export function CarrdStylePage({
     setSelections((prev) => ({ ...prev, supported: 1 }))
   }
 
+  /** Step 1 date pick for multi-date format events: stay on step 1 to reveal the (date-filtered) experience list. */
+  const selectDateForStep1 = (dateId: string) => {
+    setSelectedDate(dateId)
+    if (!multiDateFormatEvent) {
+      setReservationStep(2)
+    }
+  }
+
   const selectTicketFormat = (formatId: string) => {
     const format = ticketFormats?.find((f) => f.id === formatId)
     if (format && isFormatSoldOut(format)) return
@@ -537,6 +552,10 @@ export function CarrdStylePage({
   }
 
   const handleReservationBack = () => {
+    if (multiDateFormatEvent && reservationStep === 1 && selectedDate) {
+      setSelectedDate(null)
+      return
+    }
     if (skipDateStep && reservationStep === 2) {
       setShowReservationView(false)
       return
@@ -635,11 +654,18 @@ export function CarrdStylePage({
                 }}
               >
                 {/* Mobile reservation reuses same panel structure - content is in desktop flow below, we need inline copy */}
-                {usesFormatStep ? (
+                {usesFormatStep && (!multiDateFormatEvent || selectedDate) ? (
                 <div className={`carrd-font-body flex-shrink-0 ${panelWidthClass} flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full`}>
                   <h2 className="carrd-font-heading carrd-font-h2 text-2xl text-center w-full">{formatStepLabel}</h2>
+                  {multiDateFormatEvent && selectedDateData ? (
+                    <p className="carrd-font-body text-center text-[#D9D0BF]/90">
+                      {selectedDateData.dateTime}
+                      {' · '}
+                      <button type="button" onClick={() => setSelectedDate(null)} className="underline hover:no-underline">Change date</button>
+                    </p>
+                  ) : null}
                   <div className="w-full max-w-full min-w-0 flex flex-col gap-3 break-words">
-                    {ticketFormats?.map((f) => {
+                    {visibleTicketFormats?.map((f) => {
                       const formatSoldOut = isFormatSoldOut(f)
                       const formatAvailability = getFormatAvailability(f)
                       return (
@@ -672,7 +698,7 @@ export function CarrdStylePage({
                   </div>
                 </div>
                 ) : null}
-                {!singleDateEvent ? (
+                {(!usesFormatStep && !singleDateEvent) || (multiDateFormatEvent && !selectedDate) ? (
                 <div className={`carrd-font-body flex-shrink-0 ${panelWidthClass} flex flex-col items-center gap-4 px-3 min-w-0 overflow-y-auto overflow-x-hidden max-w-full`}>
                   <h2 className="carrd-font-heading carrd-font-h2 text-2xl text-center w-full">1. Choose Your Evening</h2>
                   {sharedMusicBlurb ? (
@@ -690,8 +716,8 @@ export function CarrdStylePage({
                           key={d.id}
                           role={soldOut ? undefined : 'button'}
                           tabIndex={soldOut ? undefined : 0}
-                          onClick={soldOut ? undefined : () => { setSelectedDate(d.id); setReservationStep(2) }}
-                          onKeyDown={soldOut ? undefined : (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedDate(d.id); setReservationStep(2) } }}
+                          onClick={soldOut ? undefined : () => selectDateForStep1(d.id)}
+                          onKeyDown={soldOut ? undefined : (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectDateForStep1(d.id) } }}
                           className={`carrd-mobile-pill flex flex-col gap-3 text-left w-full ${soldOut ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'} ${isSelected ? 'carrd-mobile-pill--selected' : ''}`}
                         >
                           <div className="min-w-0">
@@ -993,11 +1019,18 @@ export function CarrdStylePage({
             }}
           >
             {/* Panel 1: Choose your experience (Turby) or evening */}
-            {usesFormatStep ? (
+            {usesFormatStep && (!multiDateFormatEvent || selectedDate) ? (
             <div className={`flex-shrink-0 ${panelWidthClass} min-w-0 flex flex-col items-center gap-6 px-4 md:px-6 max-w-full`}>
               <h2 className="carrd-font-heading carrd-font-h2 text-center">{formatStepLabel}</h2>
+              {multiDateFormatEvent && selectedDateData ? (
+                <p className="carrd-font-body text-center text-[#D9D0BF]/90">
+                  {selectedDateData.dateTime}
+                  {' · '}
+                  <button type="button" onClick={() => setSelectedDate(null)} className="underline hover:no-underline">Change date</button>
+                </p>
+              ) : null}
               <div className="carrd-font-body w-full max-w-[650px] flex flex-col gap-4">
-                {ticketFormats?.map((f) => {
+                {visibleTicketFormats?.map((f) => {
                   const formatSoldOut = isFormatSoldOut(f)
                   const formatAvailability = getFormatAvailability(f)
                   return (
@@ -1028,7 +1061,7 @@ export function CarrdStylePage({
               </div>
             </div>
             ) : null}
-            {!singleDateEvent ? (
+            {(!usesFormatStep && !singleDateEvent) || (multiDateFormatEvent && !selectedDate) ? (
             <div className={`flex-shrink-0 ${panelWidthClass} min-w-0 flex flex-col items-center gap-6 px-4 md:px-6 max-w-full`}>
               <h2 className="carrd-font-heading carrd-font-h2">
                 1. Choose Your Evening
@@ -1051,15 +1084,11 @@ export function CarrdStylePage({
                       key={d.id}
                       role={soldOut ? undefined : 'button'}
                       tabIndex={soldOut ? undefined : 0}
-                      onClick={soldOut ? undefined : () => {
-                        setSelectedDate(d.id)
-                        setReservationStep(2)
-                      }}
+                      onClick={soldOut ? undefined : () => selectDateForStep1(d.id)}
                       onKeyDown={soldOut ? undefined : (e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                           e.preventDefault()
-                          setSelectedDate(d.id)
-                          setReservationStep(2)
+                          selectDateForStep1(d.id)
                         }
                       }}
                       className={`carrd-mobile-pill flex flex-col gap-3 text-left w-full ${soldOut ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'} ${
@@ -1128,10 +1157,7 @@ export function CarrdStylePage({
                     <button
                       type="button"
                       disabled={soldOut}
-                      onClick={soldOut ? undefined : () => {
-                        setSelectedDate(d.id)
-                        setReservationStep(2)
-                      }}
+                      onClick={soldOut ? undefined : () => selectDateForStep1(d.id)}
                       className={`carrd-btn px-8 py-4 flex-shrink-0 self-start md:col-start-3 md:row-start-1 md:row-span-2 disabled:opacity-70 disabled:cursor-not-allowed ${
                         selectedDate === d.id ? 'bg-[#FAE0B9]/20' : ''
                       }`}

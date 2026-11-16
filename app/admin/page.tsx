@@ -9,6 +9,7 @@ const EVENT_OPTIONS = [
   getEventConfig('special-event'),
   getEventConfig('turby-event'),
   getEventConfig('midsummer-event'),
+  getEventConfig('holiday-showcase-event'),
 ]
 
 export default function AdminPage() {

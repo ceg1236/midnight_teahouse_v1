@@ -90,19 +90,45 @@ function buildHtml(params: SendConfirmationParams): string {
 `.trim()
 }
 
-/** Build HTML for preview or test. Use with GET /api/email-preview or POST /api/email-test. */
-export function getPreviewHtml(overrides?: Partial<SendConfirmationParams>): string {
-  const params: SendConfirmationParams = {
-    to: 'test@example.com',
-    eventSlug: 'crossing-into-spring',
-    name: 'Alex',
-    ticketDate: 'Wednesday, March 18',
-    amountPaid: '$40',
-    quantity: '1',
-    orderSummary: '1 × Community $40',
-    ...overrides,
+export type PreviewEmailOptions = Partial<SendConfirmationParams> & {
+  dateId?: string
+}
+
+export function getConfirmationEmailSubject(eventSlug: string): string {
+  const event = getEventConfig(eventSlug)
+  return `Confirmation: Your ${event.title} reservation`
+}
+
+/** Sample params for preview/test; defaults to midsummer-event and first date. */
+export function resolvePreviewParams(options: PreviewEmailOptions = {}): SendConfirmationParams {
+  const eventSlug = options.eventSlug ?? 'midsummer-event'
+  const event = getEventConfig(eventSlug)
+  const date = options.dateId
+    ? event.dates.find((d) => d.id === options.dateId)
+    : event.dates[0]
+  const ticketFormat = options.ticketFormat
+  const tiers = getTiersForEvent(event, ticketFormat)
+  const sampleTier = tiers.find((t) => t.id === 'community') ?? tiers[0]
+  const defaultOrderSummary = sampleTier
+    ? `1 × ${sampleTier.label} $${sampleTier.price}`
+    : '1 ticket'
+  const defaultAmount = sampleTier ? `$${sampleTier.price}` : '$40'
+
+  return {
+    to: options.to ?? 'test@example.com',
+    eventSlug: event.slug,
+    name: options.name ?? 'Alex',
+    ticketDate: (options.ticketDate ?? date?.label ?? event.dateRangeLabel).replace(/\n/g, ' '),
+    amountPaid: options.amountPaid ?? defaultAmount,
+    quantity: options.quantity ?? '1',
+    orderSummary: options.orderSummary ?? defaultOrderSummary,
+    ticketFormat,
   }
-  return buildHtml(params)
+}
+
+/** Build HTML for preview or test. Use with GET /api/email-preview or POST /api/email-test. */
+export function getPreviewHtml(options?: PreviewEmailOptions): string {
+  return buildHtml(resolvePreviewParams(options))
 }
 
 export async function sendConfirmationEmail(
@@ -141,7 +167,7 @@ export async function sendConfirmationEmail(
     from,
     to: [to],
     ...(replyTo && { replyTo }),
-    subject: `Confirmation: Your ${event.title} reservation`,
+    subject: getConfirmationEmailSubject(event.slug),
     html: buildHtml({
       to,
       eventSlug: event.slug,

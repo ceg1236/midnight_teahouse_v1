@@ -265,4 +265,49 @@ describe('POST /api/checkout', () => {
     const json = await res.json()
     expect(json.url).toBeDefined()
   })
+
+  it('rejects a format not offered on the requested date (Holiday Showcase tasting is Wed/Thu only)', async () => {
+    vi.mocked(getAvailabilityForDates).mockResolvedValue([
+      { dateId: 'dec-15', label: 'Tuesday, December 15', sold: 0, capacity: 45, soldOut: false },
+    ])
+    const res = await POST(
+      req({
+        eventSlug: 'holiday-showcase-event',
+        dateId: 'dec-15',
+        ticketFormat: 'guided-tasting',
+        items: [{ tierId: 'tasting', quantity: 1 }],
+        name: 'Test User',
+        email: 'test@example.com',
+      })
+    )
+    expect(res.status).toBe(400)
+    const json = await res.json()
+    expect(json.error).toMatch(/not available on this date/i)
+  })
+
+  it('allows the restricted format on a date it is offered on', async () => {
+    vi.mocked(getAvailabilityForDates).mockResolvedValue([
+      {
+        dateId: 'dec-16',
+        label: 'Wednesday, December 16',
+        sold: 0,
+        capacity: 45,
+        soldOut: false,
+        ticketPools: [{ ticketType: 'tasting', sold: 0, capacity: 6, soldOut: false, remaining: 6 }],
+      },
+    ])
+    const res = await POST(
+      req({
+        eventSlug: 'holiday-showcase-event',
+        dateId: 'dec-16',
+        ticketFormat: 'guided-tasting',
+        items: [{ tierId: 'tasting', quantity: 1 }],
+        name: 'Test User',
+        email: 'test@example.com',
+      })
+    )
+    expect(res.status).toBe(200)
+    const json = await res.json()
+    expect(json.url).toBeDefined()
+  })
 })

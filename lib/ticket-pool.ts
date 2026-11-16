@@ -14,6 +14,16 @@ export function isTastingSheetTicketType(ticketType: string): boolean {
   return false
 }
 
+/** False when a format declares `availableDateIds` and this date isn't in it (e.g. tasting offered only Wed/Thu). */
+export function isFormatAvailableForDate(
+  format: EventTicketFormat,
+  dateId: string | null | undefined
+): boolean {
+  if (!format.availableDateIds?.length) return true
+  if (!dateId) return false
+  return format.availableDateIds.includes(dateId)
+}
+
 export function getFormatCapacityTicketType(format: EventTicketFormat): string | undefined {
   if (typeof format.capacity !== 'number') return undefined
   return (format.capacityTicketType ?? format.id).trim().toLowerCase()

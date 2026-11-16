@@ -62,6 +62,8 @@ const UPCOMING_GATHERINGS = [
     href: '/midsummer',
     ctaLabel: 'Reserve →',
   },
+  // Holiday Showcase intentionally not listed yet — unlisted URL only, shared directly with the team.
+  // Add back here (see /midsummer above for the shape) once ready to go public.
 ] as const satisfies readonly UpcomingGathering[]
 
 /**

@@ -1,13 +1,18 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
-import { getPreviewHtml } from '../../../lib/confirmation-email'
+import {
+  getConfirmationEmailSubject,
+  getPreviewHtml,
+  type PreviewEmailOptions,
+} from '../../../lib/confirmation-email'
+import { isKnownEventSlug } from '../../../lib/event-registry'
 
 /**
  * Send a test confirmation email to your own address.
  * Only works in development (NODE_ENV=development).
  *
  * POST /api/email-test
- * Body: { "to": "your@email.com", "name": "Alex", "ticketDate": "...", "orderSummary": "...", "amountPaid": "$25", "quantity": "1" }
+ * Body: { "to": "your@email.com", "eventSlug": "midsummer-event", "dateId": "midsummer-jun-26", "name": "Alex" }
  */
 export async function POST(req: Request) {
   if (process.env.NODE_ENV !== 'development') {
@@ -25,14 +30,7 @@ export async function POST(req: Request) {
     )
   }
 
-  let body: {
-    to?: string
-    name?: string
-    ticketDate?: string
-    orderSummary?: string
-    amountPaid?: string
-    quantity?: string
-  }
+  let body: PreviewEmailOptions & { to?: string }
   try {
     body = await req.json()
   } catch {
@@ -47,16 +45,13 @@ export async function POST(req: Request) {
     )
   }
 
-  const overrides: Record<string, string> = {
-    to,
-    name: typeof body?.name === 'string' ? body.name : 'Alex',
+  if (body.eventSlug && !isKnownEventSlug(body.eventSlug)) {
+    return NextResponse.json({ error: `Unknown eventSlug: ${body.eventSlug}` }, { status: 400 })
   }
-  if (typeof body?.ticketDate === 'string') overrides.ticketDate = body.ticketDate
-  if (typeof body?.orderSummary === 'string') overrides.orderSummary = body.orderSummary
-  if (typeof body?.amountPaid === 'string') overrides.amountPaid = body.amountPaid
-  if (typeof body?.quantity === 'string') overrides.quantity = body.quantity
 
-  const html = getPreviewHtml(overrides)
+  const options: PreviewEmailOptions = { ...body, to }
+  const html = getPreviewHtml(options)
+  const eventSlug = options.eventSlug ?? 'midsummer-event'
 
   const from = process.env.RESEND_FROM ?? 'Midnight Teahouse <onboarding@resend.dev>'
   const replyTo = process.env.RESEND_REPLY_TO
@@ -66,7 +61,7 @@ export async function POST(req: Request) {
     from,
     to: [to],
     ...(replyTo && { replyTo }),
-    subject: 'Confirmation: Crossing into Spring at Midnight Teahouse ✨',
+    subject: getConfirmationEmailSubject(eventSlug),
     html,
   })
 

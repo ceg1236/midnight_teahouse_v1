@@ -979,6 +979,14 @@ html::-webkit-scrollbar {
   background-color: rgba(107, 83, 68, 0.72) !important;
 }
 
+/* Holiday Showcase: darker, cooler take on the base evening theme — deep charcoal/navy with icy highlights instead of warm gold. */
+.carrd-page--winter::before {
+  background: linear-gradient(180deg, #0a0e14 60%, #1c2a38 98%);
+}
+.carrd-page--winter .carrd-video-fade::after {
+  background: radial-gradient(ellipse 80% 70% at 50% 50%, transparent 40%, rgba(10, 14, 20, 0.5) 100%);
+}
+
 .carrd-blurb-clamp {
   display: -webkit-box;
   -webkit-line-clamp: 5;

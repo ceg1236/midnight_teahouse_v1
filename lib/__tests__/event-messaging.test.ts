@@ -119,3 +119,22 @@ describe('Midsummer event messaging', () => {
     expect(getConfirmationEmailIntro('midsummer-event')).toContain('summer sun sets over the city')
   })
 })
+
+describe('Holiday Showcase event messaging', () => {
+  it('builds calendar title for Holiday Showcase', () => {
+    expect(getCalendarEventTitle('holiday-showcase-event')).toBe('Holiday Showcase')
+  })
+
+  it('uses PST (-08:00), not PDT, for a December Google Calendar URL', () => {
+    // Dec 15, 2026 is standard time in Los Angeles (UTC-8), not daylight time (UTC-7).
+    // A fixed -07:00 offset would produce 20261216T030000Z instead.
+    const url = getGoogleCalendarUrl(
+      '2026-12-15',
+      'Holiday Showcase',
+      'details',
+      '54 Washburn st, San Francisco',
+      'holiday-showcase-event'
+    )
+    expect(url).toContain('20261216T030000Z/20261216T070000Z')
+  })
+})
