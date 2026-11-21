@@ -6,11 +6,17 @@ export type EventDate = {
   value: string
   capacity?: number
   musicians: readonly string[]
+  /** Short always-visible credit line on the date card (e.g. "Music by X & Y"); full bio stays in `blurb`, revealed via "More". */
+  musicianTitle?: string
   blurb?: string
   websiteUrl?: string
+  websiteLabel?: string
   instagramUrl?: string
+  instagramLabel?: string
   spotifyUrl?: string
   spotifyLabel?: string
+  /** Extra named links beyond websiteUrl/instagramUrl (e.g. a second performer's social on a shared date). */
+  extraLinks?: readonly { label: string; url: string }[]
 }
 
 export type EventTier = {

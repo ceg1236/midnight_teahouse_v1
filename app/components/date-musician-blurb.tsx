@@ -5,9 +5,16 @@ import { useLayoutEffect, useRef, useState, type SyntheticEvent } from 'react'
 const MAX_LINES = 5
 
 type DateMusicianBlurbProps = {
+  /** Short always-visible credit line shown above the (collapsible) blurb, e.g. "Music by X & Y". */
+  title?: string
+  titleClassName?: string
   blurb: string
   websiteUrl?: string
+  websiteLabel?: string
   instagramUrl?: string
+  instagramLabel?: string
+  /** Extra named links beyond website/Instagram (e.g. a second performer's social on a shared date). */
+  extraLinks?: readonly { label: string; url: string }[]
   textClassName?: string
 }
 
@@ -24,15 +31,20 @@ function blurbExceedsMaxLines(el: HTMLParagraphElement): boolean {
 }
 
 export function DateMusicianBlurb({
+  title,
+  titleClassName = 'text-[#C4AF86] font-medium italic',
   blurb,
   websiteUrl,
+  websiteLabel = 'Website',
   instagramUrl,
+  instagramLabel = 'Instagram',
+  extraLinks,
   textClassName = 'text-[#D9D0BF]/90 leading-snug',
 }: DateMusicianBlurbProps) {
   const textRef = useRef<HTMLParagraphElement>(null)
   const [expanded, setExpanded] = useState(false)
   const [overflows, setOverflows] = useState(false)
-  const hasLinks = Boolean(websiteUrl || instagramUrl)
+  const hasLinks = Boolean(websiteUrl || instagramUrl || extraLinks?.length)
   const showToggle = overflows
   const showLinks = hasLinks && (expanded || !overflows)
 
@@ -61,6 +73,7 @@ export function DateMusicianBlurb({
 
   return (
     <div className="mt-1 min-w-0" onClick={stopBubble} onKeyDown={stopBubble}>
+      {title ? <p className={titleClassName}>{title}</p> : null}
       <p
         ref={textRef}
         className={`${textClassName} whitespace-pre-line ${expanded ? '' : 'carrd-blurb-clamp'}`}
@@ -77,7 +90,7 @@ export function DateMusicianBlurb({
               className="carrd-link underline hover:no-underline"
               onClick={stopBubble}
             >
-              Website
+              {websiteLabel}
             </a>
           ) : null}
           {instagramUrl ? (
@@ -88,9 +101,21 @@ export function DateMusicianBlurb({
               className="carrd-link underline hover:no-underline"
               onClick={stopBubble}
             >
-              Instagram
+              {instagramLabel}
             </a>
           ) : null}
+          {extraLinks?.map((link) => (
+            <a
+              key={link.url}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="carrd-link underline hover:no-underline"
+              onClick={stopBubble}
+            >
+              {link.label}
+            </a>
+          ))}
         </p>
       ) : null}
       {showToggle ? (
