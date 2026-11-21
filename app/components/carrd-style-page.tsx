@@ -583,7 +583,7 @@ export function CarrdStylePage({
           <div className="flex flex-col items-center px-6 py-8 gap-[1.25em] overflow-x-hidden w-full max-w-full">
             <div className="relative w-full flex flex-col items-center gap-1">
               <h1 className="carrd-font-heading carrd-font-title text-center">Midnight Teahouse</h1>
-              <p className="carrd-font-subtitle text-center italic">{subtitle}</p>
+              <p className="carrd-font-subtitle text-center italic whitespace-pre-line">{subtitle}</p>
             </div>
             <div className="carrd-video-fade w-full py-6 overflow-hidden">
               <div className="aspect-video overflow-hidden">
@@ -907,7 +907,7 @@ export function CarrdStylePage({
           <h1 className="carrd-font-heading carrd-font-title text-center">
             Midnight Teahouse
           </h1>
-          <p className="carrd-font-subtitle text-center italic">
+          <p className="carrd-font-subtitle text-center italic whitespace-pre-line">
             {subtitle}
           </p>
         </div>

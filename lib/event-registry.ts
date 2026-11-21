@@ -141,7 +141,7 @@ const EVENTS: Record<string, EventConfig> = {
     slug: 'holiday-showcase-event',
     eventTheme: 'winter',
     title: 'Holiday Showcase',
-    subtitle: '2026.12.15 – 12.17, 7–11pm',
+    subtitle: 'December 15-17\n7-11pm',
     invitePath: '/holiday-showcase',
     successPath: '/holiday-showcase/success',
     countdownTarget: Math.floor(new Date('2026-12-15T19:00:00-08:00').getTime() / 1000),

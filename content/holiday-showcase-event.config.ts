@@ -14,6 +14,8 @@ export const holidayShowcaseEventDates = [
       'Daniel Berkman is a San Francisco–based composer and multi-instrumentalist known for his work on the kora, the 21-stringed West African harp.\n\nFor over three decades, he has explored the instrument\'s expressive range, weaving intricate, cascading patterns with spacious, meditative passages.\n\nDaniel brings a deep sensitivity to collaboration and live improvisation. Join us for an evening of luminous strings, quiet attention, and unfolding sound.',
     spotifyUrl: 'https://open.spotify.com/artist/61alTpjryjk7OUyNFGxrzV',
     spotifyLabel: "Listen to Daniel's music",
+    websiteUrl: 'https://www.danielberkman.com/',
+    instagramUrl: 'https://www.instagram.com/danielberkman/',
   },
   {
     id: 'dec-16',
@@ -36,7 +38,10 @@ export const holidayShowcaseEventDates = [
     value: '2026-12-17',
     capacity: 45,
     musicians: ['Music by Xuun'],
-    blurb: 'Xuun – live-looping',
+    blurb:
+      'Xuun is a Vietnamese-American sound alchemist based in the Bay Area. He live-loops ancient instruments such as Chinese guzheng, jaw harp, and flute and weaves it together with electronic synths, bass, and drums.\n\nHe improvises every set in the moment, each show is unique and original — music shaped by the energy in the room, the people in it, and whatever wants to move through the field. His sound journeys hold space for dance, stillness, and everything in between.',
+    websiteUrl: 'https://www.xuunlive.com/',
+    instagramUrl: 'https://www.instagram.com/xuun.live',
   },
 ] as const satisfies readonly EventDate[]
 
