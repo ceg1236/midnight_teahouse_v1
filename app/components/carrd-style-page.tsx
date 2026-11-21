@@ -50,6 +50,8 @@ function EventHero({
 type CarrdStylePageProps = {
   eventSlug: string
   eventTitle: string
+  /** Overrides the default "an enchanted world hidden in San Francisco" tagline under the title. */
+  subtitle?: string
   welcomeContent: string
   dates: readonly EventDate[]
   tiers: readonly EventTier[]
@@ -174,6 +176,7 @@ function savePersisted(
 export function CarrdStylePage({
   eventSlug,
   eventTitle,
+  subtitle = 'an enchanted world hidden in San Francisco',
   welcomeContent,
   dates,
   tiers,
@@ -580,7 +583,7 @@ export function CarrdStylePage({
           <div className="flex flex-col items-center px-6 py-8 gap-[1.25em] overflow-x-hidden w-full max-w-full">
             <div className="relative w-full flex flex-col items-center gap-1">
               <h1 className="carrd-font-heading carrd-font-title text-center">Midnight Teahouse</h1>
-              <p className="carrd-font-subtitle text-center italic">an enchanted world hidden in San Francisco</p>
+              <p className="carrd-font-subtitle text-center italic">{subtitle}</p>
             </div>
             <div className="carrd-video-fade w-full py-6 overflow-hidden">
               <div className="aspect-video overflow-hidden">
@@ -905,7 +908,7 @@ export function CarrdStylePage({
             Midnight Teahouse
           </h1>
           <p className="carrd-font-subtitle text-center italic">
-            an enchanted world hidden in San Francisco
+            {subtitle}
           </p>
         </div>
 

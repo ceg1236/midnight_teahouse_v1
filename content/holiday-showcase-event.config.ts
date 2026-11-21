@@ -1,4 +1,4 @@
-import type { EventDate, EventTicketFormat } from './event-schema'
+import type { EventDate } from './event-schema'
 import { specialEventTiers } from './special-event.config'
 
 export const holidayShowcaseEventDates = [
@@ -9,7 +9,11 @@ export const holidayShowcaseEventDates = [
     label: 'Tuesday, December 15',
     value: '2026-12-15',
     capacity: 45,
-    musicians: [],
+    musicians: ['Music by Daniel Berkman, Kora'],
+    blurb:
+      'Daniel Berkman is a San Francisco–based composer and multi-instrumentalist known for his work on the kora, the 21-stringed West African harp.\n\nFor over three decades, he has explored the instrument\'s expressive range, weaving intricate, cascading patterns with spacious, meditative passages.\n\nDaniel brings a deep sensitivity to collaboration and live improvisation. Join us for an evening of luminous strings, quiet attention, and unfolding sound.',
+    spotifyUrl: 'https://open.spotify.com/artist/61alTpjryjk7OUyNFGxrzV',
+    spotifyLabel: "Listen to Daniel's music",
   },
   {
     id: 'dec-16',
@@ -18,7 +22,11 @@ export const holidayShowcaseEventDates = [
     label: 'Wednesday, December 16',
     value: '2026-12-16',
     capacity: 45,
-    musicians: [],
+    musicians: ['Music by Noah Solt & Xiao'],
+    blurb:
+      'Noah Solt is a sea captain and folk musician whose music is deeply inspired by his time sailing around the world. For Noah, music is a point of reflection — a way to slow down and remember that he is whole in the midst of a distracted and extractive world that so often urges us to forget.\n\nJoined this evening by Xiao.',
+    websiteUrl: 'https://www.noahsolt.com/about',
+    instagramUrl: 'https://www.instagram.com/noahsolt/',
   },
   {
     id: 'dec-17',
@@ -27,37 +35,10 @@ export const holidayShowcaseEventDates = [
     label: 'Thursday, December 17',
     value: '2026-12-17',
     capacity: 45,
-    musicians: [],
+    musicians: ['Music by Xuun'],
+    blurb: 'Xuun – live-looping',
   },
 ] as const satisfies readonly EventDate[]
 
 /** Same tiers as Erstwhere / special-event. */
 export const holidayShowcaseEventTiers = specialEventTiers
-
-export const holidayShowcaseTicketFormats = [
-  {
-    id: 'standard',
-    label: 'Main Event, 7pm',
-    description: 'The main evening — gongfu-style tea, live music, and the people in the room, 7-11pm.',
-    capacity: 45,
-    capacityTicketType: 'standard',
-  },
-  {
-    id: 'guided-tasting',
-    label: 'Guided Tasting, 5:30pm',
-    description:
-      'Arrive early for an intimate guided tasting, then stay for the full evening from 7-11pm.\nCapped at 6 guests. Wednesday and Thursday only.',
-    capacity: 6,
-    capacityTicketType: 'tasting',
-    availableDateIds: ['dec-16', 'dec-17'],
-    tiers: [
-      {
-        id: 'tasting',
-        label: 'Guided Tasting',
-        mainLine: 'Includes entry to the evening',
-        blurb: 'An intimate guided tasting at 5:30pm, plus full entry to the 7-11pm evening.',
-        price: 75,
-      },
-    ],
-  },
-] as const satisfies readonly EventTicketFormat[]

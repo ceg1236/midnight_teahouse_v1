@@ -2,7 +2,6 @@ import { eventDates, eventTiers } from '../content/event-invite.config'
 import {
   holidayShowcaseEventDates,
   holidayShowcaseEventTiers,
-  holidayShowcaseTicketFormats,
 } from '../content/holiday-showcase-event.config'
 import { midsummerEventDates, midsummerEventTiers } from '../content/midsummer-event.config'
 import { specialEventDates, specialEventTiers } from '../content/special-event.config'
@@ -17,6 +16,8 @@ export type EventConfig = {
   eventTheme?: EventTheme
   /** Static hero image instead of looping video. */
   heroImage?: string
+  /** Overrides the default "an enchanted world hidden in San Francisco" tagline under the title. */
+  subtitle?: string
   invitePath: string
   successPath: string
   countdownTarget: number
@@ -140,6 +141,7 @@ const EVENTS: Record<string, EventConfig> = {
     slug: 'holiday-showcase-event',
     eventTheme: 'winter',
     title: 'Holiday Showcase',
+    subtitle: '2026.12.15 – 12.17, 7–11pm',
     invitePath: '/holiday-showcase',
     successPath: '/holiday-showcase/success',
     countdownTarget: Math.floor(new Date('2026-12-15T19:00:00-08:00').getTime() / 1000),
@@ -157,7 +159,6 @@ const EVENTS: Record<string, EventConfig> = {
       "We'll be gathering in a beautiful home in SoMa, hidden in plain sight in the middle of the city streets. It's one of our favorite places for hosting.",
     dates: holidayShowcaseEventDates,
     tiers: holidayShowcaseEventTiers,
-    ticketFormats: holidayShowcaseTicketFormats,
   },
 }
 
