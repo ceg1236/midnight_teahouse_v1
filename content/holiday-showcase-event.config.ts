@@ -9,7 +9,8 @@ export const holidayShowcaseEventDates = [
     label: 'Tuesday, December 15',
     value: '2026-12-15',
     capacity: 45,
-    musicians: ['Music by Daniel Berkman, Kora'],
+    musicians: [],
+    musicianTitle: 'Music by Daniel Berkman',
     blurb:
       'Daniel Berkman is a San Francisco–based composer and multi-instrumentalist known for his work on the kora, the 21-stringed West African harp.\n\nFor over three decades, he has explored the instrument\'s expressive range, weaving intricate, cascading patterns with spacious, meditative passages.\n\nDaniel brings a deep sensitivity to collaboration and live improvisation. Join us for an evening of luminous strings, quiet attention, and unfolding sound.',
     spotifyUrl: 'https://open.spotify.com/artist/61alTpjryjk7OUyNFGxrzV',
@@ -24,11 +25,15 @@ export const holidayShowcaseEventDates = [
     label: 'Wednesday, December 16',
     value: '2026-12-16',
     capacity: 45,
-    musicians: ['Music by Noah Solt & Xiao'],
+    musicians: [],
+    musicianTitle: 'Music by Noah Solt & Xiao Zhang',
     blurb:
-      'Noah Solt is a sea captain and folk musician whose music is deeply inspired by his time sailing around the world. For Noah, music is a point of reflection — a way to slow down and remember that he is whole in the midst of a distracted and extractive world that so often urges us to forget.\n\nJoined this evening by Xiao.',
+      'Noah Solt is a sea captain and folk musician whose music is deeply inspired by his time sailing around the world. For Noah, music is a point of reflection — a way to slow down and remember that he is whole in the midst of a distracted and extractive world that so often urges us to forget.\n\nXiao Zhang 張潇 is a Pipa artist whose music moves with both quiet stillness and vibrant expression. Rooted in classical tradition yet fluid in spirit, her playing reflects the Daoist ideal of harmonious contrast where sound arises from silence, and emotion flows in cycles.',
     websiteUrl: 'https://www.noahsolt.com/about',
+    websiteLabel: "Noah's Website",
     instagramUrl: 'https://www.instagram.com/noahsolt/',
+    instagramLabel: "Noah's Instagram",
+    extraLinks: [{ label: "Xiao's Instagram", url: 'https://www.instagram.com/xiaozpipa/' }],
   },
   {
     id: 'dec-17',
@@ -37,7 +42,8 @@ export const holidayShowcaseEventDates = [
     label: 'Thursday, December 17',
     value: '2026-12-17',
     capacity: 45,
-    musicians: ['Music by Xuun'],
+    musicians: [],
+    musicianTitle: 'Music by Xuun',
     blurb:
       'Xuun is a Vietnamese-American sound alchemist based in the Bay Area. He live-loops ancient instruments such as Chinese guzheng, jaw harp, and flute and weaves it together with electronic synths, bass, and drums.\n\nHe improvises every set in the moment, each show is unique and original — music shaped by the energy in the room, the people in it, and whatever wants to move through the field. His sound journeys hold space for dance, stillness, and everything in between.',
     websiteUrl: 'https://www.xuunlive.com/',

@@ -480,7 +480,14 @@ export function CarrdStylePage({
       ) : null}
     </div>
   )
-  const sharedMusicBlurb = dates.flatMap((d) => d.musicians).find((line) => line?.trim()) ?? ''
+  /** Only shown when every date shares the exact same line (e.g. a general "our musicians will roam" note).
+   *  When musicians differ per date, each date card shows its own `musicianTitle` instead — showing one
+   *  date's name above a list of other dates would be misleading. */
+  const sharedMusicBlurb = (() => {
+    const lines = dates.map((d) => d.musicians.find((m) => m?.trim())).filter((m): m is string => !!m)
+    if (lines.length === 0) return ''
+    return lines.every((line) => line === lines[0]) ? lines[0] : ''
+  })()
   const reservationSteps = skipDateStep ? ([2, 3] as const) : ([1, 2, 3] as const)
   const panelCount = reservationSteps.length
   const slideOffset = skipDateStep ? reservationStep - 2 : reservationStep - 1
@@ -730,9 +737,13 @@ export function CarrdStylePage({
                             </p>
                             {d.blurb ? (
                               <DateMusicianBlurb
+                                title={d.musicianTitle}
                                 blurb={d.blurb}
                                 websiteUrl={d.websiteUrl}
+                                websiteLabel={d.websiteLabel}
                                 instagramUrl={d.instagramUrl}
+                                instagramLabel={d.instagramLabel}
+                                extraLinks={d.extraLinks}
                                 textClassName="text-[#D9D0BF]/90 text-base leading-snug"
                               />
                             ) : null}
@@ -1105,9 +1116,13 @@ export function CarrdStylePage({
                         </p>
                         {d.blurb ? (
                           <DateMusicianBlurb
+                            title={d.musicianTitle}
                             blurb={d.blurb}
                             websiteUrl={d.websiteUrl}
+                            websiteLabel={d.websiteLabel}
                             instagramUrl={d.instagramUrl}
+                            instagramLabel={d.instagramLabel}
+                            extraLinks={d.extraLinks}
                             textClassName="text-[#D9D0BF]/90 text-[0.9375rem] leading-snug"
                           />
                         ) : null}
@@ -1147,9 +1162,13 @@ export function CarrdStylePage({
                     <div className="min-w-0 md:col-start-2 md:row-start-1 md:row-span-2">
                       {d.blurb ? (
                         <DateMusicianBlurb
+                          title={d.musicianTitle}
                           blurb={d.blurb}
                           websiteUrl={d.websiteUrl}
+                          websiteLabel={d.websiteLabel}
                           instagramUrl={d.instagramUrl}
+                          instagramLabel={d.instagramLabel}
+                          extraLinks={d.extraLinks}
                           textClassName="carrd-font-body carrd-table-row-2 carrd-table-row-2-sm min-w-0 text-[#D9D0BF]/90"
                         />
                       ) : null}
