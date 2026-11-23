@@ -121,8 +121,8 @@ describe('Midsummer event messaging', () => {
 })
 
 describe('Holiday Showcase event messaging', () => {
-  it('builds calendar title for Holiday Showcase', () => {
-    expect(getCalendarEventTitle('holiday-showcase-event')).toBe('Holiday Showcase')
+  it('builds calendar title for Holiday Showcase (now "Make a Wish")', () => {
+    expect(getCalendarEventTitle('holiday-showcase-event')).toBe('Make a Wish · Midnight Teahouse')
   })
 
   it('uses PST (-08:00), not PDT, for a December Google Calendar URL', () => {

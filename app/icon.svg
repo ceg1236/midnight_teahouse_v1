@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <mask id="crescent">
+    <rect width="32" height="32" fill="#fff" />
+    <circle cx="20.5" cy="12" r="10.5" fill="#000" />
+  </mask>
+  <circle cx="16" cy="16" r="13" fill="#D4AE6E" mask="url(#crescent)" />
+</svg>

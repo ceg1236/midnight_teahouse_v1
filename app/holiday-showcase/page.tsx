@@ -1,63 +1,20 @@
-import { CarrdStylePage } from '../components/carrd-style-page'
-import { getEventInviteContentBySlug } from '../../content/parse'
-import { getAvailabilityForDates, getMockAvailabilityForDates } from '../../lib/sheets-availability'
-import { getEventConfig } from '../../lib/event-registry'
+import { redirect } from 'next/navigation'
 
-export const dynamic = 'force-dynamic'
-
-function firstString(v: string | string[] | undefined): string | undefined {
-  if (v == null) return undefined
-  return Array.isArray(v) ? v[0] : v
-}
-
-export default async function HolidayShowcaseEventPage({
+/** Redirects already-shared /holiday-showcase links to the redesigned /make-a-wish page, preserving query params (e.g. door-sale ?ticket=). */
+export default async function HolidayShowcaseRedirect({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
-  const eventConfig = getEventConfig('holiday-showcase-event')
-  const welcomeContent = getEventInviteContentBySlug(eventConfig.welcomeContentSlug)
   const params = await searchParams
-
-  let availability: Awaited<ReturnType<typeof getAvailabilityForDates>>
-  const mockParam = firstString(params.mock)
-  if (process.env.NODE_ENV === 'development' && mockParam?.startsWith('soldOut:')) {
-    const ids = mockParam.replace('soldOut:', '').split(',').map((s) => s.trim()).filter(Boolean)
-    availability = getMockAvailabilityForDates(eventConfig.dates, ids)
-  } else {
-    availability = await getAvailabilityForDates(eventConfig.dates)
-  }
-
-  const soldOutByDateId: Record<string, boolean> = {}
-  const remainingByDateId: Record<string, number> = {}
-  if (availability) {
-    for (const a of availability) {
-      soldOutByDateId[a.dateId] = a.soldOut
-      remainingByDateId[a.dateId] = Math.max(0, a.capacity - a.sold)
+  const query = new URLSearchParams()
+  for (const [key, value] of Object.entries(params)) {
+    if (Array.isArray(value)) {
+      for (const v of value) query.append(key, v)
+    } else if (value != null) {
+      query.append(key, value)
     }
   }
-
-  const ticket = firstString(params.ticket)
-
-  return (
-    <CarrdStylePage
-      eventSlug={eventConfig.slug}
-      eventTitle={eventConfig.title}
-      subtitle={eventConfig.subtitle}
-      welcomeContent={welcomeContent}
-      dates={eventConfig.dates}
-      tiers={eventConfig.tiers}
-      countdownTarget={eventConfig.countdownTarget}
-      showCountdown={eventConfig.showCountdown}
-      dateRangeLabel={eventConfig.dateRangeLabel}
-      timeLabel={eventConfig.timeLabel}
-      locationLabel={eventConfig.locationLabel}
-      hostSectionTitle={eventConfig.hostSectionTitle}
-      hostSectionDescription={eventConfig.hostSectionDescription}
-      soldOutByDateId={soldOutByDateId}
-      remainingByDateId={remainingByDateId}
-      initialTicket={ticket ?? undefined}
-      heroImage={eventConfig.heroImage}
-    />
-  )
+  const qs = query.toString()
+  redirect(`/make-a-wish${qs ? `?${qs}` : ''}`)
 }

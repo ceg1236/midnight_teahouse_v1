@@ -43,6 +43,58 @@ html, body {
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+/* Estonia - local for reliable loading */
+@font-face {
+  font-family: 'Estonia';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/estonia-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Estonia';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/estonia-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* Newsreader - local for reliable loading */
+@font-face {
+  font-family: 'Newsreader';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/newsreader-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Newsreader';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/newsreader-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/newsreader-normal-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Newsreader';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/newsreader-normal-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 /* Aboreto - local for reliable loading */
 @font-face {
   font-family: 'Aboreto';
@@ -1336,4 +1388,271 @@ html::-webkit-scrollbar {
   z-index: 1;
   pointer-events: none;
   background: radial-gradient(ellipse 80% 70% at 50% 50%, transparent 40%, rgba(46, 3, 3, 0.35) 100%);
+}
+
+/* ==========================================================================
+   mw- : shared "winter redesign" design system (Make a Wish / Private events / Our story)
+   ========================================================================== */
+
+.mw-page {
+  --mw-text-strong: #F1EADD;
+  --mw-text: #E4DDD0;
+  --mw-text-soft: #C9C3B7;
+  --mw-text-muted: #A9A397;
+  --mw-text-tier: #B8B2A6;
+  --mw-text-disabled: #8C877D;
+  --mw-gold: #D4AE6E;
+  --mw-on-gold: #14110D;
+  --mw-navy: #0C1016;
+  --mw-line: #2C333B;
+  --mw-line-card: #3A424B;
+  --mw-line-input: #5A6370;
+  --mw-line-footer: #252C34;
+  --mw-field-bg: #0C1016;
+  --mw-panel: #121820;
+  --mw-error: #E8A48A;
+  --mw-selected-tint: rgba(212, 174, 110, 0.08);
+
+  position: relative;
+  overflow-x: hidden;
+  background:
+    radial-gradient(ellipse 760px 520px at var(--mw-ember-x, 78%) var(--mw-ember-y, 300px), rgba(176, 92, 34, 0.13) 0%, rgba(176, 92, 34, 0) 70%),
+    radial-gradient(ellipse 1000px 700px at 8% 0%, rgba(78, 104, 150, 0.18) 0%, rgba(78, 104, 150, 0) 70%),
+    radial-gradient(ellipse 900px 1000px at 0% 62%, rgba(44, 88, 96, 0.10) 0%, rgba(44, 88, 96, 0) 70%),
+    radial-gradient(ellipse 1100px 900px at 96% 100%, rgba(98, 60, 104, 0.16) 0%, rgba(98, 60, 104, 0) 70%),
+    linear-gradient(165deg, #0F151E 0%, #0C1016 45%, #0A0D13 100%);
+  color: var(--mw-text);
+}
+
+.mw-page--event {
+  --mw-ember-x: 76%;
+  --mw-ember-y: 900px;
+  background-image:
+    radial-gradient(ellipse 1300px 900px at 50% var(--mw-ember-y, 900px), rgba(4, 5, 7, 0.92) 0%, rgba(4, 5, 7, 0.55) 38%, rgba(4, 5, 7, 0) 68%),
+    radial-gradient(ellipse 760px 520px at var(--mw-ember-x, 76%) var(--mw-ember-y, 900px), rgba(176, 92, 34, 0.13) 0%, rgba(176, 92, 34, 0) 70%),
+    radial-gradient(ellipse 1000px 700px at 8% 0%, rgba(78, 104, 150, 0.18) 0%, rgba(78, 104, 150, 0) 70%),
+    radial-gradient(ellipse 900px 1000px at 0% 62%, rgba(44, 88, 96, 0.10) 0%, rgba(44, 88, 96, 0) 70%),
+    radial-gradient(ellipse 1100px 900px at 96% 100%, rgba(98, 60, 104, 0.16) 0%, rgba(98, 60, 104, 0) 70%),
+    linear-gradient(165deg, #0F151E 0%, #0C1016 45%, #0A0D13 100%);
+}
+@media (max-width: 600px) {
+  .mw-page--event { --mw-ember-y: 560px; }
+}
+
+.mw-page--private { --mw-ember-x: 78%; --mw-ember-y: 300px; }
+.mw-page--story { --mw-ember-x: 72%; --mw-ember-y: 380px; }
+
+/* Type */
+.mw-font-title {
+  font-family: 'Estonia', cursive;
+  font-weight: 400;
+  color: var(--mw-text-strong);
+  padding: 0.12em 0.1em;
+  line-height: 1.1;
+}
+.mw-font-aboreto { font-family: 'Aboreto', cursive; }
+.mw-font-body { font-family: 'Newsreader', serif; }
+
+/* Buttons */
+.mw-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  padding: 0 40px;
+  border-radius: 4px;
+  background: var(--mw-gold);
+  color: var(--mw-on-gold);
+  font-family: 'Newsreader', serif;
+  font-weight: 700;
+  font-size: 18px;
+  border: none;
+  transition: filter 0.15s ease;
+}
+.mw-btn-primary:hover { filter: brightness(1.06); }
+.mw-btn-primary:disabled {
+  background: var(--mw-line);
+  color: var(--mw-text-disabled);
+  cursor: not-allowed;
+}
+
+.mw-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+  min-height: 48px;
+  padding: 0 20px;
+  border-radius: 4px;
+  border: 1px solid var(--mw-gold);
+  color: var(--mw-gold);
+  font-family: 'Newsreader', serif;
+  font-weight: 700;
+  font-size: 16px;
+  background: transparent;
+}
+.mw-btn-outline:disabled {
+  border-color: var(--mw-line);
+  color: var(--mw-text-disabled);
+  cursor: not-allowed;
+}
+.mw-btn-outline--chosen {
+  background: var(--mw-gold);
+  color: var(--mw-on-gold);
+  border-color: var(--mw-gold);
+}
+
+.mw-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  padding: 0 32px;
+  border-radius: 4px;
+  border: 1px solid var(--mw-line-input);
+  color: var(--mw-text-strong);
+  font-family: 'Newsreader', serif;
+  font-size: 17px;
+  background: transparent;
+}
+
+.mw-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 5px;
+  text-decoration-color: #6E675C;
+  cursor: pointer;
+}
+
+.mw-input {
+  height: 52px;
+  padding: 0 16px;
+  border-radius: 4px;
+  border: 1px solid var(--mw-line-input);
+  background: var(--mw-field-bg);
+  color: var(--mw-text-strong);
+  font-size: 17px;
+  font-family: 'Newsreader', serif;
+  width: 100%;
+}
+.mw-input::placeholder { color: var(--mw-text-muted); }
+.mw-input--error { border-color: var(--mw-error); }
+.mw-textarea {
+  padding: 14px 16px;
+  resize: vertical;
+}
+
+.mw-stepper-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 4px;
+  border: 1px solid var(--mw-line-input);
+  background: transparent;
+  color: var(--mw-text-strong);
+  font-size: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.mw-stepper-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+*:where(.mw-page) :focus-visible,
+.mw-page:focus-visible {
+  outline: 2px solid #D4AE6E;
+  outline-offset: 3px;
+}
+
+/* Fireflies + shooting star */
+.mw-fx-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+.mw-firefly {
+  position: absolute;
+  border-radius: 9999px;
+  background: #F6DC9A;
+  opacity: 0;
+  animation: mw-firefly-glow var(--mw-glow-dur, 6s) ease-in-out var(--mw-glow-delay, 0s) infinite,
+    mw-firefly-drift var(--mw-drift-dur, 14s) ease-in-out infinite alternate;
+}
+@keyframes mw-firefly-glow {
+  0% { opacity: 0; }
+  45% { opacity: 0.85; }
+  60% { opacity: 0.55; }
+  100% { opacity: 0; }
+}
+@keyframes mw-firefly-drift {
+  from { transform: translate(0, 0); }
+  to { transform: translate(var(--mw-dx, 20px), var(--mw-dy, -20px)); }
+}
+@media (max-width: 600px) {
+  .mw-firefly--desktop-only { display: none; }
+}
+.mw-shooting-star {
+  position: fixed;
+  width: 140px;
+  height: 1.5px;
+  border-radius: 1px;
+  transform-origin: 100% 50%;
+  background: linear-gradient(90deg, rgba(246, 220, 154, 0) 0%, rgba(246, 220, 154, 0.25) 55%, rgba(250, 232, 186, 0.9) 100%);
+  pointer-events: none;
+  z-index: 0;
+  animation: mw-shooting-star var(--mw-star-dur, 1.3s) cubic-bezier(0.2, 0.6, 0.3, 1) forwards;
+}
+@keyframes mw-shooting-star {
+  0% { transform: rotate(var(--mw-star-angle, 160deg)) translateX(0); opacity: 0; }
+  20% { opacity: 0.7; }
+  100% { transform: rotate(var(--mw-star-angle, 160deg)) translateX(var(--mw-star-dist, 300px)); opacity: 0; }
+}
+
+/* Title letter drift (Make a Wish only) */
+.mw-title-letter {
+  display: inline-block;
+  white-space: pre;
+  animation: mw-title-letter var(--mw-letter-dur, 5200ms) ease-in-out infinite;
+  animation-delay: var(--mw-letter-delay, 0ms);
+}
+@keyframes mw-title-letter {
+  0% { transform: translateY(0) rotate(0); }
+  33% { transform: translateY(calc(-3px * var(--mw-up, 1))) rotate(calc(0.8deg * var(--mw-up, 1))); }
+  66% { transform: translateY(calc(1.5px * var(--mw-up, 1))) rotate(calc(-0.5deg * var(--mw-up, 1))); }
+  100% { transform: translateY(0) rotate(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mw-firefly,
+  .mw-shooting-star,
+  .mw-title-letter {
+    animation: none !important;
+  }
+}
+
+.mw-crescent {
+  color: var(--mw-gold);
+}
+
+/* Reservation step transition */
+.mw-step-enter {
+  animation: mw-step-fade-in 420ms ease-out both;
+}
+@keyframes mw-step-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mw-step-enter {
+    animation: none;
+  }
 }

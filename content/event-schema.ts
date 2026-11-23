@@ -9,6 +9,8 @@ export type EventDate = {
   /** Short always-visible credit line on the date card (e.g. "Music by X & Y"); full bio stays in `blurb`, revealed via "More". */
   musicianTitle?: string
   blurb?: string
+  /** One-line bio for the evening-picker row on the redesigned Make a Wish page. */
+  shortBio?: string
   websiteUrl?: string
   websiteLabel?: string
   instagramUrl?: string
