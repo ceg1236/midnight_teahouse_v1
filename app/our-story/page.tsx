@@ -1,99 +1,80 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { SiteFooter } from '../components/site-footer'
+import { MwNav } from '../components/mw/mw-nav'
+import { MwFooter } from '../components/mw/mw-footer'
+import { FirefliesLayer } from '../components/mw/fireflies-layer'
+
+export const metadata = {
+  title: 'Our Story',
+}
 
 export default function OurStoryPage() {
   return (
-    <div className="carrd-page flex flex-col items-center min-h-screen overflow-x-hidden pt-8">
-      <div className="w-full max-w-[750px] flex flex-col items-center px-6 md:px-12 py-8 md:py-12 gap-8 flex-1">
-          {/* Hero photo */}
-          <div className="relative w-full flex flex-col items-center">
-            <div className="w-full flex justify-center">
-            <div className="our-story-frame relative w-full max-w-[39.2rem]">
+    <div className="mw-page mw-page--story min-h-[100dvh]">
+      <FirefliesLayer />
+      <div className="relative z-10 flex min-h-[100dvh] flex-col">
+        <MwNav variant="story" />
+        <main className="mx-auto flex w-full max-w-[760px] flex-1 flex-col items-center gap-8 px-6 pb-16 pt-12">
+          {/* Opening */}
+          <div className="flex w-full flex-col items-center gap-7 text-center">
+            <div className="relative aspect-[16/10] w-full max-w-[640px] overflow-hidden rounded-[50%]">
               <Image
                 src="/images/teahouse-team.png"
-                alt="The Midnight Teahouse team gathered around a low tea table"
-                width={1024}
-                height={682}
-                className="w-full h-auto object-cover object-center"
+                alt="Tea being poured from a glass pitcher beside a fire"
+                fill
+                className="object-cover object-center"
                 priority
               />
             </div>
-            </div>
+            <h1 className="mw-font-title text-[clamp(64px,10vw,120px)]">Our Story</h1>
+            <p className="mw-font-body max-w-[600px] text-[21px] italic leading-[1.65] text-[var(--mw-text-strong)]">
+              Welcome to the Midnight Teahouse — a dreamy little world created by friends for friends, with
+              support from our talented and loving community.
+            </p>
           </div>
 
-          {/* Story copy: text blocks in rectangle, photos between */}
-          <div className="carrd-font-body-light our-story-body w-full max-w-[750px] flex flex-col gap-8">
-            {/* Text block 1 */}
-            <div className="text-left">
-              <h1 className="carrd-font-heading text-3xl md:text-4xl mb-6">
-                Our Story
-              </h1>
-              <p>
-                Welcome to the Midnight Teahouse —{' '}
-                a dreamy little world created by friends for friends, with support from our talented and loving community.
-              </p>
-            </div>
+          <hr className="my-2 h-px w-16 border-0" style={{ background: '#4A525C' }} />
 
-            {/* What is the Midnight Teahouse? + Photo 1: photo above text on mobile, text left photo right on desktop */}
-            <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center">
-              <div className="text-left w-full sm:w-[60%] min-w-0 order-2 sm:order-1">
-                <p className="our-story-subheading mt-6">What is the Midnight Teahouse?</p>
-                <p>
-                  We are cultivating a beloved gathering spot for ourselves, our community, and the beautiful strangers we meet along the way. This is a space to savor: where body and mind can be softened, senses delighted, imaginations set loose.
-                </p>
-                <p>
-                  For now, our teahouse is offered as a monthly pop-up: a curated evening of gongfu tea service, live music and cozy corners. It is a time and space carved out for rest, unfurling and gentle play.
-                </p>
-              </div>
-              <div className="our-story-frame w-full sm:w-[40%] max-w-[20rem] sm:max-w-none shrink-0 order-1 sm:order-2">
-                <Image
-                  src="/images/our-story-tea-ceremony-1.png"
-                  alt="Tea ceremony with vibrant pink and purple lighting, a person pouring tea"
-                  width={600}
-                  height={400}
-                  className="w-full h-auto object-cover"
-                />
-              </div>
-            </div>
-
-            {/* What's next? + Photo 2: photo above text on mobile, photo left text right on desktop */}
-            <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center">
-              <div className="our-story-frame our-story-frame--alt w-full sm:w-[40%] max-w-[20rem] sm:max-w-none shrink-0 order-1 sm:order-1">
-                <Image
-                  src="/images/our-story-tea-ceremony-2.png"
-                  alt="Two people smiling during a tea ceremony with purple and pink lighting"
-                  width={600}
-                  height={400}
-                  className="w-full h-auto object-cover"
-                />
-              </div>
-              <div className="text-left w-full sm:w-[60%] min-w-0 order-2 sm:order-2">
-                <p className="our-story-subheading">What&apos;s next?</p>
-                <p>
-                  Soon we hope to find a permanent home. A place where artists and musicians gather to play, where regulars come to unwind and new friends are always wandering in, hoping to be surprised.
-                </p>
-                <p>
-                  Thank you for being part of our unfolding. We are grateful to be building it with you.
-                </p>
-              </div>
-            </div>
-
-            {/* Signature: right-aligned with text block above */}
-            <div className="text-right mt-4">
-              <p>With love,</p>
-              <p>Your Tea Keepers</p>
-            </div>
+          {/* First text block */}
+          <div className="mw-font-body flex w-full max-w-[600px] flex-col gap-5 text-left text-[19px] leading-[1.75] text-[var(--mw-text)]">
+            <h2 className="mw-font-aboreto text-[22px] tracking-[0.06em] text-[var(--mw-text-strong)]">
+              What is the Midnight Teahouse?
+            </h2>
+            <p>
+              We are cultivating a beloved gathering spot for ourselves, our community, and the beautiful
+              strangers we meet along the way. This is a space to savor: where body and mind can be softened,
+              senses delighted, imaginations set loose.
+            </p>
+            <p>
+              For now, our teahouse is offered as a monthly pop-up: a curated evening of gongfu tea service,
+              live music and cozy corners. It is a time and space carved out for rest, unfurling and gentle
+              play.
+            </p>
           </div>
 
-          <Link
-            href="/"
-            className="carrd-btn px-8 py-3 mt-4 inline-block"
-          >
+          {/* Second text block */}
+          <div className="mw-font-body flex w-full max-w-[600px] flex-col gap-5 text-left text-[19px] leading-[1.75] text-[var(--mw-text)]">
+            <h2 className="mw-font-aboreto text-[22px] tracking-[0.06em] text-[var(--mw-text-strong)]">
+              What&rsquo;s next?
+            </h2>
+            <p>
+              Soon we hope to find a permanent home. A place where artists and musicians gather to play, where
+              regulars come to unwind and new friends are always wandering in, hoping to be surprised.
+            </p>
+            <p>Thank you for being part of our unfolding. We are grateful to be building it with you.</p>
+            <p className="italic text-[22px] text-[var(--mw-text-strong)]">
+              With love,
+              <br />
+              Your Tea Keepers
+            </p>
+          </div>
+
+          <Link href="/make-a-wish" className="mw-btn-primary mt-2">
             Join Our Gatherings
           </Link>
-        </div>
-      <SiteFooter />
+        </main>
+        <MwFooter variant="story" />
+      </div>
     </div>
   )
 }
