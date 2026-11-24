@@ -38,9 +38,6 @@ export function MwFooter({ variant }: { variant: MwFooterVariant }) {
             <a href="mailto:midnight.teahouse.sf@gmail.com" className={textLinkClass}>
               Email
             </a>
-            <Link href="/our-story" className={textLinkClass}>
-              Our story
-            </Link>
           </div>
         </div>
       </footer>
@@ -64,14 +61,9 @@ export function MwFooter({ variant }: { variant: MwFooterVariant }) {
             <InstagramIcon />
           </a>
           {variant === 'event' ? (
-            <>
-              <Link href="/our-story" className={textLinkClass}>
-                Our story
-              </Link>
-              <Link href="/private-events" className={textLinkClass}>
-                Private events
-              </Link>
-            </>
+            <Link href="/private-events" className={textLinkClass}>
+              Private events
+            </Link>
           ) : (
             <>
               <Link href={EVENT_PATH} className={textLinkClass}>

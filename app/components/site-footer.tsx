@@ -1,13 +1,9 @@
-import Link from 'next/link'
-
 type SiteFooterProps = {
   variant?: 'main' | 'default'
   className?: string
 }
 
-export function SiteFooter({ variant = 'default', className }: SiteFooterProps) {
-  const isMain = variant === 'main'
-
+export function SiteFooter({ className }: SiteFooterProps) {
   return (
     <footer className={`w-full flex justify-center ${className ?? ''}`}>
       <div className="w-full max-w-[60rem] px-4 md:px-12 py-4 md:py-6 flex items-center justify-center gap-8 md:gap-10">
@@ -48,17 +44,6 @@ export function SiteFooter({ variant = 'default', className }: SiteFooterProps) 
             </svg>
           </a>
         </div>
-
-        {isMain && (
-          <div className="ml-2">
-            <Link
-              href="/our-story"
-              className="carrd-link text-sm whitespace-nowrap"
-            >
-              Our Story
-            </Link>
-          </div>
-        )}
       </div>
     </footer>
   )

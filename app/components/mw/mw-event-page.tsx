@@ -505,15 +505,17 @@ export function MwEventPage({ eventSlug, dates, tiers, soldOutByDateId, initialT
           </section>
 
           {/* Mailing list */}
-          <section id="mailing-list" className="mw-font-body w-full max-w-[600px] scroll-mt-4 px-6 pb-20 text-center">
-            <h2 className="mw-font-aboreto mb-3 text-xl tracking-[0.06em] text-[var(--mw-text-strong)]">
-              Join our mailing list
-            </h2>
-            <p className="mb-6 text-[17px] text-[var(--mw-text-muted)]">
-              Hear about future gatherings before they&rsquo;re announced here.
-            </p>
-            <MwNewsletterForm />
-          </section>
+          {step !== 3 && (
+            <section id="mailing-list" className="mw-font-body w-full max-w-[600px] scroll-mt-4 px-6 pb-20 text-center">
+              <h2 className="mw-font-aboreto mb-3 text-xl tracking-[0.06em] text-[var(--mw-text-strong)]">
+                Join our mailing list
+              </h2>
+              <p className="mb-6 text-[17px] text-[var(--mw-text-muted)]">
+                Hear about future gatherings before they&rsquo;re announced here.
+              </p>
+              <MwNewsletterForm />
+            </section>
+          )}
         </main>
 
         <MwFooter variant="event" />

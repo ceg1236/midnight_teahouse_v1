@@ -17,7 +17,6 @@ function linksForVariant(variant: MwNavVariant): { wordmarkHref: string; links: 
       return {
         wordmarkHref: '/',
         links: [
-          { label: 'Our story', href: '/our-story' },
           { label: 'Private events', href: '/private-events' },
           { label: 'Reserve', href: '#evenings', gold: true },
         ],
@@ -26,7 +25,6 @@ function linksForVariant(variant: MwNavVariant): { wordmarkHref: string; links: 
       return {
         wordmarkHref: '/',
         links: [
-          { label: 'Our story', href: '/our-story' },
           { label: 'Private events', href: '/private-events', current: true },
           { label: 'Upcoming gathering', href: EVENT_PATH },
         ],
