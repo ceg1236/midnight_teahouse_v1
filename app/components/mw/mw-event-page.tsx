@@ -9,6 +9,7 @@ import { AnimatedTitle } from './animated-title'
 import { MwNav } from './mw-nav'
 import { MwFooter } from './mw-footer'
 import { FirefliesLayer } from './fireflies-layer'
+import { MwNewsletterForm } from './mw-newsletter-form'
 
 type MwEventPageProps = {
   eventSlug: string
@@ -298,17 +299,21 @@ export function MwEventPage({ eventSlug, dates, tiers, soldOutByDateId, initialT
                             onClick={() => chooseDate(d.id)}
                             className="mw-btn-outline mw-btn-outline--chosen"
                           >
-                            ✓ Chosen
+                            Selected
                           </button>
                         ) : (
                           <button type="button" aria-pressed={false} onClick={() => chooseDate(d.id)} className="mw-btn-outline">
-                            Choose
+                            Select
                           </button>
                         )}
                       </div>
                     </div>
                   ))}
                 </div>
+                <p className="mw-font-body text-center text-[16px] text-[var(--mw-text-muted)]">
+                  If you can&rsquo;t make these dates, <a href="#mailing-list" className="mw-link">join our mailing list</a> to
+                  hear about future gatherings.
+                </p>
               </div>
             )}
 
@@ -323,6 +328,7 @@ export function MwEventPage({ eventSlug, dates, tiers, soldOutByDateId, initialT
 
                 <TierRow
                   tier={community}
+                  isFirst
                   selected={selectedTierId === 'community'}
                   quantity={quantity}
                   onSelect={() => selectTier('community')}
@@ -497,6 +503,17 @@ export function MwEventPage({ eventSlug, dates, tiers, soldOutByDateId, initialT
               </div>
             )}
           </section>
+
+          {/* Mailing list */}
+          <section id="mailing-list" className="mw-font-body w-full max-w-[600px] scroll-mt-4 px-6 pb-20 text-center">
+            <h2 className="mw-font-aboreto mb-3 text-xl tracking-[0.06em] text-[var(--mw-text-strong)]">
+              Join our mailing list
+            </h2>
+            <p className="mb-6 text-[17px] text-[var(--mw-text-muted)]">
+              Hear about future gatherings before they&rsquo;re announced here.
+            </p>
+            <MwNewsletterForm />
+          </section>
         </main>
 
         <MwFooter variant="event" />
@@ -570,6 +587,7 @@ function TierRow({
   onSelect,
   onQtyChange,
   onRemove,
+  isFirst,
 }: {
   tier?: EventTier
   selected: boolean
@@ -577,12 +595,13 @@ function TierRow({
   onSelect: () => void
   onQtyChange: (q: number) => void
   onRemove: () => void
+  isFirst?: boolean
 }) {
   if (!tier) return null
   return (
     <div
       className="flex flex-col gap-3 border-[var(--mw-line)] py-[30px] sm:flex-row sm:items-center sm:gap-6"
-      style={{ borderTopWidth: 1, borderBottomWidth: 1 }}
+      style={{ borderTopWidth: isFirst ? 1 : 0, borderBottomWidth: 1 }}
     >
       <div className="mw-font-body sm:w-[120px] sm:shrink-0">
         <p className="text-[18px] font-bold text-[var(--mw-text-strong)]">{tier.label}</p>
@@ -632,7 +651,7 @@ function SupportedTierRow({
   return (
     <div
       className="flex flex-col gap-3 border-[var(--mw-line)] py-[30px] sm:flex-row sm:items-center sm:gap-6"
-      style={{ borderTopWidth: 1, borderBottomWidth: 1 }}
+      style={{ borderTopWidth: 0, borderBottomWidth: 1 }}
     >
       <div className="mw-font-body sm:w-[120px] sm:shrink-0">
         <p className="text-[18px] font-bold text-[var(--mw-text-strong)]">{tier.label}</p>

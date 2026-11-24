@@ -3,6 +3,7 @@ import { MwNav } from '../components/mw/mw-nav'
 import { MwFooter } from '../components/mw/mw-footer'
 import { FirefliesLayer } from '../components/mw/fireflies-layer'
 import { PrivateQuoteForm } from '../components/mw/private-quote-form'
+import { HeroVideo } from '../components/hero-video'
 
 export const metadata = {
   title: 'Private Events',
@@ -12,14 +13,20 @@ const INCLUDED = [
   {
     title: 'Hosted tea tables',
     description: 'Our team brews and pours gongfu-style for your guests throughout the event.',
+    image: '/images/private-events-tea-service.jpg',
+    alt: 'A guest smiling at a candlelit tea table set with cups and a gongfu tea tray',
   },
   {
     title: 'Curated tea menu',
     description: 'Teas and teaware from China and Taiwan, selected for your event.',
+    image: '/images/private-events-tea-station.webp',
+    alt: 'Outdoor tea station set up under string lights with glass teapots and warmers',
   },
   {
     title: 'Live music (optional)',
     description: 'Musicians from our community to set the mood.',
+    image: '/images/private-events-musicians.jpg',
+    alt: 'Musicians playing pipa and cello together by candlelight',
   },
 ]
 
@@ -41,13 +48,13 @@ const STEPS = [
   },
 ]
 
-function PhotoPlaceholder({ label }: { label: string }) {
+function IncludedPhoto({ src, alt }: { src: string; alt: string }) {
   return (
     <div
-      className="flex aspect-[4/5] w-full items-center justify-center rounded-sm border"
-      style={{ borderColor: 'var(--mw-line-card)', background: 'rgba(255,255,255,0.02)' }}
+      className="relative aspect-[4/5] w-full overflow-hidden rounded-sm border"
+      style={{ borderColor: 'var(--mw-line-card)' }}
     >
-      <span className="mw-font-body px-4 text-center text-sm text-[var(--mw-text-muted)]">{label}</span>
+      <Image src={src} alt={alt} fill className="object-cover" />
     </div>
   )
 }
@@ -86,13 +93,7 @@ export default function PrivateEventsPage() {
               </div>
             </div>
             <div className="relative aspect-[4/3] w-full overflow-hidden rounded-sm">
-              <Image
-                src="/images/fire_tea_pouring_poster.jpg"
-                alt="Tea being poured from a glass pitcher at a tea table by the fire"
-                fill
-                className="object-cover"
-                priority
-              />
+              <HeroVideo wrapperClassName="absolute inset-0" className="h-full w-full object-cover" />
             </div>
           </section>
 
@@ -134,7 +135,7 @@ export default function PrivateEventsPage() {
             <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
               {INCLUDED.map((item) => (
                 <div key={item.title} className="flex flex-col gap-4">
-                  <PhotoPlaceholder label={item.title} />
+                  <IncludedPhoto src={item.image} alt={item.alt} />
                   <h3 className="mw-font-body text-[21px] font-bold text-[var(--mw-text-strong)]">{item.title}</h3>
                   <p className="mw-font-body text-[17px] leading-relaxed text-[var(--mw-text-soft)]">
                     {item.description}
